@@ -5,7 +5,7 @@
 @tailwind utilities;
 
 /* Vibe Shift Studio Design System
-   Warm, grounded, calm palette inspired by watercolor brand identity
+   Warm, grounded, calm palette with organic depth
    All colors in HSL
 */
 
@@ -13,52 +13,64 @@
   :root {
     /* Warm cream/paper background */
     --background: 42 35% 96%;
-    --foreground: 28 15% 18%;
+    --foreground: 25 20% 16%;
 
     /* Card uses slightly warmer white */
-    --card: 40 40% 99%;
-    --card-foreground: 28 15% 18%;
+    --card: 40 45% 99%;
+    --card-foreground: 25 20% 16%;
 
-    --popover: 40 40% 99%;
-    --popover-foreground: 28 15% 18%;
+    --popover: 40 45% 99%;
+    --popover-foreground: 25 20% 16%;
 
-    /* Primary: Deep warm charcoal (from logo text) */
-    --primary: 28 12% 24%;
+    /* Primary: Deep warm charcoal */
+    --primary: 25 18% 22%;
     --primary-foreground: 42 35% 96%;
 
-    /* Secondary: Soft sage green */
-    --secondary: 150 25% 92%;
-    --secondary-foreground: 150 35% 28%;
+    /* Secondary: Deeper sage green */
+    --secondary: 152 28% 88%;
+    --secondary-foreground: 152 40% 26%;
 
     /* Muted: Warm taupe */
-    --muted: 38 20% 93%;
-    --muted-foreground: 28 10% 42%;
+    --muted: 38 22% 92%;
+    --muted-foreground: 25 12% 40%;
 
-    /* Accent: Soft blue-green from watercolor */
-    --accent: 185 30% 90%;
-    --accent-foreground: 185 35% 28%;
+    /* Accent: Deeper blue-green */
+    --accent: 188 32% 86%;
+    --accent-foreground: 188 38% 26%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 38 25% 88%;
-    --input: 38 25% 88%;
-    --ring: 150 30% 42%;
+    --border: 38 28% 85%;
+    --input: 38 28% 85%;
+    --ring: 152 35% 38%;
 
     --radius: 0.75rem;
 
-    /* Custom brand colors */
-    --sage: 150 30% 42%;
-    --sage-light: 150 25% 92%;
-    --sage-muted: 150 20% 85%;
-    --ocean: 195 35% 48%;
-    --ocean-light: 195 35% 92%;
-    --ocean-muted: 195 25% 85%;
-    --sand: 38 35% 88%;
-    --sand-deep: 35 30% 82%;
-    --warm-white: 42 40% 98%;
-    --cream: 42 35% 95%;
-    --cream-deep: 40 30% 92%;
+    /* Custom brand colors - deeper and richer */
+    --sage: 152 35% 38%;
+    --sage-medium: 152 30% 52%;
+    --sage-light: 152 28% 90%;
+    --sage-muted: 152 22% 82%;
+    
+    --ocean: 198 38% 44%;
+    --ocean-medium: 198 32% 58%;
+    --ocean-light: 198 38% 90%;
+    --ocean-muted: 198 28% 82%;
+    
+    --sand: 38 40% 85%;
+    --sand-deep: 35 35% 78%;
+    --sand-rich: 32 38% 72%;
+    
+    --warm-white: 42 45% 98%;
+    --cream: 42 38% 94%;
+    --cream-deep: 40 32% 90%;
+    --cream-rich: 38 28% 86%;
+
+    /* Organic shape colors */
+    --shape-sage: 152 30% 75%;
+    --shape-ocean: 198 32% 78%;
+    --shape-sand: 38 35% 80%;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -71,33 +83,33 @@
   }
 
   .dark {
-    --background: 28 12% 8%;
-    --foreground: 40 25% 92%;
+    --background: 25 15% 8%;
+    --foreground: 40 28% 92%;
 
-    --card: 28 12% 10%;
-    --card-foreground: 40 25% 92%;
+    --card: 25 15% 10%;
+    --card-foreground: 40 28% 92%;
 
-    --popover: 28 12% 10%;
-    --popover-foreground: 40 25% 92%;
+    --popover: 25 15% 10%;
+    --popover-foreground: 40 28% 92%;
 
-    --primary: 40 25% 92%;
-    --primary-foreground: 28 12% 8%;
+    --primary: 40 28% 92%;
+    --primary-foreground: 25 15% 8%;
 
-    --secondary: 150 15% 18%;
-    --secondary-foreground: 150 25% 85%;
+    --secondary: 152 18% 18%;
+    --secondary-foreground: 152 28% 82%;
 
-    --muted: 28 12% 16%;
-    --muted-foreground: 38 12% 58%;
+    --muted: 25 15% 16%;
+    --muted-foreground: 38 14% 55%;
 
-    --accent: 185 18% 18%;
-    --accent-foreground: 185 30% 85%;
+    --accent: 188 20% 18%;
+    --accent-foreground: 188 32% 82%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 28 12% 18%;
-    --input: 28 12% 18%;
-    --ring: 150 30% 48%;
+    --border: 25 15% 18%;
+    --input: 25 15% 18%;
+    --ring: 152 32% 48%;
 
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
@@ -123,7 +135,7 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Cormorant Garamond', Georgia, serif;
-    @apply tracking-normal font-medium;
+    @apply tracking-normal;
   }
 }
 
@@ -132,51 +144,76 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Soft watercolor-inspired backgrounds */
+/* Rich watercolor-inspired backgrounds with organic shapes */
 @layer utilities {
-  .bg-watercolor-cream {
+  .bg-hero {
     background: 
-      radial-gradient(ellipse 80% 50% at 20% 40%, hsl(150 25% 92% / 0.4), transparent),
-      radial-gradient(ellipse 60% 40% at 80% 60%, hsl(195 35% 92% / 0.3), transparent),
-      hsl(42 35% 96%);
+      radial-gradient(ellipse 120% 80% at 90% 20%, hsl(152 30% 90% / 0.45), transparent 50%),
+      radial-gradient(ellipse 100% 60% at 10% 80%, hsl(198 32% 88% / 0.35), transparent 50%),
+      radial-gradient(ellipse 80% 100% at 50% 100%, hsl(38 35% 88% / 0.3), transparent 60%),
+      linear-gradient(180deg, hsl(42 38% 97%) 0%, hsl(40 35% 95%) 100%);
   }
 
-  .bg-watercolor-sage {
+  .bg-section-warm {
     background: 
-      radial-gradient(ellipse 70% 50% at 30% 30%, hsl(150 25% 90% / 0.5), transparent),
-      radial-gradient(ellipse 50% 40% at 70% 70%, hsl(38 35% 90% / 0.4), transparent),
-      hsl(150 22% 94%);
+      radial-gradient(ellipse 90% 70% at 85% 30%, hsl(38 40% 90% / 0.4), transparent 50%),
+      radial-gradient(ellipse 70% 50% at 15% 70%, hsl(152 28% 92% / 0.3), transparent 50%),
+      hsl(42 45% 98%);
   }
 
-  .bg-watercolor-sand {
+  .bg-section-sage {
     background: 
-      radial-gradient(ellipse 60% 50% at 80% 30%, hsl(195 30% 92% / 0.35), transparent),
-      radial-gradient(ellipse 70% 40% at 20% 60%, hsl(150 20% 90% / 0.3), transparent),
-      hsl(38 30% 94%);
+      radial-gradient(ellipse 100% 80% at 20% 20%, hsl(152 30% 88% / 0.55), transparent 50%),
+      radial-gradient(ellipse 80% 60% at 80% 80%, hsl(198 28% 90% / 0.4), transparent 50%),
+      radial-gradient(ellipse 60% 40% at 60% 30%, hsl(38 32% 92% / 0.3), transparent 50%),
+      linear-gradient(180deg, hsl(152 25% 94%) 0%, hsl(150 22% 92%) 100%);
   }
 
-  .bg-watercolor-ocean {
+  .bg-section-sand {
     background: 
-      radial-gradient(ellipse 50% 50% at 25% 50%, hsl(195 35% 90% / 0.5), transparent),
-      radial-gradient(ellipse 60% 40% at 75% 40%, hsl(150 25% 92% / 0.35), transparent),
-      hsl(195 28% 95%);
+      radial-gradient(ellipse 90% 70% at 75% 25%, hsl(38 38% 86% / 0.5), transparent 50%),
+      radial-gradient(ellipse 80% 60% at 25% 75%, hsl(152 25% 90% / 0.35), transparent 50%),
+      radial-gradient(ellipse 60% 50% at 50% 50%, hsl(198 30% 92% / 0.25), transparent 50%),
+      linear-gradient(180deg, hsl(38 32% 93%) 0%, hsl(36 30% 91%) 100%);
   }
 
-  .bg-soft-gradient {
-    background: linear-gradient(
-      180deg,
-      hsl(42 35% 96%) 0%,
-      hsl(40 30% 95%) 100%
-    );
+  .bg-section-ocean {
+    background: 
+      radial-gradient(ellipse 100% 80% at 30% 30%, hsl(198 35% 88% / 0.5), transparent 50%),
+      radial-gradient(ellipse 80% 70% at 70% 70%, hsl(152 28% 90% / 0.4), transparent 50%),
+      radial-gradient(ellipse 70% 50% at 90% 20%, hsl(38 30% 92% / 0.3), transparent 50%),
+      linear-gradient(180deg, hsl(198 30% 94%) 0%, hsl(195 28% 92%) 100%);
   }
 
-  .section-divider {
-    @apply w-16 h-0.5 mx-auto rounded-full;
-    background: linear-gradient(90deg, hsl(var(--sage) / 0.3), hsl(var(--ocean) / 0.3));
+  .bg-section-cream {
+    background: 
+      radial-gradient(ellipse 80% 60% at 10% 40%, hsl(152 25% 92% / 0.3), transparent 50%),
+      radial-gradient(ellipse 70% 50% at 90% 60%, hsl(198 28% 92% / 0.25), transparent 50%),
+      linear-gradient(180deg, hsl(40 35% 96%) 0%, hsl(38 32% 94%) 100%);
+  }
+
+  .section-divider-subtle {
+    @apply relative;
+  }
+  
+  .section-divider-subtle::before {
+    content: '';
+    @apply absolute left-1/2 -translate-x-1/2 w-24 h-px;
+    background: linear-gradient(90deg, transparent, hsl(var(--sage) / 0.25), hsl(var(--ocean) / 0.25), transparent);
+  }
+
+  .heading-accent {
+    @apply relative inline-block;
+  }
+  
+  .heading-accent::after {
+    content: '';
+    @apply absolute -bottom-3 left-0 w-12 h-0.5 rounded-full;
+    background: linear-gradient(90deg, hsl(var(--sage) / 0.5), hsl(var(--ocean) / 0.3));
   }
 }
 
-/* Subtle texture overlay */
+/* Subtle paper texture overlay */
 .texture-paper {
   position: relative;
 }
@@ -185,7 +222,54 @@ html {
   content: '';
   position: absolute;
   inset: 0;
-  opacity: 0.03;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
   pointer-events: none;
+  z-index: 1;
+}
+
+.texture-paper > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Organic blob shapes */
+.organic-shape {
+  position: absolute;
+  border-radius: 60% 40% 50% 50% / 50% 60% 40% 50%;
+  opacity: 0.08;
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+/* Card enhancements */
+.card-elevated {
+  @apply relative overflow-hidden;
+  box-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.02),
+    0 4px 12px rgba(0, 0, 0, 0.03),
+    0 8px 24px rgba(139, 115, 85, 0.06);
+}
+
+.card-elevated::before {
+  content: '';
+  @apply absolute inset-0 opacity-50;
+  background: linear-gradient(
+    135deg,
+    hsl(40 45% 99%) 0%,
+    hsl(42 40% 98%) 50%,
+    hsl(40 38% 97%) 100%
+  );
+  z-index: 0;
+}
+
+.card-elevated > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Process step connector line */
+.process-connector {
+  @apply hidden md:block absolute top-7 left-1/2 w-full h-px;
+  background: linear-gradient(90deg, transparent 10%, hsl(var(--border)) 30%, hsl(var(--border)) 70%, transparent 90%);
 }

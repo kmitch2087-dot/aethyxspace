@@ -49,21 +49,25 @@ export default {
         },
         sage: {
           DEFAULT: "hsl(var(--sage))",
+          medium: "hsl(var(--sage-medium))",
           light: "hsl(var(--sage-light))",
           muted: "hsl(var(--sage-muted))",
         },
         ocean: {
           DEFAULT: "hsl(var(--ocean))",
+          medium: "hsl(var(--ocean-medium))",
           light: "hsl(var(--ocean-light))",
           muted: "hsl(var(--ocean-muted))",
         },
         sand: {
           DEFAULT: "hsl(var(--sand))",
           deep: "hsl(var(--sand-deep))",
+          rich: "hsl(var(--sand-rich))",
         },
         cream: {
           DEFAULT: "hsl(var(--cream))",
           deep: "hsl(var(--cream-deep))",
+          rich: "hsl(var(--cream-rich))",
         },
         "warm-white": "hsl(var(--warm-white))",
         sidebar: {
@@ -87,28 +91,24 @@ export default {
         sm: "calc(var(--radius) - 4px)",
         xl: "1rem",
         "2xl": "1.25rem",
+        "3xl": "1.5rem",
       },
       boxShadow: {
-        soft: "0 2px 20px -4px rgba(0, 0, 0, 0.05)",
+        soft: "0 2px 20px -4px rgba(0, 0, 0, 0.04)",
+        "soft-md": "0 4px 24px -6px rgba(0, 0, 0, 0.06)",
         "soft-lg": "0 8px 30px -8px rgba(0, 0, 0, 0.08)",
-        warm: "0 4px 24px -6px rgba(139, 115, 85, 0.12)",
+        warm: "0 4px 24px -6px rgba(139, 115, 85, 0.1)",
+        "warm-lg": "0 8px 32px -8px rgba(139, 115, 85, 0.14)",
+        elevated: "0 1px 3px rgba(0,0,0,0.02), 0 4px 12px rgba(0,0,0,0.03), 0 8px 24px rgba(139,115,85,0.06)",
       },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
         },
       },
       animation: {
