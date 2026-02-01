@@ -50,12 +50,21 @@ export default {
         sage: {
           DEFAULT: "hsl(var(--sage))",
           light: "hsl(var(--sage-light))",
+          muted: "hsl(var(--sage-muted))",
         },
         ocean: {
           DEFAULT: "hsl(var(--ocean))",
           light: "hsl(var(--ocean-light))",
+          muted: "hsl(var(--ocean-muted))",
         },
-        sand: "hsl(var(--sand))",
+        sand: {
+          DEFAULT: "hsl(var(--sand))",
+          deep: "hsl(var(--sand-deep))",
+        },
+        cream: {
+          DEFAULT: "hsl(var(--cream))",
+          deep: "hsl(var(--cream-deep))",
+        },
         "warm-white": "hsl(var(--warm-white))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
@@ -69,13 +78,20 @@ export default {
         },
       },
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
-        serif: ["Georgia", "Cambria", "serif"],
+        sans: ["'Source Sans 3'", "system-ui", "sans-serif"],
+        serif: ["'Cormorant Garamond'", "Georgia", "serif"],
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        xl: "1rem",
+        "2xl": "1.25rem",
+      },
+      boxShadow: {
+        soft: "0 2px 20px -4px rgba(0, 0, 0, 0.05)",
+        "soft-lg": "0 8px 30px -8px rgba(0, 0, 0, 0.08)",
+        warm: "0 4px 24px -6px rgba(139, 115, 85, 0.12)",
       },
       keyframes: {
         "accordion-down": {

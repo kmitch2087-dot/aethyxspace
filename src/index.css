@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Source+Sans+3:wght@300;400;500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -10,48 +12,53 @@
 @layer base {
   :root {
     /* Warm cream/paper background */
-    --background: 40 30% 96%;
-    --foreground: 30 10% 20%;
+    --background: 42 35% 96%;
+    --foreground: 28 15% 18%;
 
     /* Card uses slightly warmer white */
-    --card: 40 25% 98%;
-    --card-foreground: 30 10% 20%;
+    --card: 40 40% 99%;
+    --card-foreground: 28 15% 18%;
 
-    --popover: 40 25% 98%;
-    --popover-foreground: 30 10% 20%;
+    --popover: 40 40% 99%;
+    --popover-foreground: 28 15% 18%;
 
     /* Primary: Deep warm charcoal (from logo text) */
-    --primary: 30 10% 22%;
-    --primary-foreground: 40 30% 96%;
+    --primary: 28 12% 24%;
+    --primary-foreground: 42 35% 96%;
 
     /* Secondary: Soft sage green */
-    --secondary: 145 20% 90%;
-    --secondary-foreground: 145 30% 30%;
+    --secondary: 150 25% 92%;
+    --secondary-foreground: 150 35% 28%;
 
     /* Muted: Warm taupe */
-    --muted: 35 15% 92%;
-    --muted-foreground: 30 8% 45%;
+    --muted: 38 20% 93%;
+    --muted-foreground: 28 10% 42%;
 
     /* Accent: Soft blue-green from watercolor */
-    --accent: 180 25% 88%;
-    --accent-foreground: 180 30% 25%;
+    --accent: 185 30% 90%;
+    --accent-foreground: 185 35% 28%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 35 20% 88%;
-    --input: 35 20% 88%;
-    --ring: 145 25% 45%;
+    --border: 38 25% 88%;
+    --input: 38 25% 88%;
+    --ring: 150 30% 42%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
     /* Custom brand colors */
-    --sage: 145 25% 45%;
-    --sage-light: 145 20% 90%;
-    --ocean: 200 35% 50%;
-    --ocean-light: 200 30% 92%;
-    --sand: 35 30% 85%;
-    --warm-white: 40 30% 98%;
+    --sage: 150 30% 42%;
+    --sage-light: 150 25% 92%;
+    --sage-muted: 150 20% 85%;
+    --ocean: 195 35% 48%;
+    --ocean-light: 195 35% 92%;
+    --ocean-muted: 195 25% 85%;
+    --sand: 38 35% 88%;
+    --sand-deep: 35 30% 82%;
+    --warm-white: 42 40% 98%;
+    --cream: 42 35% 95%;
+    --cream-deep: 40 30% 92%;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -64,33 +71,33 @@
   }
 
   .dark {
-    --background: 30 10% 10%;
-    --foreground: 40 20% 95%;
+    --background: 28 12% 8%;
+    --foreground: 40 25% 92%;
 
-    --card: 30 10% 12%;
-    --card-foreground: 40 20% 95%;
+    --card: 28 12% 10%;
+    --card-foreground: 40 25% 92%;
 
-    --popover: 30 10% 12%;
-    --popover-foreground: 40 20% 95%;
+    --popover: 28 12% 10%;
+    --popover-foreground: 40 25% 92%;
 
-    --primary: 40 20% 95%;
-    --primary-foreground: 30 10% 10%;
+    --primary: 40 25% 92%;
+    --primary-foreground: 28 12% 8%;
 
-    --secondary: 145 15% 20%;
-    --secondary-foreground: 145 20% 85%;
+    --secondary: 150 15% 18%;
+    --secondary-foreground: 150 25% 85%;
 
-    --muted: 30 10% 18%;
-    --muted-foreground: 35 10% 60%;
+    --muted: 28 12% 16%;
+    --muted-foreground: 38 12% 58%;
 
-    --accent: 180 20% 20%;
-    --accent-foreground: 180 25% 85%;
+    --accent: 185 18% 18%;
+    --accent-foreground: 185 30% 85%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 30 10% 20%;
-    --input: 30 10% 20%;
-    --ring: 145 25% 50%;
+    --border: 28 12% 18%;
+    --input: 28 12% 18%;
+    --ring: 150 30% 48%;
 
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
@@ -110,15 +117,75 @@
 
   body {
     @apply bg-background text-foreground antialiased;
+    font-family: 'Source Sans 3', system-ui, sans-serif;
     font-feature-settings: "kern" 1, "liga" 1;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply tracking-tight;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    @apply tracking-normal font-medium;
   }
 }
 
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;
+}
+
+/* Soft watercolor-inspired backgrounds */
+@layer utilities {
+  .bg-watercolor-cream {
+    background: 
+      radial-gradient(ellipse 80% 50% at 20% 40%, hsl(150 25% 92% / 0.4), transparent),
+      radial-gradient(ellipse 60% 40% at 80% 60%, hsl(195 35% 92% / 0.3), transparent),
+      hsl(42 35% 96%);
+  }
+
+  .bg-watercolor-sage {
+    background: 
+      radial-gradient(ellipse 70% 50% at 30% 30%, hsl(150 25% 90% / 0.5), transparent),
+      radial-gradient(ellipse 50% 40% at 70% 70%, hsl(38 35% 90% / 0.4), transparent),
+      hsl(150 22% 94%);
+  }
+
+  .bg-watercolor-sand {
+    background: 
+      radial-gradient(ellipse 60% 50% at 80% 30%, hsl(195 30% 92% / 0.35), transparent),
+      radial-gradient(ellipse 70% 40% at 20% 60%, hsl(150 20% 90% / 0.3), transparent),
+      hsl(38 30% 94%);
+  }
+
+  .bg-watercolor-ocean {
+    background: 
+      radial-gradient(ellipse 50% 50% at 25% 50%, hsl(195 35% 90% / 0.5), transparent),
+      radial-gradient(ellipse 60% 40% at 75% 40%, hsl(150 25% 92% / 0.35), transparent),
+      hsl(195 28% 95%);
+  }
+
+  .bg-soft-gradient {
+    background: linear-gradient(
+      180deg,
+      hsl(42 35% 96%) 0%,
+      hsl(40 30% 95%) 100%
+    );
+  }
+
+  .section-divider {
+    @apply w-16 h-0.5 mx-auto rounded-full;
+    background: linear-gradient(90deg, hsl(var(--sage) / 0.3), hsl(var(--ocean) / 0.3));
+  }
+}
+
+/* Subtle texture overlay */
+.texture-paper {
+  position: relative;
+}
+
+.texture-paper::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  pointer-events: none;
 }
