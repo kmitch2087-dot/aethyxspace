@@ -1,25 +1,22 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle2, Sparkles, Layout, Palette } from "lucide-react";
+import { Link } from "react-router-dom";
+import Header from "@/components/Header";
 import vibeShiftLogo from "@/assets/vibe-shift-logo.jpg";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
+      <Header />
+      
       {/* Hero Section */}
-      <header className="relative bg-hero texture-paper overflow-hidden">
+      <section className="relative bg-hero texture-paper overflow-hidden">
         {/* Organic shapes */}
         <div className="organic-shape w-[600px] h-[600px] bg-sage-muted -top-40 -right-40" />
         <div className="organic-shape w-[500px] h-[500px] bg-ocean-muted bottom-20 -left-32" />
         <div className="organic-shape w-[300px] h-[300px] bg-sand-deep top-1/2 right-1/4" />
         
-        <div className="relative z-10 px-6 py-12 md:px-12 lg:px-24 xl:px-32">
-          <nav className="mb-20 md:mb-28">
-            <img 
-              src={vibeShiftLogo} 
-              alt="Vibe Shift Studio" 
-              className="h-16 md:h-20 w-auto rounded-xl shadow-soft"
-            />
-          </nav>
+        <div className="relative z-10 px-6 pt-32 pb-20 md:px-12 lg:px-24 xl:px-32 md:pt-40 md:pb-28">
           
           <div className="max-w-3xl pb-20 md:pb-28">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium leading-[1.15] text-foreground mb-8 tracking-tight">
@@ -29,16 +26,18 @@ const Index = () => {
               Clean, modern websites for small businesses who want to look professional, 
               feel aligned, and stop overthinking their online presence.
             </p>
-            <Button 
-              size="lg" 
-              className="text-base px-10 py-7 rounded-full bg-sage hover:bg-sage/90 text-white shadow-warm transition-all duration-300 hover:shadow-warm-lg hover:-translate-y-0.5"
-            >
-              Start Here
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
+            <Link to="/start-here">
+              <Button 
+                size="lg" 
+                className="text-base px-10 py-7 rounded-full bg-sage hover:bg-sage/90 text-white shadow-warm transition-all duration-300 hover:shadow-warm-lg hover:-translate-y-0.5"
+              >
+                Start Here
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
           </div>
         </div>
-      </header>
+      </section>
 
       {/* Relief & Recognition Section */}
       <section className="relative bg-section-warm texture-paper overflow-hidden">
@@ -255,13 +254,15 @@ const Index = () => {
               When you're ready for an online presence that feels aligned, clear, and 
               professional — we're here to help make it happen.
             </p>
-            <Button 
-              size="lg" 
-              className="text-base px-12 py-8 rounded-full bg-sage hover:bg-sage/90 text-white shadow-warm transition-all duration-300 hover:shadow-warm-lg hover:-translate-y-0.5"
-            >
-              Start Here
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
+            <Link to="/start-here">
+              <Button 
+                size="lg" 
+                className="text-base px-12 py-8 rounded-full bg-sage hover:bg-sage/90 text-white shadow-warm transition-all duration-300 hover:shadow-warm-lg hover:-translate-y-0.5"
+              >
+                Start Here
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
