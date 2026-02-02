@@ -272,8 +272,12 @@ const Services = () => {
         <div className="relative px-6 py-20 md:px-12 lg:px-24 xl:px-32 md:py-28">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-12">
+              <div className="inline-flex items-center gap-2 bg-ocean/10 text-ocean px-4 py-2 rounded-full text-sm font-medium mb-4">
+                <span className="w-2 h-2 bg-ocean rounded-full animate-pulse"></span>
+                Available Soon
+              </div>
               <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground font-semibold mb-4">
-                Quick Services
+                Quick Deliverables
               </h2>
               <p className="text-lg text-muted-foreground font-light max-w-2xl mx-auto">
                 Need something specific? These services come with a <span className="font-medium text-foreground">48-hour turnaround</span> for your first draft. If you need to refine your vision, I'm here with you until we achieve that.
