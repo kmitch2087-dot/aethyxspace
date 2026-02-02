@@ -7,6 +7,7 @@ const Header = () => {
   const navLinks = [
     { href: "/", label: "Home" },
     { href: "/services", label: "Services" },
+    { href: "/membership", label: "Membership" },
     { href: "/about", label: "About" },
   ];
 
@@ -22,12 +23,12 @@ const Header = () => {
           />
           
           {/* Navigation bubbles at bottom center of banner */}
-          <nav className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-2">
+          <nav className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 to={link.href}
-                className={`text-xs font-semibold px-4 py-1.5 rounded-full transition-all duration-200 ${
+                className={`text-[10px] font-semibold px-3 py-1 rounded-full transition-all duration-200 ${
                   location.pathname === link.href
                     ? "bg-white text-sage border border-sage"
                     : "bg-white/90 text-sage hover:bg-white border border-transparent hover:border-sage"
@@ -38,7 +39,7 @@ const Header = () => {
             ))}
             <Link
               to="/start-here"
-              className="text-xs font-semibold px-4 py-1.5 rounded-full bg-sage text-white hover:bg-sage/90 transition-all duration-200 shadow-warm"
+              className="text-[10px] font-semibold px-3 py-1 rounded-full bg-sage text-white hover:bg-sage/90 transition-all duration-200 shadow-warm"
             >
               Start Here
             </Link>
