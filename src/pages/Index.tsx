@@ -4,32 +4,27 @@ import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import vibeShiftLogo from "@/assets/vibe-shift-logo.jpg";
 import watercolorBg from "@/assets/watercolor-bg.jpg";
-
 const Index = () => {
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       <Header />
       
       {/* Fixed watercolor background */}
-      <div 
-        className="fixed inset-0 z-0 pointer-events-none"
-        style={{
-          backgroundImage: `url(${watercolorBg})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          opacity: 0.27,
-        }}
-      />
+      <div className="fixed inset-0 z-0 pointer-events-none" style={{
+      backgroundImage: `url(${watercolorBg})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      opacity: 0.27
+    }} />
       
       {/* Hero Section */}
       <section className="relative z-10 overflow-hidden">
-        <div className="relative px-6 pt-[280px] pb-12 md:px-12 lg:px-24 xl:px-32 md:pt-[320px] md:pb-16">
+        <div className="relative px-6 pt-28 pb-12 md:px-12 lg:px-24 xl:px-32 md:pt-36 md:pb-16">
           
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium leading-[1.15] text-foreground mb-6 tracking-tight">
               A better online presence — without the chaos.
             </h1>
-            <p className="text-lg md:text-xl text-foreground leading-relaxed max-w-2xl mx-auto font-light">
+            <p className="text-lg text-foreground leading-relaxed max-w-2xl mx-auto font-sans font-medium md:text-2xl">
               Clean, modern websites for small businesses who want to look professional, 
               feel aligned, and stop overthinking their online presence.
             </p>
@@ -67,24 +62,14 @@ const Index = () => {
               Why your online presence matters
             </h2>
             <div className="space-y-4">
-              {[
-                "Most people research a business online before reaching out or making a purchase.",
-                "First impressions happen fast — visitors decide in seconds whether to stay or leave.",
-                "A cluttered or outdated site can send the wrong message — even if your work is excellent.",
-                "A clear, professional website builds trust before a single conversation."
-              ].map((text, i) => (
-                <div 
-                  key={i}
-                  className="flex items-start gap-4 p-5 rounded-2xl bg-white border border-border/30 shadow-soft transition-all duration-300 hover:shadow-soft-md"
-                >
+              {["Most people research a business online before reaching out or making a purchase.", "First impressions happen fast — visitors decide in seconds whether to stay or leave.", "A cluttered or outdated site can send the wrong message — even if your work is excellent.", "A clear, professional website builds trust before a single conversation."].map((text, i) => <div key={i} className="flex items-start gap-4 p-5 rounded-2xl bg-white border border-border/30 shadow-soft transition-all duration-300 hover:shadow-soft-md">
                   <div className="w-8 h-8 rounded-full bg-sage-light flex items-center justify-center flex-shrink-0">
                     <CheckCircle2 className="h-5 w-5 text-sage" />
                   </div>
                   <p className="text-foreground text-lg font-light leading-relaxed pt-0.5">
                     {text}
                   </p>
-                </div>
-              ))}
+                </div>)}
             </div>
           </div>
         </div>
@@ -188,16 +173,27 @@ const Index = () => {
             </div>
             
             <div className="grid md:grid-cols-4 gap-6">
-              {[
-                { num: "1", title: "Intake", desc: "Fill out a simple form so we can understand your needs and vision.", color: "sage" },
-                { num: "2", title: "Design & Build", desc: "We craft your website with care, handling all the details.", color: "ocean" },
-                { num: "3", title: "Review", desc: "You review and we refine until everything feels just right.", color: "sand" },
-                { num: "4", title: "Launch", desc: "Your polished website goes live, ready to welcome visitors.", color: "sage" }
-              ].map((step, i) => (
-                <div 
-                  key={i} 
-                  className="card-elevated rounded-3xl p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-warm-lg"
-                >
+              {[{
+              num: "1",
+              title: "Intake",
+              desc: "Fill out a simple form so we can understand your needs and vision.",
+              color: "sage"
+            }, {
+              num: "2",
+              title: "Design & Build",
+              desc: "We craft your website with care, handling all the details.",
+              color: "ocean"
+            }, {
+              num: "3",
+              title: "Review",
+              desc: "You review and we refine until everything feels just right.",
+              color: "sand"
+            }, {
+              num: "4",
+              title: "Launch",
+              desc: "Your polished website goes live, ready to welcome visitors.",
+              color: "sage"
+            }].map((step, i) => <div key={i} className="card-elevated rounded-3xl p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-warm-lg">
                   <div className={`
                     w-12 h-12 rounded-full mx-auto mb-4 text-lg font-serif font-medium
                     flex items-center justify-center shadow-soft
@@ -213,8 +209,7 @@ const Index = () => {
                   <p className="text-sm text-foreground font-light leading-relaxed">
                     {step.desc}
                   </p>
-                </div>
-              ))}
+                </div>)}
             </div>
           </div>
         </div>
@@ -235,10 +230,7 @@ const Index = () => {
               professional — we're here to help make it happen.
             </p>
             <Link to="/start-here">
-              <Button 
-                size="lg" 
-                className="text-base px-12 py-8 rounded-full bg-sage hover:bg-sage/90 text-white shadow-warm transition-all duration-300 hover:shadow-warm-lg hover:-translate-y-0.5"
-              >
+              <Button size="lg" className="text-base px-12 py-8 rounded-full bg-sage hover:bg-sage/90 text-white shadow-warm transition-all duration-300 hover:shadow-warm-lg hover:-translate-y-0.5">
                 Start Here
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
@@ -251,19 +243,13 @@ const Index = () => {
       <footer className="relative z-10 bg-cream-deep border-t border-border/30">
         <div className="px-6 py-12 md:px-12 lg:px-24 xl:px-32">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <img 
-              src={vibeShiftLogo} 
-              alt="Vibe Shift Studio" 
-              className="h-20 md:h-24 w-auto opacity-90 rounded-xl shadow-soft"
-            />
+            <img src={vibeShiftLogo} alt="Vibe Shift Studio" className="h-20 md:h-24 w-auto opacity-90 rounded-xl shadow-soft" />
             <p className="text-sm text-foreground font-light">
               © {new Date().getFullYear()} Vibe Shift Studio. All rights reserved.
             </p>
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
