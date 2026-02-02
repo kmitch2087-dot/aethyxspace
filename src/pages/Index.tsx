@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle2, Sparkles, Layout, Palette } from "lucide-react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
+import PaintSplat from "@/components/PaintSplat";
 import vibeShiftLogo from "@/assets/vibe-shift-logo.jpg";
 import watercolorBg from "@/assets/watercolor-bg.jpg";
 const Index = () => {
@@ -176,32 +177,24 @@ const Index = () => {
               num: "1",
               title: "Intake",
               desc: "Fill out a simple form so we can understand your needs and vision.",
-              color: "sage"
+              color: "sage" as const
             }, {
               num: "2",
               title: "Design & Build",
               desc: "We craft your website with care, handling all the details.",
-              color: "ocean"
+              color: "ocean" as const
             }, {
               num: "3",
               title: "Review",
               desc: "You review and we refine until everything feels just right.",
-              color: "sand"
+              color: "sage" as const
             }, {
               num: "4",
               title: "Launch",
               desc: "Your polished website goes live, ready to welcome visitors.",
-              color: "sage"
+              color: "ocean" as const
             }].map((step, i) => <div key={i} className="card-elevated rounded-3xl p-5 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-warm-lg">
-                  <div className={`
-                    w-10 h-10 rounded-full mx-auto mb-3 text-base font-serif font-medium
-                    flex items-center justify-center shadow-soft
-                    ${step.color === 'sage' ? 'bg-gradient-to-br from-sage-light to-sage-muted text-sage' : ''}
-                    ${step.color === 'ocean' ? 'bg-gradient-to-br from-ocean-light to-ocean-muted text-ocean' : ''}
-                    ${step.color === 'sand' ? 'bg-gradient-to-br from-sand to-sand-deep text-foreground' : ''}
-                  `}>
-                    {step.num}
-                  </div>
+                  <PaintSplat number={step.num} color={step.color} />
                   <h3 className="font-serif text-lg text-foreground mb-1 font-medium">
                     {step.title}
                   </h3>
