@@ -32,7 +32,7 @@
 
     /* Muted: Warm taupe */
     --muted: 38 22% 92%;
-    --muted-foreground: 25 12% 40%;
+    --muted-foreground: 25 15% 32%;
 
     /* Accent: Deeper blue-green */
     --accent: 188 32% 86%;
@@ -244,23 +244,11 @@ html {
 
 /* Card enhancements */
 .card-elevated {
-  @apply relative overflow-hidden;
+  @apply relative overflow-hidden bg-white;
   box-shadow: 
-    0 1px 3px rgba(0, 0, 0, 0.02),
-    0 4px 12px rgba(0, 0, 0, 0.03),
-    0 8px 24px rgba(139, 115, 85, 0.06);
-}
-
-.card-elevated::before {
-  content: '';
-  @apply absolute inset-0 opacity-50;
-  background: linear-gradient(
-    135deg,
-    hsl(40 45% 99%) 0%,
-    hsl(42 40% 98%) 50%,
-    hsl(40 38% 97%) 100%
-  );
-  z-index: 0;
+    0 1px 3px rgba(0, 0, 0, 0.04),
+    0 4px 12px rgba(0, 0, 0, 0.05),
+    0 8px 24px rgba(139, 115, 85, 0.08);
 }
 
 .card-elevated > * {

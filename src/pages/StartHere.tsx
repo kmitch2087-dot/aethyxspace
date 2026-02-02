@@ -64,7 +64,7 @@ const StartHere = () => {
               ].map((item, i) => (
                 <div 
                   key={i}
-                  className="flex items-center gap-4 p-5 rounded-2xl bg-white/60 backdrop-blur-sm border border-white/50 shadow-soft"
+                  className="flex items-center gap-4 p-5 rounded-2xl bg-white border border-border/30 shadow-soft"
                 >
                   <div className="w-10 h-10 rounded-full bg-sage-light flex items-center justify-center flex-shrink-0">
                     <item.icon className="h-5 w-5 text-sage" />
