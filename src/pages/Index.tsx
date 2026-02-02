@@ -18,7 +18,7 @@ const Index = () => {
       
       {/* Hero Section */}
       <section className="relative z-10 overflow-hidden">
-        <div className="relative px-6 pt-28 pb-12 md:px-12 lg:px-24 xl:px-32 md:pt-36 md:pb-16">
+        <div className="relative px-6 pt-[280px] pb-12 md:px-12 lg:px-24 xl:px-32 md:pt-[320px] md:pb-16">
           
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium leading-[1.15] text-foreground mb-6 tracking-tight">
@@ -42,7 +42,7 @@ const Index = () => {
             <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground mb-6 leading-snug font-semibold">
               You're not alone if your website feels harder than it should be.
             </h2>
-            <p className="text-foreground text-lg md:text-xl leading-relaxed font-light">
+            <p className="text-foreground text-lg md:text-2xl leading-relaxed font-medium">
               Between picking templates, writing the "right" words, and second-guessing every choice — 
               it's easy to feel stuck. We get it. That's exactly why we focus on clarity over complexity. 
               You don't need more options. You need the right ones, handled with care.
@@ -86,11 +86,11 @@ const Index = () => {
               What we do
             </h2>
             <div className="space-y-4">
-              <p className="text-foreground text-lg md:text-xl leading-relaxed font-light">
+              <p className="text-foreground text-lg md:text-2xl leading-relaxed font-medium">
                 We design and build websites that remove the friction — so you can stop worrying 
                 about fonts, layouts, or "what to say" and start showing up with confidence.
               </p>
-              <p className="text-foreground text-lg md:text-xl leading-relaxed font-light">
+              <p className="text-foreground text-lg md:text-2xl leading-relaxed font-medium">
                 We handle the structure, the copy guidance, and all the little details 
                 that make a website feel polished and professional. You stay focused on what you do best.
               </p>
@@ -225,7 +225,7 @@ const Index = () => {
             <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground mb-6 font-semibold leading-snug">
               Your business is evolving. Your website should too.
             </h2>
-            <p className="text-foreground text-lg md:text-xl leading-relaxed mb-10 font-light">
+            <p className="text-foreground text-lg md:text-2xl leading-relaxed mb-10 font-medium">
               When you're ready for an online presence that feels aligned, clear, and 
               professional — we're here to help make it happen.
             </p>
