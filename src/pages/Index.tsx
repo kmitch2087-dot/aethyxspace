@@ -32,44 +32,43 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Relief & Recognition Section */}
+      {/* Relief & Recognition + Why This Matters - Side by Side */}
       <section className="relative z-10 overflow-hidden">
         <div className="relative px-6 py-8 md:px-12 lg:px-24 xl:px-32 md:py-12">
-          <div className="max-w-2xl">
-            <span className="block text-sm font-medium text-sage tracking-wide uppercase mb-3">
-              We understand
-            </span>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground mb-4 leading-snug font-semibold">
-              You're not alone if your website feels harder than it should be.
-            </h2>
-            <p className="text-foreground text-lg md:text-2xl leading-relaxed font-medium">
-              Between picking templates, writing the "right" words, and second-guessing every choice — 
-              it's easy to feel stuck. We get it. That's exactly why we focus on clarity over complexity. 
-              You don't need more options. You need the right ones, handled with care.
-            </p>
-          </div>
-        </div>
-      </section>
+          <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
+            {/* We Understand */}
+            <div>
+              <span className="block text-sm font-medium text-sage tracking-wide uppercase mb-3">
+                We understand
+              </span>
+              <h2 className="text-2xl md:text-3xl lg:text-4xl text-foreground mb-4 leading-snug font-semibold">
+                You're not alone if your website feels harder than it should be.
+              </h2>
+              <p className="text-foreground text-base md:text-lg leading-relaxed font-medium">
+                Between picking templates, writing the "right" words, and second-guessing every choice — 
+                it's easy to feel stuck. We get it. That's exactly why we focus on clarity over complexity. 
+                You don't need more options. You need the right ones, handled with care.
+              </p>
+            </div>
 
-      {/* Why This Matters Section */}
-      <section className="relative z-10 overflow-hidden">
-        <div className="relative px-6 py-8 md:px-12 lg:px-24 xl:px-32 md:py-12">
-          <div className="max-w-3xl">
-            <span className="block text-sm font-medium text-sage tracking-wide uppercase mb-3">
-              The reality
-            </span>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground mb-6 font-semibold heading-accent">
-              Why your online presence matters
-            </h2>
-            <div className="space-y-3">
-              {["Most people research a business online before reaching out or making a purchase.", "First impressions happen fast — visitors decide in seconds whether to stay or leave.", "A cluttered or outdated site can send the wrong message — even if your work is excellent.", "A clear, professional website builds trust before a single conversation."].map((text, i) => <div key={i} className="flex items-start gap-4 p-4 rounded-2xl bg-white border border-border/30 shadow-soft transition-all duration-300 hover:shadow-soft-md">
-                  <div className="w-8 h-8 rounded-full bg-sage-light flex items-center justify-center flex-shrink-0">
-                    <CheckCircle2 className="h-5 w-5 text-sage" />
-                  </div>
-                  <p className="text-foreground text-lg font-light leading-relaxed pt-0.5">
-                    {text}
-                  </p>
-                </div>)}
+            {/* The Reality */}
+            <div>
+              <span className="block text-sm font-medium text-sage tracking-wide uppercase mb-3">
+                The reality
+              </span>
+              <h2 className="text-2xl md:text-3xl lg:text-4xl text-foreground mb-4 font-semibold heading-accent">
+                Why your online presence matters
+              </h2>
+              <div className="space-y-2">
+                {["Most people research a business online before reaching out or making a purchase.", "First impressions happen fast — visitors decide in seconds whether to stay or leave.", "A cluttered or outdated site can send the wrong message — even if your work is excellent.", "A clear, professional website builds trust before a single conversation."].map((text, i) => <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-white border border-border/30 shadow-soft transition-all duration-300 hover:shadow-soft-md">
+                    <div className="w-6 h-6 rounded-full bg-sage-light flex items-center justify-center flex-shrink-0">
+                      <CheckCircle2 className="h-4 w-4 text-sage" />
+                    </div>
+                    <p className="text-foreground text-sm font-light leading-relaxed">
+                      {text}
+                    </p>
+                  </div>)}
+              </div>
             </div>
           </div>
         </div>
