@@ -43,7 +43,7 @@ const Header = () => {
           <img 
             src={vibeShiftBanner} 
             alt="Vibe Shift Studio" 
-            className="w-full h-auto max-h-[280px] md:max-h-[320px] object-cover object-center"
+            className="w-full h-auto max-h-[160px] md:max-h-[200px] object-cover object-center"
           />
           
           {/* Navigation bubbles at bottom center of banner */}
