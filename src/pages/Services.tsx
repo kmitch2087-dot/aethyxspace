@@ -118,7 +118,7 @@ const Services = () => {
                     <p className={`text-2xl md:text-3xl font-medium ${
                       service.accent === 'sage' ? 'text-sage' : 
                       service.accent === 'ocean' ? 'text-ocean' : 
-                      'text-foreground/80'
+                      'text-foreground'
                     }`}>
                       {service.price}
                     </p>
@@ -129,7 +129,7 @@ const Services = () => {
                     <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-2">
                       Who it's for
                     </p>
-                    <p className="text-foreground/80 font-light leading-relaxed">
+                    <p className="text-foreground font-light leading-relaxed">
                       {service.whoFor}
                     </p>
                   </div>
@@ -150,10 +150,10 @@ const Services = () => {
                             <Check className={`h-3 w-3 ${
                               service.accent === 'sage' ? 'text-sage' : 
                               service.accent === 'ocean' ? 'text-ocean' : 
-                              'text-foreground/70'
+                              'text-foreground'
                             }`} />
                           </div>
-                          <span className="text-foreground/80 font-light text-sm leading-relaxed">
+                          <span className="text-foreground font-light text-sm leading-relaxed">
                             {feature}
                           </span>
                         </li>

@@ -84,7 +84,7 @@ const Index = () => {
               ].map((text, i) => (
                 <div 
                   key={i}
-                  className="flex items-start gap-5 p-6 rounded-2xl bg-white/60 backdrop-blur-sm border border-white/50 shadow-soft transition-all duration-300 hover:shadow-soft-md hover:bg-white/70"
+                  className="flex items-start gap-5 p-6 rounded-2xl bg-white border border-border/30 shadow-soft transition-all duration-300 hover:shadow-soft-md"
                 >
                   <div className="w-8 h-8 rounded-full bg-sage-light flex items-center justify-center flex-shrink-0">
                     <CheckCircle2 className="h-5 w-5 text-sage" />
@@ -168,7 +168,7 @@ const Index = () => {
               {/* Service Card 3 */}
               <div className="card-elevated rounded-3xl p-8 md:p-10 transition-all duration-300 hover:-translate-y-1 hover:shadow-warm-lg">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-sand to-sand-deep flex items-center justify-center mb-8 shadow-soft">
-                  <Palette className="h-7 w-7 text-foreground/70" />
+                  <Palette className="h-7 w-7 text-foreground" />
                 </div>
                 <h3 className="text-xl md:text-2xl text-foreground mb-4 font-serif font-medium">
                   Signature Brand Presence
@@ -212,7 +212,7 @@ const Index = () => {
                     flex items-center justify-center shadow-soft
                     ${step.color === 'sage' ? 'bg-gradient-to-br from-sage-light to-sage-muted text-sage' : ''}
                     ${step.color === 'ocean' ? 'bg-gradient-to-br from-ocean-light to-ocean-muted text-ocean' : ''}
-                    ${step.color === 'sand' ? 'bg-gradient-to-br from-sand to-sand-deep text-foreground/70' : ''}
+                    ${step.color === 'sand' ? 'bg-gradient-to-br from-sand to-sand-deep text-foreground' : ''}
                   `}>
                     {step.num}
                   </div>
