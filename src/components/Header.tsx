@@ -43,7 +43,7 @@ const Header = () => {
         className="fixed top-0 left-0 right-0 z-40 bg-background px-4 py-3"
       >
         <div 
-          className="relative border-4 border-foreground rounded-2xl overflow-hidden h-[140px] md:h-[180px]"
+          className="relative border-4 border-foreground rounded-2xl overflow-hidden h-[100px] md:h-[130px]"
           style={{
             backgroundImage: `url(${vibeShiftBanner})`,
             backgroundSize: 'cover',
