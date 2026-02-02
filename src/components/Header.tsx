@@ -1,8 +1,10 @@
+import { useLayoutEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import vibeShiftBanner from "@/assets/vibe-shift-banner.png";
 
 const Header = () => {
   const location = useLocation();
+  const bannerRef = useRef<HTMLDivElement | null>(null);
   
   const navLinks = [
     { href: "/", label: "Home" },
@@ -11,10 +13,32 @@ const Header = () => {
     { href: "/about", label: "About" },
   ];
 
+  // Publish the banner's actual rendered height so pages can offset content reliably.
+  useLayoutEffect(() => {
+    const el = bannerRef.current;
+    if (!el) return;
+
+    const setVar = () => {
+      const h = Math.ceil(el.getBoundingClientRect().height);
+      document.documentElement.style.setProperty("--fixed-banner-height", `${h}px`);
+    };
+
+    setVar();
+
+    const ro = new ResizeObserver(() => setVar());
+    ro.observe(el);
+
+    window.addEventListener("resize", setVar);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", setVar);
+    };
+  }, []);
+
   return (
     <>
       {/* Full-width banner with black frame and navigation at bottom */}
-      <div className="fixed top-0 left-0 right-0 z-40 bg-background px-4 py-3">
+      <div ref={bannerRef} className="fixed top-0 left-0 right-0 z-40 bg-background px-4 py-3">
         <div className="relative border-4 border-foreground rounded-2xl overflow-hidden">
           <img 
             src={vibeShiftBanner} 
