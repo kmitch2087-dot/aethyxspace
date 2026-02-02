@@ -3,20 +3,27 @@ import { ArrowRight, CheckCircle2, Sparkles, Layout, Palette } from "lucide-reac
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import vibeShiftLogo from "@/assets/vibe-shift-logo.jpg";
+import watercolorBg from "@/assets/watercolor-bg.jpg";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
       
+      {/* Fixed watercolor background */}
+      <div 
+        className="fixed inset-0 z-0 pointer-events-none"
+        style={{
+          backgroundImage: `url(${watercolorBg})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          opacity: 0.27,
+        }}
+      />
+      
       {/* Hero Section */}
-      <section className="relative bg-hero texture-paper overflow-hidden">
-        {/* Organic shapes */}
-        <div className="organic-shape w-[600px] h-[600px] bg-sage-muted -top-40 -right-40" />
-        <div className="organic-shape w-[500px] h-[500px] bg-ocean-muted bottom-20 -left-32" />
-        <div className="organic-shape w-[300px] h-[300px] bg-sand-deep top-1/2 right-1/4" />
-        
-        <div className="relative z-10 px-6 pt-32 pb-20 md:px-12 lg:px-24 xl:px-32 md:pt-40 md:pb-28">
+      <section className="relative z-10 overflow-hidden">
+        <div className="relative px-6 pt-32 pb-20 md:px-12 lg:px-24 xl:px-32 md:pt-40 md:pb-28">
           
           <div className="max-w-3xl pb-20 md:pb-28">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium leading-[1.15] text-foreground mb-8 tracking-tight">
@@ -40,15 +47,13 @@ const Index = () => {
       </section>
 
       {/* Relief & Recognition Section */}
-      <section className="relative bg-section-warm texture-paper overflow-hidden">
-        <div className="organic-shape w-[400px] h-[400px] bg-sage-light top-10 right-20" />
-        
-        <div className="relative z-10 px-6 py-28 md:px-12 lg:px-24 xl:px-32 md:py-36">
+      <section className="relative z-10 overflow-hidden">
+        <div className="relative px-6 py-28 md:px-12 lg:px-24 xl:px-32 md:py-36">
           <div className="max-w-2xl">
             <span className="inline-block text-sm font-medium text-sage tracking-wide uppercase mb-6">
               We understand
             </span>
-            <h2 className="text-3xl md:text-4xl lg:text-[2.75rem] text-foreground mb-8 leading-snug font-medium">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground mb-8 leading-snug font-semibold">
               You're not alone if your website feels harder than it should be.
             </h2>
             <p className="text-muted-foreground text-lg md:text-xl leading-relaxed font-light">
@@ -61,16 +66,13 @@ const Index = () => {
       </section>
 
       {/* Why This Matters Section */}
-      <section className="relative bg-section-sage texture-paper overflow-hidden">
-        <div className="organic-shape w-[500px] h-[500px] bg-ocean-light -bottom-20 -right-20" />
-        <div className="organic-shape w-[350px] h-[350px] bg-sand top-40 left-10" />
-        
-        <div className="relative z-10 px-6 py-28 md:px-12 lg:px-24 xl:px-32 md:py-36">
+      <section className="relative z-10 overflow-hidden">
+        <div className="relative px-6 py-28 md:px-12 lg:px-24 xl:px-32 md:py-36">
           <div className="max-w-3xl">
             <span className="inline-block text-sm font-medium text-sage tracking-wide uppercase mb-6">
               The reality
             </span>
-            <h2 className="text-3xl md:text-4xl lg:text-[2.75rem] text-foreground mb-14 font-medium heading-accent">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground mb-14 font-semibold heading-accent">
               Why your online presence matters
             </h2>
             <div className="space-y-5">
@@ -98,15 +100,13 @@ const Index = () => {
       </section>
 
       {/* What We Do Section */}
-      <section className="relative bg-section-cream texture-paper overflow-hidden">
-        <div className="organic-shape w-[450px] h-[450px] bg-sage-muted top-20 -right-32" />
-        
-        <div className="relative z-10 px-6 py-28 md:px-12 lg:px-24 xl:px-32 md:py-36">
+      <section className="relative z-10 overflow-hidden">
+        <div className="relative px-6 py-28 md:px-12 lg:px-24 xl:px-32 md:py-36">
           <div className="max-w-2xl">
             <span className="inline-block text-sm font-medium text-ocean tracking-wide uppercase mb-6">
               Our approach
             </span>
-            <h2 className="text-3xl md:text-4xl lg:text-[2.75rem] text-foreground mb-10 font-medium heading-accent">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground mb-10 font-semibold heading-accent">
               What we do
             </h2>
             <div className="space-y-6">
@@ -124,17 +124,14 @@ const Index = () => {
       </section>
 
       {/* Services Preview Section */}
-      <section className="relative bg-section-sand texture-paper overflow-hidden">
-        <div className="organic-shape w-[600px] h-[600px] bg-sage-light -top-40 left-1/4" />
-        <div className="organic-shape w-[400px] h-[400px] bg-ocean-muted bottom-20 right-10" />
-        
-        <div className="relative z-10 px-6 py-28 md:px-12 lg:px-24 xl:px-32 md:py-36">
+      <section className="relative z-10 overflow-hidden">
+        <div className="relative px-6 py-28 md:px-12 lg:px-24 xl:px-32 md:py-36">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-16">
               <span className="inline-block text-sm font-medium text-sage tracking-wide uppercase mb-6">
                 How we help
               </span>
-              <h2 className="text-3xl md:text-4xl lg:text-[2.75rem] text-foreground font-medium">
+              <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground font-semibold">
                 Services
               </h2>
             </div>
@@ -187,17 +184,14 @@ const Index = () => {
       </section>
 
       {/* Process Section */}
-      <section className="relative bg-section-warm texture-paper overflow-hidden">
-        <div className="organic-shape w-[500px] h-[500px] bg-ocean-light top-0 -left-40" />
-        <div className="organic-shape w-[350px] h-[350px] bg-sage-muted bottom-20 right-20" />
-        
-        <div className="relative z-10 px-6 py-28 md:px-12 lg:px-24 xl:px-32 md:py-36">
+      <section className="relative z-10 overflow-hidden">
+        <div className="relative px-6 py-28 md:px-12 lg:px-24 xl:px-32 md:py-36">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-20">
               <span className="inline-block text-sm font-medium text-ocean tracking-wide uppercase mb-6">
                 Simple & clear
               </span>
-              <h2 className="text-3xl md:text-4xl lg:text-[2.75rem] text-foreground font-medium">
+              <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground font-semibold">
                 How it works
               </h2>
             </div>
@@ -238,16 +232,13 @@ const Index = () => {
       </section>
 
       {/* Final CTA Section */}
-      <section className="relative bg-section-ocean texture-paper overflow-hidden">
-        <div className="organic-shape w-[600px] h-[600px] bg-sage-light -top-32 right-1/4" />
-        <div className="organic-shape w-[450px] h-[450px] bg-sand bottom-10 -left-20" />
-        
-        <div className="relative z-10 px-6 py-32 md:px-12 lg:px-24 xl:px-32 md:py-40">
+      <section className="relative z-10 overflow-hidden">
+        <div className="relative px-6 py-32 md:px-12 lg:px-24 xl:px-32 md:py-40">
           <div className="max-w-2xl mx-auto text-center">
             <span className="inline-block text-sm font-medium text-ocean tracking-wide uppercase mb-6">
               Ready to begin?
             </span>
-            <h2 className="text-3xl md:text-4xl lg:text-[2.75rem] text-foreground mb-8 font-medium leading-snug">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground mb-8 font-semibold leading-snug">
               Your business is evolving. Your website should too.
             </h2>
             <p className="text-muted-foreground text-lg md:text-xl leading-relaxed mb-14 font-light">
@@ -268,13 +259,13 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="relative bg-cream-deep border-t border-border/30">
+      <footer className="relative z-10 bg-cream-deep border-t border-border/30">
         <div className="px-6 py-16 md:px-12 lg:px-24 xl:px-32">
           <div className="flex flex-col md:flex-row justify-between items-center gap-8">
             <img 
               src={vibeShiftLogo} 
               alt="Vibe Shift Studio" 
-              className="h-14 w-auto opacity-90 rounded-xl shadow-soft"
+              className="h-24 md:h-28 w-auto opacity-90 rounded-xl shadow-soft"
             />
             <p className="text-sm text-muted-foreground font-light">
               © {new Date().getFullYear()} Vibe Shift Studio. All rights reserved.

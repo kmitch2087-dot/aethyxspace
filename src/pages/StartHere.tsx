@@ -1,16 +1,27 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, MessageCircle, Compass, Heart } from "lucide-react";
+import { Link } from "react-router-dom";
 import Header from "@/components/Header";
+import watercolorBg from "@/assets/watercolor-bg.jpg";
 
 const StartHere = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      
+      {/* Fixed watercolor background */}
+      <div 
+        className="fixed inset-0 z-0 pointer-events-none"
+        style={{
+          backgroundImage: `url(${watercolorBg})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          opacity: 0.27,
+        }}
+      />
 
       {/* Section 1 — Opening */}
-      <section className="relative bg-hero texture-paper overflow-hidden">
-        <div className="organic-shape w-[500px] h-[500px] bg-sage-muted -top-32 -right-32" />
-        <div className="organic-shape w-[400px] h-[400px] bg-ocean-muted bottom-10 -left-20" />
+      <section className="relative z-10 overflow-hidden">
         
         <div className="relative z-10 px-6 pt-32 pb-24 md:px-12 lg:px-24 xl:px-32 md:pt-40 md:pb-32">
           <div className="max-w-2xl">
@@ -28,15 +39,14 @@ const StartHere = () => {
       </section>
 
       {/* Section 2 — What Happens Next */}
-      <section className="relative bg-section-warm texture-paper overflow-hidden">
-        <div className="organic-shape w-[450px] h-[450px] bg-sage-light top-20 right-10" />
+      <section className="relative z-10 overflow-hidden">
         
         <div className="relative z-10 px-6 py-24 md:px-12 lg:px-24 xl:px-32 md:py-32">
           <div className="max-w-2xl">
             <span className="inline-block text-sm font-medium text-sage tracking-wide uppercase mb-6">
               The process
             </span>
-            <h2 className="text-3xl md:text-4xl text-foreground mb-8 leading-snug font-medium">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground mb-8 leading-snug font-semibold">
               What happens next
             </h2>
             <p className="text-muted-foreground text-lg md:text-xl leading-relaxed font-light mb-10">
@@ -68,9 +78,7 @@ const StartHere = () => {
       </section>
 
       {/* Section 3 — Intake Form Placeholder */}
-      <section className="relative bg-section-sage texture-paper overflow-hidden">
-        <div className="organic-shape w-[500px] h-[500px] bg-ocean-light -bottom-32 -right-32" />
-        <div className="organic-shape w-[350px] h-[350px] bg-sand top-20 left-10" />
+      <section className="relative z-10 overflow-hidden">
         
         <div className="relative z-10 px-6 py-28 md:px-12 lg:px-24 xl:px-32 md:py-36">
           <div className="max-w-xl mx-auto text-center">
@@ -82,13 +90,15 @@ const StartHere = () => {
                 Fill out a short form and I'll get back to you with clear next steps.
               </p>
               
-              <Button 
-                size="lg" 
-                className="text-base px-12 py-8 rounded-full bg-sage hover:bg-sage/90 text-white shadow-warm transition-all duration-300 hover:shadow-warm-lg hover:-translate-y-0.5"
-              >
-                Get Started
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+              <Link to="/start-here">
+                <Button 
+                  size="lg" 
+                  className="text-base px-12 py-8 rounded-full bg-sage hover:bg-sage/90 text-white shadow-warm transition-all duration-300 hover:shadow-warm-lg hover:-translate-y-0.5"
+                >
+                  Start Here
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
               
               <p className="text-sm text-muted-foreground mt-6 font-light">
                 No pressure. Just a clear next step.
@@ -99,8 +109,7 @@ const StartHere = () => {
       </section>
 
       {/* Section 4 — Closing Line */}
-      <section className="relative bg-section-cream texture-paper overflow-hidden">
-        <div className="organic-shape w-[400px] h-[400px] bg-sage-muted top-10 -left-20" />
+      <section className="relative z-10 overflow-hidden">
         
         <div className="relative z-10 px-6 py-24 md:px-12 lg:px-24 xl:px-32 md:py-32">
           <div className="max-w-2xl mx-auto text-center">

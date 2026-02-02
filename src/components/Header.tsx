@@ -6,9 +6,8 @@ const Header = () => {
   
   const navLinks = [
     { href: "/", label: "Home" },
-    { href: "/about", label: "About" },
     { href: "/services", label: "Services" },
-    { href: "/start-here", label: "Start Here" },
+    { href: "/about", label: "About" },
   ];
 
   return (
@@ -19,7 +18,7 @@ const Header = () => {
             <img 
               src={vibeShiftLogo} 
               alt="Vibe Shift Studio" 
-              className="h-12 md:h-14 w-auto rounded-xl shadow-soft"
+              className="h-24 md:h-28 w-auto rounded-xl shadow-soft"
             />
           </Link>
           
@@ -37,6 +36,12 @@ const Header = () => {
                 {link.label}
               </Link>
             ))}
+            <Link
+              to="/start-here"
+              className="text-sm font-medium px-6 py-2.5 rounded-full bg-sage text-white hover:bg-sage/90 transition-all duration-200 shadow-warm hover:shadow-warm-lg"
+            >
+              Start Here
+            </Link>
           </nav>
         </div>
       </div>
