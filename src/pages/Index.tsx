@@ -23,7 +23,7 @@ const Index = () => {
       
       {/* Hero Section */}
       <section className="relative z-10 overflow-hidden">
-        <div className="relative px-6 pt-48 pb-12 md:px-12 lg:px-24 xl:px-32 md:pt-56 md:pb-16">
+        <div className="relative px-6 pt-[280px] pb-12 md:px-12 lg:px-24 xl:px-32 md:pt-[320px] md:pb-16">
           
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium leading-[1.15] text-foreground mb-6 tracking-tight">
