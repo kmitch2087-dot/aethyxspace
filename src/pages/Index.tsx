@@ -196,36 +196,34 @@ const Index = () => {
               </h2>
             </div>
             
-            {/* Process container with connector */}
-            <div className="relative">
-              <div className="process-connector" style={{ top: '2rem' }} />
-              
-              <div className="grid md:grid-cols-4 gap-12 md:gap-8">
-                {[
-                  { num: "1", title: "Intake", desc: "Fill out a simple form so we can understand your needs and vision.", color: "sage" },
-                  { num: "2", title: "Design & Build", desc: "We craft your website with care, handling all the details.", color: "ocean" },
-                  { num: "3", title: "Review", desc: "You review and we refine until everything feels just right.", color: "sand" },
-                  { num: "4", title: "Launch", desc: "Your polished website goes live, ready to welcome visitors.", color: "sage" }
-                ].map((step, i) => (
-                  <div key={i} className="text-center relative">
-                    <div className={`
-                      w-16 h-16 rounded-full mx-auto mb-8 text-xl font-serif font-medium
-                      flex items-center justify-center shadow-elevated
-                      ${step.color === 'sage' ? 'bg-gradient-to-br from-sage-light to-sage-muted text-sage' : ''}
-                      ${step.color === 'ocean' ? 'bg-gradient-to-br from-ocean-light to-ocean-muted text-ocean' : ''}
-                      ${step.color === 'sand' ? 'bg-gradient-to-br from-sand to-sand-deep text-foreground/70' : ''}
-                    `}>
-                      {step.num}
-                    </div>
-                    <h3 className="font-serif text-xl md:text-2xl text-foreground mb-4 font-medium">
-                      {step.title}
-                    </h3>
-                    <p className="text-sm md:text-base text-muted-foreground font-light leading-relaxed max-w-[200px] mx-auto">
-                      {step.desc}
-                    </p>
+            <div className="grid md:grid-cols-4 gap-8">
+              {[
+                { num: "1", title: "Intake", desc: "Fill out a simple form so we can understand your needs and vision.", color: "sage" },
+                { num: "2", title: "Design & Build", desc: "We craft your website with care, handling all the details.", color: "ocean" },
+                { num: "3", title: "Review", desc: "You review and we refine until everything feels just right.", color: "sand" },
+                { num: "4", title: "Launch", desc: "Your polished website goes live, ready to welcome visitors.", color: "sage" }
+              ].map((step, i) => (
+                <div 
+                  key={i} 
+                  className="card-elevated rounded-3xl p-8 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-warm-lg"
+                >
+                  <div className={`
+                    w-14 h-14 rounded-full mx-auto mb-6 text-lg font-serif font-medium
+                    flex items-center justify-center shadow-soft
+                    ${step.color === 'sage' ? 'bg-gradient-to-br from-sage-light to-sage-muted text-sage' : ''}
+                    ${step.color === 'ocean' ? 'bg-gradient-to-br from-ocean-light to-ocean-muted text-ocean' : ''}
+                    ${step.color === 'sand' ? 'bg-gradient-to-br from-sand to-sand-deep text-foreground/70' : ''}
+                  `}>
+                    {step.num}
                   </div>
-                ))}
-              </div>
+                  <h3 className="font-serif text-xl text-foreground mb-3 font-medium">
+                    {step.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground font-light leading-relaxed">
+                    {step.desc}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
