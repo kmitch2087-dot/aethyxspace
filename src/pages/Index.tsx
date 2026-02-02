@@ -41,7 +41,7 @@ const Index = () => {
       <section className="relative z-10 overflow-hidden">
         <div className="relative px-6 py-16 md:px-12 lg:px-24 xl:px-32 md:py-20">
           <div className="max-w-2xl">
-            <span className="inline-block text-sm font-medium text-sage tracking-wide uppercase mb-4">
+            <span className="block text-sm font-medium text-sage tracking-wide uppercase mb-4">
               We understand
             </span>
             <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground mb-6 leading-snug font-semibold">
@@ -60,7 +60,7 @@ const Index = () => {
       <section className="relative z-10 overflow-hidden">
         <div className="relative px-6 py-16 md:px-12 lg:px-24 xl:px-32 md:py-20">
           <div className="max-w-3xl">
-            <span className="inline-block text-sm font-medium text-sage tracking-wide uppercase mb-4">
+            <span className="block text-sm font-medium text-sage tracking-wide uppercase mb-4">
               The reality
             </span>
             <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground mb-10 font-semibold heading-accent">
@@ -94,7 +94,7 @@ const Index = () => {
       <section className="relative z-10 overflow-hidden">
         <div className="relative px-6 py-16 md:px-12 lg:px-24 xl:px-32 md:py-20">
           <div className="max-w-2xl">
-            <span className="inline-block text-sm font-medium text-ocean tracking-wide uppercase mb-4">
+            <span className="block text-sm font-medium text-ocean tracking-wide uppercase mb-4">
               Our approach
             </span>
             <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground mb-6 font-semibold heading-accent">
@@ -119,7 +119,7 @@ const Index = () => {
         <div className="relative px-6 py-16 md:px-12 lg:px-24 xl:px-32 md:py-20">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-10">
-              <span className="inline-block text-sm font-medium text-sage tracking-wide uppercase mb-4">
+              <span className="block text-sm font-medium text-sage tracking-wide uppercase mb-4">
                 How we help
               </span>
               <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground font-semibold">
@@ -179,7 +179,7 @@ const Index = () => {
         <div className="relative px-6 py-16 md:px-12 lg:px-24 xl:px-32 md:py-20">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-12">
-              <span className="inline-block text-sm font-medium text-ocean tracking-wide uppercase mb-4">
+              <span className="block text-sm font-medium text-ocean tracking-wide uppercase mb-4">
                 Simple & clear
               </span>
               <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground font-semibold">
@@ -224,7 +224,7 @@ const Index = () => {
       <section className="relative z-10 overflow-hidden">
         <div className="relative px-6 py-20 md:px-12 lg:px-24 xl:px-32 md:py-24">
           <div className="max-w-2xl mx-auto text-center">
-            <span className="inline-block text-sm font-medium text-ocean tracking-wide uppercase mb-4">
+            <span className="block text-sm font-medium text-ocean tracking-wide uppercase mb-4">
               Ready to begin?
             </span>
             <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground mb-6 font-semibold leading-snug">
