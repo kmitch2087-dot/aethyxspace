@@ -18,7 +18,7 @@ const Index = () => {
       
       {/* Hero Section */}
       <section className="relative z-10 overflow-hidden">
-        <div className="relative px-6 pt-[280px] pb-12 md:px-12 lg:px-24 xl:px-32 md:pt-[320px] md:pb-16">
+        <div className="relative px-6 pt-[200px] pb-6 md:px-12 lg:px-24 xl:px-32 md:pt-[240px] md:pb-8">
           
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium leading-[1.15] text-foreground mb-6 tracking-tight">
@@ -34,12 +34,12 @@ const Index = () => {
 
       {/* Relief & Recognition Section */}
       <section className="relative z-10 overflow-hidden">
-        <div className="relative px-6 py-16 md:px-12 lg:px-24 xl:px-32 md:py-20">
+        <div className="relative px-6 py-8 md:px-12 lg:px-24 xl:px-32 md:py-12">
           <div className="max-w-2xl">
-            <span className="block text-sm font-medium text-sage tracking-wide uppercase mb-4">
+            <span className="block text-sm font-medium text-sage tracking-wide uppercase mb-3">
               We understand
             </span>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground mb-6 leading-snug font-semibold">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground mb-4 leading-snug font-semibold">
               You're not alone if your website feels harder than it should be.
             </h2>
             <p className="text-foreground text-lg md:text-2xl leading-relaxed font-medium">
@@ -53,16 +53,16 @@ const Index = () => {
 
       {/* Why This Matters Section */}
       <section className="relative z-10 overflow-hidden">
-        <div className="relative px-6 py-16 md:px-12 lg:px-24 xl:px-32 md:py-20">
+        <div className="relative px-6 py-8 md:px-12 lg:px-24 xl:px-32 md:py-12">
           <div className="max-w-3xl">
-            <span className="block text-sm font-medium text-sage tracking-wide uppercase mb-4">
+            <span className="block text-sm font-medium text-sage tracking-wide uppercase mb-3">
               The reality
             </span>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground mb-10 font-semibold heading-accent">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground mb-6 font-semibold heading-accent">
               Why your online presence matters
             </h2>
-            <div className="space-y-4">
-              {["Most people research a business online before reaching out or making a purchase.", "First impressions happen fast — visitors decide in seconds whether to stay or leave.", "A cluttered or outdated site can send the wrong message — even if your work is excellent.", "A clear, professional website builds trust before a single conversation."].map((text, i) => <div key={i} className="flex items-start gap-4 p-5 rounded-2xl bg-white border border-border/30 shadow-soft transition-all duration-300 hover:shadow-soft-md">
+            <div className="space-y-3">
+              {["Most people research a business online before reaching out or making a purchase.", "First impressions happen fast — visitors decide in seconds whether to stay or leave.", "A cluttered or outdated site can send the wrong message — even if your work is excellent.", "A clear, professional website builds trust before a single conversation."].map((text, i) => <div key={i} className="flex items-start gap-4 p-4 rounded-2xl bg-white border border-border/30 shadow-soft transition-all duration-300 hover:shadow-soft-md">
                   <div className="w-8 h-8 rounded-full bg-sage-light flex items-center justify-center flex-shrink-0">
                     <CheckCircle2 className="h-5 w-5 text-sage" />
                   </div>
@@ -77,15 +77,15 @@ const Index = () => {
 
       {/* What We Do Section */}
       <section className="relative z-10 overflow-hidden">
-        <div className="relative px-6 py-16 md:px-12 lg:px-24 xl:px-32 md:py-20">
+        <div className="relative px-6 py-8 md:px-12 lg:px-24 xl:px-32 md:py-12">
           <div className="max-w-2xl">
-            <span className="block text-sm font-medium text-ocean tracking-wide uppercase mb-4">
+            <span className="block text-sm font-medium text-ocean tracking-wide uppercase mb-3">
               Our approach
             </span>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground mb-6 font-semibold heading-accent">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground mb-4 font-semibold heading-accent">
               What we do
             </h2>
-            <div className="space-y-4">
+            <div className="space-y-3">
               <p className="text-foreground text-lg md:text-2xl leading-relaxed font-medium">
                 We design and build websites that remove the friction — so you can stop worrying 
                 about fonts, layouts, or "what to say" and start showing up with confidence.
@@ -101,10 +101,10 @@ const Index = () => {
 
       {/* Services Preview Section */}
       <section className="relative z-10 overflow-hidden">
-        <div className="relative px-6 py-16 md:px-12 lg:px-24 xl:px-32 md:py-20">
+        <div className="relative px-6 py-8 md:px-12 lg:px-24 xl:px-32 md:py-12">
           <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-10">
-              <span className="block text-sm font-medium text-sage tracking-wide uppercase mb-4">
+            <div className="text-center mb-6">
+              <span className="block text-sm font-medium text-sage tracking-wide uppercase mb-3">
                 How we help
               </span>
               <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground font-semibold">
@@ -112,44 +112,44 @@ const Index = () => {
               </h2>
             </div>
             
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-3 gap-4">
               {/* Service Card 1 */}
-              <div className="card-elevated rounded-3xl p-6 md:p-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-warm-lg">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-sage-light to-sage-muted flex items-center justify-center mb-6 shadow-soft">
-                  <Sparkles className="h-6 w-6 text-sage" />
+              <div className="card-elevated rounded-3xl p-5 md:p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-warm-lg">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-sage-light to-sage-muted flex items-center justify-center mb-4 shadow-soft">
+                  <Sparkles className="h-5 w-5 text-sage" />
                 </div>
-                <h3 className="text-xl md:text-2xl text-foreground mb-3 font-serif font-medium">
+                <h3 className="text-xl md:text-2xl text-foreground mb-2 font-serif font-medium">
                   Online Presence Starter
                 </h3>
-                <p className="text-foreground leading-relaxed font-light">
+                <p className="text-foreground leading-relaxed font-light text-sm">
                   A simple, single-page website to establish your online presence. 
                   Perfect for those just starting out or refreshing an outdated site.
                 </p>
               </div>
 
               {/* Service Card 2 */}
-              <div className="card-elevated rounded-3xl p-6 md:p-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-warm-lg">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-ocean-light to-ocean-muted flex items-center justify-center mb-6 shadow-soft">
-                  <Layout className="h-6 w-6 text-ocean" />
+              <div className="card-elevated rounded-3xl p-5 md:p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-warm-lg">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-ocean-light to-ocean-muted flex items-center justify-center mb-4 shadow-soft">
+                  <Layout className="h-5 w-5 text-ocean" />
                 </div>
-                <h3 className="text-xl md:text-2xl text-foreground mb-3 font-serif font-medium">
+                <h3 className="text-xl md:text-2xl text-foreground mb-2 font-serif font-medium">
                   Professional Brand Website
                 </h3>
-                <p className="text-foreground leading-relaxed font-light">
+                <p className="text-foreground leading-relaxed font-light text-sm">
                   A multi-page website with clear structure, thoughtful copy, and a design 
                   that reflects your unique brand identity.
                 </p>
               </div>
 
               {/* Service Card 3 */}
-              <div className="card-elevated rounded-3xl p-6 md:p-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-warm-lg">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-sand to-sand-deep flex items-center justify-center mb-6 shadow-soft">
-                  <Palette className="h-6 w-6 text-foreground" />
+              <div className="card-elevated rounded-3xl p-5 md:p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-warm-lg">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-sand to-sand-deep flex items-center justify-center mb-4 shadow-soft">
+                  <Palette className="h-5 w-5 text-foreground" />
                 </div>
-                <h3 className="text-xl md:text-2xl text-foreground mb-3 font-serif font-medium">
+                <h3 className="text-xl md:text-2xl text-foreground mb-2 font-serif font-medium">
                   Signature Brand Presence
                 </h3>
-                <p className="text-foreground leading-relaxed font-light">
+                <p className="text-foreground leading-relaxed font-light text-sm">
                   A comprehensive website experience with premium design, 
                   strategic content, and everything you need to stand out.
                 </p>
@@ -161,10 +161,10 @@ const Index = () => {
 
       {/* Process Section */}
       <section className="relative z-10 overflow-hidden">
-        <div className="relative px-6 py-16 md:px-12 lg:px-24 xl:px-32 md:py-20">
+        <div className="relative px-6 py-8 md:px-12 lg:px-24 xl:px-32 md:py-12">
           <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-12">
-              <span className="block text-sm font-medium text-ocean tracking-wide uppercase mb-4">
+            <div className="text-center mb-8">
+              <span className="block text-sm font-medium text-ocean tracking-wide uppercase mb-3">
                 Simple & clear
               </span>
               <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground font-semibold">
@@ -172,7 +172,7 @@ const Index = () => {
               </h2>
             </div>
             
-            <div className="grid md:grid-cols-4 gap-6">
+            <div className="grid md:grid-cols-4 gap-4">
               {[{
               num: "1",
               title: "Intake",
@@ -193,9 +193,9 @@ const Index = () => {
               title: "Launch",
               desc: "Your polished website goes live, ready to welcome visitors.",
               color: "sage"
-            }].map((step, i) => <div key={i} className="card-elevated rounded-3xl p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-warm-lg">
+            }].map((step, i) => <div key={i} className="card-elevated rounded-3xl p-5 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-warm-lg">
                   <div className={`
-                    w-12 h-12 rounded-full mx-auto mb-4 text-lg font-serif font-medium
+                    w-10 h-10 rounded-full mx-auto mb-3 text-base font-serif font-medium
                     flex items-center justify-center shadow-soft
                     ${step.color === 'sage' ? 'bg-gradient-to-br from-sage-light to-sage-muted text-sage' : ''}
                     ${step.color === 'ocean' ? 'bg-gradient-to-br from-ocean-light to-ocean-muted text-ocean' : ''}
@@ -203,10 +203,10 @@ const Index = () => {
                   `}>
                     {step.num}
                   </div>
-                  <h3 className="font-serif text-xl text-foreground mb-2 font-medium">
+                  <h3 className="font-serif text-lg text-foreground mb-1 font-medium">
                     {step.title}
                   </h3>
-                  <p className="text-sm text-foreground font-light leading-relaxed">
+                  <p className="text-xs text-foreground font-light leading-relaxed">
                     {step.desc}
                   </p>
                 </div>)}
@@ -217,20 +217,20 @@ const Index = () => {
 
       {/* Final CTA Section */}
       <section className="relative z-10 overflow-hidden">
-        <div className="relative px-6 py-20 md:px-12 lg:px-24 xl:px-32 md:py-24">
+        <div className="relative px-6 py-12 md:px-12 lg:px-24 xl:px-32 md:py-16">
           <div className="max-w-2xl mx-auto text-center">
-            <span className="block text-sm font-medium text-ocean tracking-wide uppercase mb-4">
+            <span className="block text-sm font-medium text-ocean tracking-wide uppercase mb-3">
               Ready to begin?
             </span>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground mb-6 font-semibold leading-snug">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground mb-4 font-semibold leading-snug">
               Your business is evolving. Your website should too.
             </h2>
-            <p className="text-foreground text-lg md:text-2xl leading-relaxed mb-10 font-medium">
+            <p className="text-foreground text-lg md:text-2xl leading-relaxed mb-8 font-medium">
               When you're ready for an online presence that feels aligned, clear, and 
               professional — we're here to help make it happen.
             </p>
             <Link to="/start-here">
-              <Button size="lg" className="text-base px-12 py-8 rounded-full bg-sage hover:bg-sage/90 text-white shadow-warm transition-all duration-300 hover:shadow-warm-lg hover:-translate-y-0.5">
+              <Button size="lg" className="text-base px-10 py-6 rounded-full bg-sage hover:bg-sage/90 text-white shadow-warm transition-all duration-300 hover:shadow-warm-lg hover:-translate-y-0.5">
                 Start Here
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
