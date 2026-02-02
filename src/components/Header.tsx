@@ -37,15 +37,19 @@ const Header = () => {
 
   return (
     <>
-      {/* Full-width banner with black frame and navigation at bottom */}
-      <div ref={bannerRef} className="fixed top-0 left-0 right-0 z-40 bg-background px-4 py-3">
-        <div className="relative border-4 border-foreground rounded-2xl overflow-hidden">
-          <img 
-            src={vibeShiftBanner} 
-            alt="Vibe Shift Studio" 
-            className="w-full h-auto max-h-[160px] md:max-h-[200px] object-cover object-center"
-          />
-          
+      {/* Full-width banner as background with navigation */}
+      <div 
+        ref={bannerRef} 
+        className="fixed top-0 left-0 right-0 z-40 bg-background px-4 py-3"
+      >
+        <div 
+          className="relative border-4 border-foreground rounded-2xl overflow-hidden h-[140px] md:h-[180px]"
+          style={{
+            backgroundImage: `url(${vibeShiftBanner})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        >
           {/* Navigation bubbles at bottom center of banner */}
           <nav className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5">
             {navLinks.map((link) => (
