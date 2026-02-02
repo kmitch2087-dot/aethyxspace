@@ -51,6 +51,34 @@ const services = [
   }
 ];
 
+const quickServices = [
+  {
+    name: "Logo Creation",
+    price: "$100",
+    description: "A custom logo designed to represent your brand. Perfect for new businesses or those ready for a fresh look.",
+    priceId: "price_1SwQOyCEyzqaryb8zKLQHt8r"
+  },
+  {
+    name: "Brand Assets From Current Logo",
+    price: "$150",
+    description: "Transform your existing logo into a complete set of brand assets — social graphics, favicons, and more.",
+    priceId: "price_1SwQPkCEyzqaryb8SJkRanuX"
+  },
+  {
+    name: "Logo & Brand Assets Package",
+    price: "$200",
+    description: "The full package: a brand new logo plus all the assets you need to show up consistently everywhere.",
+    priceId: "price_1SwQPxCEyzqaryb8ducbgf3I"
+  },
+  {
+    name: "Site Maintenance Membership",
+    price: "$100/mo",
+    description: "Ongoing website updates, edits, and support. Cancel anytime — no long-term commitment required.",
+    priceId: "price_1SwQQECEyzqaryb8F6NdVpEd",
+    isSubscription: true
+  }
+];
+
 const Services = () => {
   return (
     <div className="min-h-screen bg-background">
@@ -235,6 +263,64 @@ const Services = () => {
                 For small businesses, SEO is one of the most cost-effective ways to attract new customers. Every package includes foundational SEO setup to help you get started on the right foot.
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Quick Services Section */}
+      <section className="relative z-10 overflow-hidden">
+        <div className="relative px-6 py-20 md:px-12 lg:px-24 xl:px-32 md:py-28">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground font-semibold mb-4">
+                Quick Services
+              </h2>
+              <p className="text-lg text-muted-foreground font-light max-w-2xl mx-auto">
+                Need something specific? These services come with a <span className="font-medium text-foreground">48-hour turnaround</span> for your first draft. If you need to refine your vision, I'm here with you until we achieve that.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {quickServices.map((service, index) => (
+                <div 
+                  key={index}
+                  className="bg-white rounded-3xl p-6 shadow-warm flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-warm-lg"
+                >
+                  <h3 className="text-lg font-serif font-medium text-foreground mb-2">
+                    {service.name}
+                  </h3>
+                  <p className={`text-2xl font-medium mb-4 ${service.isSubscription ? 'text-ocean' : 'text-sage'}`}>
+                    {service.price}
+                  </p>
+                  <p className="text-sm text-muted-foreground font-light leading-relaxed flex-grow mb-4">
+                    {service.description}
+                  </p>
+                  {service.isSubscription && (
+                    <p className="text-xs text-ocean font-medium mb-4">
+                      Cancel anytime
+                    </p>
+                  )}
+                  <a 
+                    href={GOOGLE_FORM_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block"
+                  >
+                    <Button 
+                      className="w-full rounded-full py-5 bg-sage hover:bg-sage/90 text-white shadow-warm transition-all duration-300 hover:-translate-y-0.5"
+                      size="sm"
+                    >
+                      Get Started
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </a>
+                </div>
+              ))}
+            </div>
+
+            <p className="text-center text-sm text-muted-foreground mt-8 font-light">
+              Payment in full at time of ordering. Google forms for each service coming soon.
+            </p>
           </div>
         </div>
       </section>
