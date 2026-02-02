@@ -44,16 +44,16 @@ const Index = () => {
               <h2 className="text-2xl md:text-3xl lg:text-4xl text-foreground mb-4 font-semibold heading-accent">
                 Why your online presence matters
               </h2>
-              <div className="space-y-2">
-                {["Most people research a business online before reaching out or making a purchase.", "First impressions happen fast — visitors decide in seconds whether to stay or leave.", "A cluttered or outdated site can send the wrong message — even if your work is excellent.", "A clear, professional website builds trust before a single conversation."].map((text, i) => <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-white border border-border/30 shadow-soft transition-all duration-300 hover:shadow-soft-md">
-                    <div className="w-6 h-6 rounded-full bg-sage-light flex items-center justify-center flex-shrink-0">
-                      <CheckCircle2 className="h-4 w-4 text-sage" />
-                    </div>
-                    <p className="text-foreground text-sm font-light leading-relaxed">
+              <ul className="space-y-2 text-left">
+                {["Most people research a business online before reaching out or making a purchase.", "First impressions happen fast — visitors decide in seconds whether to stay or leave.", "A cluttered or outdated site can send the wrong message — even if your work is excellent.", "A clear, professional website builds trust before a single conversation."].map((text, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-sage flex-shrink-0 mt-0.5" />
+                    <span className="text-foreground text-base md:text-lg font-medium leading-relaxed">
                       {text}
-                    </p>
-                  </div>)}
-              </div>
+                    </span>
+                  </li>
+                ))}
+              </ul>
             </div>
 
             {/* We Understand - NOW SECOND */}
