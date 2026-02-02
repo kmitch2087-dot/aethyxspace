@@ -36,22 +36,7 @@ const Index = () => {
       <section className="relative z-10 overflow-hidden">
         <div className="relative px-6 py-8 md:px-12 lg:px-24 xl:px-32 md:py-12">
           <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
-            {/* We Understand */}
-            <div>
-              <span className="block text-sm font-medium text-sage tracking-wide uppercase mb-3">
-                We understand
-              </span>
-              <h2 className="text-2xl md:text-3xl lg:text-4xl text-foreground mb-4 leading-snug font-semibold">
-                You're not alone if your website feels harder than it should be.
-              </h2>
-              <p className="text-foreground text-base md:text-lg leading-relaxed font-medium">
-                Between picking templates, writing the "right" words, and second-guessing every choice — 
-                it's easy to feel stuck. We get it. That's exactly why we focus on clarity over complexity. 
-                You don't need more options. You need the right ones, handled with care.
-              </p>
-            </div>
-
-            {/* The Reality */}
+            {/* The Reality - NOW FIRST */}
             <div>
               <span className="block text-sm font-medium text-sage tracking-wide uppercase mb-3">
                 The reality
@@ -70,14 +55,29 @@ const Index = () => {
                   </div>)}
               </div>
             </div>
+
+            {/* We Understand - NOW SECOND */}
+            <div>
+              <span className="block text-sm font-medium text-sage tracking-wide uppercase mb-3">
+                We understand
+              </span>
+              <h2 className="text-2xl md:text-3xl lg:text-4xl text-foreground mb-4 leading-snug font-semibold">
+                You're not alone if your website feels harder than it should be.
+              </h2>
+              <p className="text-foreground text-base md:text-lg leading-relaxed font-medium">
+                Between picking templates, writing the "right" words, and second-guessing every choice — 
+                it's easy to feel stuck. We get it. That's exactly why we focus on clarity over complexity. 
+                You don't need more options. You need the right ones, handled with care.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* What We Do Section */}
+      {/* What We Do Section - Centered */}
       <section className="relative z-10 overflow-hidden">
-        <div className="relative px-6 py-8 md:px-12 lg:px-24 xl:px-32 md:py-12">
-          <div className="max-w-2xl">
+        <div className="relative px-6 py-6 md:px-12 lg:px-24 xl:px-32 md:py-8">
+          <div className="max-w-3xl mx-auto text-center">
             <span className="block text-sm font-medium text-ocean tracking-wide uppercase mb-3">
               Our approach
             </span>
@@ -85,11 +85,11 @@ const Index = () => {
               What we do
             </h2>
             <div className="space-y-3">
-              <p className="text-foreground text-lg md:text-2xl leading-relaxed font-medium">
+              <p className="text-foreground text-lg md:text-xl leading-relaxed font-medium">
                 We design and build websites that remove the friction — so you can stop worrying 
                 about fonts, layouts, or "what to say" and start showing up with confidence.
               </p>
-              <p className="text-foreground text-lg md:text-2xl leading-relaxed font-medium">
+              <p className="text-foreground text-lg md:text-xl leading-relaxed font-medium">
                 We handle the structure, the copy guidance, and all the little details 
                 that make a website feel polished and professional. You stay focused on what you do best.
               </p>
