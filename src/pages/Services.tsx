@@ -435,6 +435,15 @@ const Services = () => {
                 />
               ))}
             </div>
+
+            {/* Third-party services note */}
+            <div className="mt-8 bg-sand-light/50 rounded-2xl p-6 text-center">
+              <p className="text-sm text-foreground font-medium leading-relaxed">
+                <strong>Please note:</strong> Most of these add-ons involve integrating third-party services into your website. 
+                You may need to subscribe to external platforms for cloud storage, scheduling software, email campaign automation, 
+                or other tools — these subscriptions are separate from your website service fees.
+              </p>
+            </div>
           </div>
         </div>
       </section>
