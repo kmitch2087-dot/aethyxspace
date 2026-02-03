@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Check, HelpCircle, Info } from "lucide-react";
+import { ArrowRight, Check, HelpCircle, Info, Smartphone, Mail, Cloud, Users, ShoppingCart, Calendar, BarChart3 } from "lucide-react";
 import Header from "@/components/Header";
 import watercolorBg from "@/assets/watercolor-bg.jpg";
 import SeoPopup from "@/components/SeoPopup";
@@ -8,6 +8,9 @@ import WaitingListPopup from "@/components/WaitingListPopup";
 import PaintSplat from "@/components/PaintSplat";
 import ServiceInfoPopup from "@/components/ServiceInfoPopup";
 import ServiceSelectionPopup from "@/components/ServiceSelectionPopup";
+import AppPricingPopup from "@/components/AppPricingPopup";
+import AddOnCard from "@/components/AddOnCard";
+import AddOnPricingPopup from "@/components/AddOnPricingPopup";
 
 const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLScleBGGZeacHU4B-gGHDPiZFzOwpPHu8n_80DkwiypsB2nlEw/viewform";
 
@@ -89,6 +92,51 @@ const quickServices = [
   }
 ];
 
+const addOns = [
+  {
+    name: "Email Campaign Setup",
+    addonPrice: "$150",
+    standalonePrice: "$250",
+    description: "Mailchimp or similar integration with branded templates, signup forms, and automation basics.",
+    icon: <Mail className="h-5 w-5 text-sage" />
+  },
+  {
+    name: "Cloud Storage Integration",
+    addonPrice: "$100",
+    standalonePrice: "$175",
+    description: "Secure file storage and sharing for client documents, portfolios, or downloadable resources.",
+    icon: <Cloud className="h-5 w-5 text-sage" />
+  },
+  {
+    name: "Client Dashboard with Login",
+    addonPrice: "$250",
+    standalonePrice: "$400",
+    description: "Google/social login integration with a private dashboard for clients to access their content.",
+    icon: <Users className="h-5 w-5 text-sage" />
+  },
+  {
+    name: "E-commerce Add-on",
+    addonPrice: "$300",
+    standalonePrice: "$500",
+    description: "Add a shop section to your site with product listings, cart functionality, and Stripe payments.",
+    icon: <ShoppingCart className="h-5 w-5 text-sage" />
+  },
+  {
+    name: "Booking & Scheduling",
+    addonPrice: "$125",
+    standalonePrice: "$200",
+    description: "Calendly or custom booking integration for appointments, consultations, and service scheduling.",
+    icon: <Calendar className="h-5 w-5 text-sage" />
+  },
+  {
+    name: "Analytics Dashboard",
+    addonPrice: "$100",
+    standalonePrice: "$175",
+    description: "Custom analytics setup with Google Analytics, conversion tracking, and a simple reporting dashboard.",
+    icon: <BarChart3 className="h-5 w-5 text-sage" />
+  }
+];
+
 const Services = () => {
   const [seoPopupOpen, setSeoPopupOpen] = useState(false);
   const [waitingListOpen, setWaitingListOpen] = useState(false);
@@ -96,6 +144,10 @@ const Services = () => {
   const [selectedTier, setSelectedTier] = useState<1 | 2 | 3>(1);
   const [serviceSelectionOpen, setServiceSelectionOpen] = useState(false);
   const [selectedServiceName, setSelectedServiceName] = useState<string>("");
+
+  const [appPricingOpen, setAppPricingOpen] = useState(false);
+  const [addOnPopupOpen, setAddOnPopupOpen] = useState(false);
+  const [selectedAddOn, setSelectedAddOn] = useState<typeof addOns[0] | null>(null);
 
   const handleOpenServiceInfo = (tier: 1 | 2 | 3) => {
     setSelectedTier(tier);
@@ -105,6 +157,26 @@ const Services = () => {
   const handleStartService = (serviceName: string) => {
     setSelectedServiceName(serviceName);
     setServiceSelectionOpen(true);
+  };
+
+  const handleAppPricingSelect = (type: "addon" | "standalone", appType: "native" | "pwa") => {
+    setAppPricingOpen(false);
+    // Here you would trigger the payment flow with the appropriate pricing
+    console.log(`Selected ${type} ${appType} app`);
+    // For now, redirect to form - payment integration can be added
+    window.open(GOOGLE_FORM_URL, "_blank");
+  };
+
+  const handleAddOnSelect = (addOn: typeof addOns[0]) => {
+    setSelectedAddOn(addOn);
+    setAddOnPopupOpen(true);
+  };
+
+  const handleAddOnPricingSelect = (type: "addon" | "standalone") => {
+    setAddOnPopupOpen(false);
+    // Here you would trigger the payment flow
+    console.log(`Selected ${type} for ${selectedAddOn?.name}`);
+    window.open(GOOGLE_FORM_URL, "_blank");
   };
   return (
     <div className="min-h-screen bg-background">
@@ -234,7 +306,7 @@ const Services = () => {
         </div>
       </section>
 
-      {/* Quick Services Section - Moved up */}
+      {/* Quick Services Section */}
       <section className="relative z-10 overflow-hidden">
         <div className="relative px-6 py-12 md:px-12 lg:px-24 xl:px-32 md:py-16">
           <div className="max-w-5xl mx-auto">
@@ -247,7 +319,7 @@ const Services = () => {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
               {quickServices.map((service, index) => (
                 <div 
                   key={index}
@@ -292,6 +364,35 @@ const Services = () => {
                   )}
                 </div>
               ))}
+
+              {/* App Development Card */}
+              <div className="bg-white rounded-3xl p-6 shadow-warm flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-warm-lg border-2 border-sage/20">
+                <div className="mb-3">
+                  <div className="w-12 h-12 rounded-full bg-sage-light flex items-center justify-center mx-auto">
+                    <Smartphone className="h-6 w-6 text-sage" />
+                  </div>
+                </div>
+                <h3 className="text-lg font-serif font-semibold text-foreground mb-2 text-center">
+                  App Development
+                </h3>
+                <p className="text-lg font-bold text-sage mb-1 text-center">
+                  From $300
+                </p>
+                <p className="text-xs text-muted-foreground mb-4 text-center">
+                  (with package) | From $900 standalone
+                </p>
+                <p className="text-sm text-foreground font-medium leading-relaxed flex-grow mb-4">
+                  Get your business in the app stores or create a save-to-home-screen experience for your clients.
+                </p>
+                <Button 
+                  onClick={() => setAppPricingOpen(true)}
+                  className="w-full rounded-full py-5 bg-sage hover:bg-sage/90 text-white shadow-warm transition-all duration-300 hover:-translate-y-0.5"
+                  size="sm"
+                >
+                  See Options
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
             </div>
 
             {/* SEO Link */}
@@ -307,6 +408,37 @@ const Services = () => {
           </div>
         </div>
       </section>
+
+      {/* Add-ons Section */}
+      <section className="relative z-10 overflow-hidden">
+        <div className="relative px-6 py-12 md:px-12 lg:px-24 xl:px-32 md:py-16">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground font-bold mb-4">
+                Enhance Your Package
+              </h2>
+              <p className="text-xl md:text-2xl text-foreground font-semibold max-w-2xl mx-auto">
+                Add powerful features to your website. <span className="text-sage">Save when bundling</span> with any main package above.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {addOns.map((addOn, index) => (
+                <AddOnCard
+                  key={index}
+                  name={addOn.name}
+                  addonPrice={addOn.addonPrice}
+                  standalonePrice={addOn.standalonePrice}
+                  description={addOn.description}
+                  icon={addOn.icon}
+                  onSelect={() => handleAddOnSelect(addOn)}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
 
       {/* Reassurance Section */}
       <section className="relative z-10 overflow-hidden">
@@ -356,6 +488,19 @@ const Services = () => {
         open={serviceSelectionOpen} 
         onOpenChange={setServiceSelectionOpen} 
         serviceName={selectedServiceName}
+      />
+      <AppPricingPopup 
+        open={appPricingOpen} 
+        onOpenChange={setAppPricingOpen} 
+        onSelectOption={handleAppPricingSelect}
+      />
+      <AddOnPricingPopup
+        open={addOnPopupOpen}
+        onOpenChange={setAddOnPopupOpen}
+        addOnName={selectedAddOn?.name || ""}
+        addonPrice={selectedAddOn?.addonPrice || ""}
+        standalonePrice={selectedAddOn?.standalonePrice || ""}
+        onSelectOption={handleAddOnPricingSelect}
       />
     </div>
   );
