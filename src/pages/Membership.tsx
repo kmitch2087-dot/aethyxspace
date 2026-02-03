@@ -4,23 +4,18 @@ import { CheckCircle2, RefreshCw, Shield, Zap } from "lucide-react";
 import Header from "@/components/Header";
 import watercolorBg from "@/assets/watercolor-bg.jpg";
 import WaitingListPopup from "@/components/WaitingListPopup";
-
 const Membership = () => {
   const [waitingListOpen, setWaitingListOpen] = useState(false);
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       <Header />
       
       {/* Fixed watercolor background */}
-      <div 
-        className="fixed inset-0 z-0 pointer-events-none"
-        style={{
-          backgroundImage: `url(${watercolorBg})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          opacity: 0.27,
-        }}
-      />
+      <div className="fixed inset-0 z-0 pointer-events-none" style={{
+      backgroundImage: `url(${watercolorBg})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      opacity: 0.27
+    }} />
       
       {/* Hero Section */}
       <section className="relative z-10 overflow-hidden">
@@ -53,11 +48,7 @@ const Membership = () => {
                 Everything you need to keep your site secure, updated, and performing at its best.
               </p>
               
-              <Button 
-                size="lg"
-                onClick={() => setWaitingListOpen(true)}
-                className="w-full text-base px-8 py-6 rounded-full bg-sage hover:bg-sage/90 text-white shadow-warm transition-all duration-300 hover:shadow-warm-lg hover:-translate-y-0.5"
-              >
+              <Button size="lg" onClick={() => setWaitingListOpen(true)} className="w-full text-base px-8 py-6 rounded-full bg-sage hover:bg-sage/90 text-white shadow-warm transition-all duration-300 hover:shadow-warm-lg hover:-translate-y-0.5">
                 Get on the Waiting List
               </Button>
             </div>
@@ -79,41 +70,28 @@ const Membership = () => {
             </div>
             
             <div className="grid md:grid-cols-2 gap-4">
-              {[
-                {
-                  icon: RefreshCw,
-                  title: "Regular Updates",
-                  desc: "Software updates, security patches, and plugin maintenance to keep everything current.",
-                  color: "sage"
-                },
-                {
-                  icon: Shield,
-                  title: "Security Monitoring",
-                  desc: "Ongoing security checks and backups to protect your site and your visitors.",
-                  color: "ocean"
-                },
-                {
-                  icon: Zap,
-                  title: "Priority Support",
-                  desc: "Fast response times when you need changes or have questions about your site.",
-                  color: "sage"
-                },
-                {
-                  icon: CheckCircle2,
-                  title: "Content Updates",
-                  desc: "Small text and image updates included each month to keep your site fresh.",
-                  color: "ocean"
-                }
-              ].map((item, i) => (
-                <div 
-                  key={i} 
-                  className="card-elevated rounded-3xl p-5 md:p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-warm-lg"
-                >
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 shadow-soft ${
-                    item.color === 'sage' 
-                      ? 'bg-gradient-to-br from-sage-light to-sage-muted' 
-                      : 'bg-gradient-to-br from-ocean-light to-ocean-muted'
-                  }`}>
+              {[{
+              icon: RefreshCw,
+              title: "Regular Updates",
+              desc: "Software updates, security patches, and plugin maintenance to keep everything current.",
+              color: "sage"
+            }, {
+              icon: Shield,
+              title: "Security Monitoring",
+              desc: "Ongoing security checks and backups to protect your site and your visitors.",
+              color: "ocean"
+            }, {
+              icon: Zap,
+              title: "Priority Support",
+              desc: "Fast response times when you need changes or have questions about your site.",
+              color: "sage"
+            }, {
+              icon: CheckCircle2,
+              title: "Content Updates",
+              desc: "Small text and image updates included each month to keep your site fresh.",
+              color: "ocean"
+            }].map((item, i) => <div key={i} className="card-elevated rounded-3xl p-5 md:p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-warm-lg">
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 shadow-soft ${item.color === 'sage' ? 'bg-gradient-to-br from-sage-light to-sage-muted' : 'bg-gradient-to-br from-ocean-light to-ocean-muted'}`}>
                     <item.icon className={`h-5 w-5 ${item.color === 'sage' ? 'text-sage' : 'text-ocean'}`} />
                   </div>
                   <h3 className="text-xl text-foreground mb-2 font-serif font-medium">
@@ -122,8 +100,7 @@ const Membership = () => {
                   <p className="text-foreground leading-relaxed font-light text-sm">
                     {item.desc}
                   </p>
-                </div>
-              ))}
+                </div>)}
             </div>
           </div>
         </div>
@@ -133,30 +110,18 @@ const Membership = () => {
       <section className="relative z-10 overflow-hidden">
         <div className="relative px-6 py-8 md:px-12 lg:px-24 xl:px-32 md:py-12">
           <div className="max-w-2xl">
-            <span className="block text-sm font-medium text-sage tracking-wide uppercase mb-3">
-              Perfect for
-            </span>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground mb-4 font-semibold">
-              Who this is for
-            </h2>
+            <span className="block text-sm font-medium text-sage tracking-wide uppercase mb-3 text-left">
+          </span>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground mb-4 font-semibold text-left">This is the ideal option for;</h2>
             <div className="space-y-3">
-              {[
-                "Business owners who want their website taken care of without the tech headaches.",
-                "Anyone who values having a professional handle the behind-the-scenes work.",
-                "Sites that need regular content updates but don't require constant redesigns."
-              ].map((text, i) => (
-                <div 
-                  key={i} 
-                  className="flex items-start gap-4 p-4 rounded-2xl bg-white border border-border/30 shadow-soft"
-                >
+              {["Business owners who want their website taken care of without the tech headaches.", "Anyone who values having a professional handle the behind-the-scenes work.", "Sites that need regular content updates but don't require constant redesigns."].map((text, i) => <div key={i} className="gap-4 p-4 rounded-2xl border border-border/30 shadow-soft items-center justify-start flex flex-row bg-destructive-foreground">
                   <div className="w-8 h-8 rounded-full bg-sage-light flex items-center justify-center flex-shrink-0">
                     <CheckCircle2 className="h-5 w-5 text-sage" />
                   </div>
                   <p className="text-foreground text-lg font-light leading-relaxed pt-0.5">
                     {text}
                   </p>
-                </div>
-              ))}
+                </div>)}
             </div>
           </div>
         </div>
@@ -172,11 +137,7 @@ const Membership = () => {
             <p className="text-foreground text-lg md:text-2xl leading-relaxed mb-8 font-medium">
               Let us handle the maintenance so you can focus on what you do best.
             </p>
-            <Button 
-              size="lg"
-              onClick={() => setWaitingListOpen(true)}
-              className="text-base px-10 py-6 rounded-full bg-sage hover:bg-sage/90 text-white shadow-warm transition-all duration-300 hover:shadow-warm-lg hover:-translate-y-0.5"
-            >
+            <Button size="lg" onClick={() => setWaitingListOpen(true)} className="text-base px-10 py-6 rounded-full bg-sage hover:bg-sage/90 text-white shadow-warm transition-all duration-300 hover:shadow-warm-lg hover:-translate-y-0.5">
               Get on the Waiting List
             </Button>
           </div>
@@ -196,8 +157,6 @@ const Membership = () => {
 
       {/* Waiting List Popup */}
       <WaitingListPopup open={waitingListOpen} onOpenChange={setWaitingListOpen} />
-    </div>
-  );
+    </div>;
 };
-
 export default Membership;
