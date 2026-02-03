@@ -44,12 +44,13 @@ const Header = () => {
         className="fixed top-0 left-0 right-0 z-40 bg-background"
       >
         <div 
-          className="relative overflow-hidden h-[120px] md:h-[180px] lg:h-[220px]"
+          className="relative overflow-hidden h-[120px] md:h-[180px] lg:h-[220px] border-b-2 border-sage/30"
           style={{
             backgroundImage: `url(${vibeShiftBanner})`,
-            backgroundSize: 'cover',
+            backgroundSize: '100% auto',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
+            backgroundColor: 'transparent',
           }}
         >
           {/* Navigation bubbles at bottom center of banner */}
