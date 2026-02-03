@@ -19,6 +19,16 @@ const getCorsHeaders = (origin: string | null) => {
   };
 };
 
+// Mask email for logging (e.g., "user@example.com" -> "u***@e***.com")
+function maskEmail(email: string): string {
+  const [local, domain] = email.split("@");
+  if (!domain) return "***";
+  const [domainName, ...tlds] = domain.split(".");
+  const maskedLocal = local.length > 1 ? local[0] + "***" : "***";
+  const maskedDomain = domainName.length > 1 ? domainName[0] + "***" : "***";
+  return `${maskedLocal}@${maskedDomain}.${tlds.join(".")}`;
+}
+
 // Consultation fee price ID
 const CONSULTATION_PRICE_ID = "price_1SwQ4mCEyzqaryb8RIoTHGwM";
 
@@ -56,7 +66,7 @@ serve(async (req) => {
     const sanitizedEmail = email.trim().toLowerCase().slice(0, 255);
     const sanitizedName = typeof name === "string" ? name.trim().slice(0, 100) : "";
 
-    console.log("Creating consultation payment for:", sanitizedEmail);
+    console.log("Creating consultation payment for:", maskEmail(sanitizedEmail));
 
     // Initialize Stripe
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {

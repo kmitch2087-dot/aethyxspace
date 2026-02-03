@@ -23,6 +23,16 @@ const getCorsHeaders = (origin: string | null) => {
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const urlRegex = /^https?:\/\/.+/;
 
+// Mask email for logging (e.g., "user@example.com" -> "u***@e***.com")
+function maskEmail(email: string): string {
+  const [local, domain] = email.split("@");
+  if (!domain) return "***";
+  const [domainName, ...tlds] = domain.split(".");
+  const maskedLocal = local.length > 1 ? local[0] + "***" : "***";
+  const maskedDomain = domainName.length > 1 ? domainName[0] + "***" : "***";
+  return `${maskedLocal}@${maskedDomain}.${tlds.join(".")}`;
+}
+
 interface WaitingListInput {
   name: string;
   email: string;
@@ -129,9 +139,36 @@ serve(async (req) => {
 
     const { name, email, updateFrequency, websiteUrl } = validation.data;
 
-    console.log("Submitting waiting list entry for:", email);
+    console.log("Submitting waiting list entry for:", maskEmail(email));
 
-    // Initialize Supabase client
+    // Initialize Supabase client with service role for checking duplicates
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+    );
+
+    // Check for duplicate email (rate limiting - prevent multiple submissions)
+    const { data: existingEntry, error: checkError } = await supabaseAdmin
+      .from("waiting_list")
+      .select("id")
+      .eq("email", email)
+      .limit(1)
+      .maybeSingle();
+
+    if (checkError) {
+      console.error("Error checking for duplicate:", checkError);
+      // Continue anyway - better to allow potential duplicate than block legitimate user
+    } else if (existingEntry) {
+      // Email already exists - return success to avoid leaking information
+      // but don't insert duplicate
+      console.log("Duplicate submission attempt for:", maskEmail(email));
+      return new Response(
+        JSON.stringify({ success: true, message: "Successfully added to waiting list" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
+      );
+    }
+
+    // Initialize Supabase client with anon key for insert
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_ANON_KEY") ?? ""
@@ -155,7 +192,7 @@ serve(async (req) => {
       );
     }
 
-    console.log("Successfully added to waiting list:", email);
+    console.log("Successfully added to waiting list:", maskEmail(email));
 
     return new Response(
       JSON.stringify({ success: true, message: "Successfully added to waiting list" }),
