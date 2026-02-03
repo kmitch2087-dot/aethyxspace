@@ -11,6 +11,10 @@ import ServiceSelectionPopup from "@/components/ServiceSelectionPopup";
 import AppPricingPopup from "@/components/AppPricingPopup";
 import AddOnCard from "@/components/AddOnCard";
 import AddOnPricingPopup from "@/components/AddOnPricingPopup";
+import AgreementPopup from "@/components/AgreementPopup";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { SERVICE_TIERS, QUICK_SERVICES, ADD_ONS, APP_DEVELOPMENT } from "@/lib/stripePrices";
 
 const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLScleBGGZeacHU4B-gGHDPiZFzOwpPHu8n_80DkwiypsB2nlEw/viewform";
 
@@ -99,14 +103,16 @@ const addOns = [
     addonPrice: "$150",
     standalonePrice: "$250",
     description: "Mailchimp or similar integration with branded templates, signup forms, and automation basics.",
-    icon: <Mail className="h-5 w-5 text-sage" />
+    icon: <Mail className="h-5 w-5 text-sage" />,
+    key: "emailCampaign",
   },
   {
     name: "Cloud Storage Integration",
     addonPrice: "$100",
     standalonePrice: "$175",
     description: "Secure file storage and sharing for client documents, portfolios, or downloadable resources.",
-    icon: <Cloud className="h-5 w-5 text-sage" />
+    icon: <Cloud className="h-5 w-5 text-sage" />,
+    key: "cloudStorage",
   },
   {
     name: "Client Dashboard with Login",
@@ -114,32 +120,37 @@ const addOns = [
     standalonePrice: "$400",
     description: "Included in Tier 3! Google/social login with a private client dashboard plus an admin dashboard for you to manage clients from the backend.",
     icon: <Users className="h-5 w-5 text-sage" />,
-    includedInTier3: true
+    includedInTier3: true,
+    key: "clientDashboard",
   },
   {
     name: "E-commerce Add-on",
     addonPrice: "$300",
     standalonePrice: "$500",
     description: "Add a shop section to your site with product listings, cart functionality, and Stripe payments.",
-    icon: <ShoppingCart className="h-5 w-5 text-sage" />
+    icon: <ShoppingCart className="h-5 w-5 text-sage" />,
+    key: "ecommerce",
   },
   {
     name: "Booking & Scheduling",
     addonPrice: "$125",
     standalonePrice: "$200",
     description: "Calendly or custom booking integration for appointments, consultations, and service scheduling.",
-    icon: <Calendar className="h-5 w-5 text-sage" />
+    icon: <Calendar className="h-5 w-5 text-sage" />,
+    key: "bookingScheduling",
   },
   {
     name: "Analytics Dashboard",
     addonPrice: "$100",
     standalonePrice: "$175",
     description: "Custom analytics setup with Google Analytics, conversion tracking, and a simple reporting dashboard.",
-    icon: <BarChart3 className="h-5 w-5 text-sage" />
-  }
+    icon: <BarChart3 className="h-5 w-5 text-sage" />,
+    key: "analytics",
+  },
 ];
 
 const Services = () => {
+  const { toast } = useToast();
   const [seoPopupOpen, setSeoPopupOpen] = useState(false);
   const [waitingListOpen, setWaitingListOpen] = useState(false);
   const [serviceInfoOpen, setServiceInfoOpen] = useState(false);
@@ -151,6 +162,17 @@ const Services = () => {
   const [addOnPopupOpen, setAddOnPopupOpen] = useState(false);
   const [selectedAddOn, setSelectedAddOn] = useState<typeof addOns[0] | null>(null);
 
+  // Agreement flow state
+  const [agreementOpen, setAgreementOpen] = useState(false);
+  const [pendingPayment, setPendingPayment] = useState<{
+    priceId: string;
+    serviceName: string;
+    isSubscription?: boolean;
+    email?: string;
+    name?: string;
+  } | null>(null);
+  const [isPaymentLoading, setIsPaymentLoading] = useState(false);
+
   const handleOpenServiceInfo = (tier: 1 | 2 | 3) => {
     setSelectedTier(tier);
     setServiceInfoOpen(true);
@@ -161,12 +183,51 @@ const Services = () => {
     setServiceSelectionOpen(true);
   };
 
+  // Process payment after agreement is complete
+  const processPayment = async () => {
+    if (!pendingPayment) return;
+
+    setIsPaymentLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-service-payment", {
+        body: {
+          email: pendingPayment.email || "customer@example.com", // Will be collected in form
+          name: pendingPayment.name || "",
+          priceId: pendingPayment.priceId,
+          serviceName: pendingPayment.serviceName,
+          isSubscription: pendingPayment.isSubscription || false,
+        },
+      });
+
+      if (error) throw error;
+      if (data?.url) {
+        window.open(data.url, "_blank");
+      }
+    } catch (error) {
+      console.error("Payment error:", error);
+      toast({
+        title: "Payment Error",
+        description: "There was an issue creating your payment session. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsPaymentLoading(false);
+      setAgreementOpen(false);
+      setPendingPayment(null);
+    }
+  };
+
+  // Start payment flow with agreement requirement
+  const startPaymentFlow = (priceId: string, serviceName: string, isSubscription = false) => {
+    setPendingPayment({ priceId, serviceName, isSubscription });
+    setAgreementOpen(true);
+  };
+
   const handleAppPricingSelect = (type: "addon" | "standalone", appType: "native" | "pwa") => {
     setAppPricingOpen(false);
-    // Here you would trigger the payment flow with the appropriate pricing
-    console.log(`Selected ${type} ${appType} app`);
-    // For now, redirect to form - payment integration can be added
-    window.open(GOOGLE_FORM_URL, "_blank");
+    const appPrices = APP_DEVELOPMENT[appType];
+    const priceId = type === "addon" ? appPrices.addon.priceId : appPrices.standalone.priceId;
+    startPaymentFlow(priceId, `${appPrices.name} (${type})`);
   };
 
   const handleAddOnSelect = (addOn: typeof addOns[0]) => {
@@ -176,9 +237,22 @@ const Services = () => {
 
   const handleAddOnPricingSelect = (type: "addon" | "standalone") => {
     setAddOnPopupOpen(false);
-    // Here you would trigger the payment flow
-    console.log(`Selected ${type} for ${selectedAddOn?.name}`);
-    window.open(GOOGLE_FORM_URL, "_blank");
+    if (!selectedAddOn?.key) return;
+    
+    const addOnPrices = ADD_ONS[selectedAddOn.key as keyof typeof ADD_ONS];
+    if (!addOnPrices) return;
+    
+    const priceId = type === "addon" ? addOnPrices.addon.priceId : addOnPrices.standalone.priceId;
+    startPaymentFlow(priceId, `${addOnPrices.name} (${type})`);
+  };
+
+  const handleQuickServicePayment = (service: typeof quickServices[0]) => {
+    if (service.isSubscription) {
+      // Subscription goes to waiting list for now
+      setWaitingListOpen(true);
+    } else {
+      startPaymentFlow(service.priceId, service.name);
+    }
   };
   return (
     <div className="min-h-screen bg-background">
@@ -338,20 +412,14 @@ const Services = () => {
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   ) : (
-                    <a 
-                      href={GOOGLE_FORM_URL}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block"
+                    <Button 
+                      onClick={() => handleQuickServicePayment(service)}
+                      className="w-full rounded-full py-5 bg-sage hover:bg-sage/90 text-white shadow-warm transition-all duration-300 hover:-translate-y-0.5"
+                      size="sm"
                     >
-                      <Button 
-                        className="w-full rounded-full py-5 bg-sage hover:bg-sage/90 text-white shadow-warm transition-all duration-300 hover:-translate-y-0.5"
-                        size="sm"
-                      >
-                        Get Started
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
-                    </a>
+                      Get Started
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
                   )}
                 </div>
               ))}
@@ -502,6 +570,13 @@ const Services = () => {
         addonPrice={selectedAddOn?.addonPrice || ""}
         standalonePrice={selectedAddOn?.standalonePrice || ""}
         onSelectOption={handleAddOnPricingSelect}
+      />
+      <AgreementPopup
+        open={agreementOpen}
+        onOpenChange={setAgreementOpen}
+        onAgreementComplete={processPayment}
+        serviceName={pendingPayment?.serviceName || ""}
+        isLoading={isPaymentLoading}
       />
     </div>
   );
