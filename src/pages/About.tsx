@@ -1,23 +1,11 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
-import watercolorBg from "@/assets/watercolor-bg.jpg";
 
 const About = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
-      {/* Watercolor background layer */}
-      <div 
-        className="fixed inset-0 z-0 pointer-events-none"
-        style={{
-          backgroundImage: `url(${watercolorBg})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          opacity: 0.27,
-        }}
-      />
       
       <main className="relative z-10 pt-28 pb-24 px-6 md:px-12 lg:px-24 xl:px-32">
         <div className="max-w-2xl mx-auto">

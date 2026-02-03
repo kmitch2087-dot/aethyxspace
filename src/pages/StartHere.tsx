@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, MessageCircle, Compass, Heart, ExternalLink } from "lucide-react";
 import Header from "@/components/Header";
-import watercolorBg from "@/assets/watercolor-bg.jpg";
 import ConsultationPayment from "@/components/ConsultationPayment";
 
 const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLScleBGGZeacHU4B-gGHDPiZFzOwpPHu8n_80DkwiypsB2nlEw/viewform?usp=publish-editor";
@@ -10,17 +9,6 @@ const StartHere = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
-      {/* Fixed watercolor background */}
-      <div 
-        className="fixed inset-0 z-0 pointer-events-none"
-        style={{
-          backgroundImage: `url(${watercolorBg})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          opacity: 0.27,
-        }}
-      />
 
       {/* Section 1 — Opening */}
       <section className="relative z-10 overflow-hidden">

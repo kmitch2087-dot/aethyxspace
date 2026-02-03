@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle, Loader2 } from "lucide-react";
 import Header from "@/components/Header";
-import watercolorBg from "@/assets/watercolor-bg.jpg";
 
 const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLScleBGGZeacHU4B-gGHDPiZFzOwpPHu8n_80DkwiypsB2nlEw/viewform";
 
@@ -31,17 +30,6 @@ const PaymentSuccess = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
-      {/* Fixed watercolor background */}
-      <div 
-        className="fixed inset-0 z-0 pointer-events-none"
-        style={{
-          backgroundImage: `url(${watercolorBg})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          opacity: 0.27,
-        }}
-      />
 
       <section className="relative z-10 overflow-hidden">
         <div className="relative px-6 pt-32 pb-24 md:px-12 lg:px-24 xl:px-32 md:pt-40 md:pb-32">
