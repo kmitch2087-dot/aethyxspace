@@ -43,11 +43,20 @@ serve(async (req) => {
   try {
     const { email, name } = await req.json();
 
-    if (!email) {
-      throw new Error("Email is required");
+    // Input validation - email format check
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || typeof email !== "string" || !emailRegex.test(email.trim())) {
+      return new Response(
+        JSON.stringify({ error: "Valid email address is required" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+      );
     }
 
-    console.log("Creating consultation payment for:", email);
+    // Sanitize inputs
+    const sanitizedEmail = email.trim().toLowerCase().slice(0, 255);
+    const sanitizedName = typeof name === "string" ? name.trim().slice(0, 100) : "";
+
+    console.log("Creating consultation payment for:", sanitizedEmail);
 
     // Initialize Stripe
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
@@ -55,7 +64,7 @@ serve(async (req) => {
     });
 
     // Check if a Stripe customer already exists for this email
-    const customers = await stripe.customers.list({ email, limit: 1 });
+    const customers = await stripe.customers.list({ email: sanitizedEmail, limit: 1 });
     let customerId: string | undefined;
 
     if (customers.data.length > 0) {
@@ -64,8 +73,8 @@ serve(async (req) => {
     } else {
       // Create a new customer
       const customer = await stripe.customers.create({
-        email,
-        name: name || undefined,
+        email: sanitizedEmail,
+        name: sanitizedName || undefined,
       });
       customerId = customer.id;
       console.log("Created new customer:", customerId);
@@ -85,8 +94,8 @@ serve(async (req) => {
       cancel_url: `${req.headers.get("origin")}/services`,
       metadata: {
         type: "consultation",
-        customerEmail: email,
-        customerName: name || "",
+        customerEmail: sanitizedEmail,
+        customerName: sanitizedName,
       },
     });
 
@@ -97,11 +106,11 @@ serve(async (req) => {
       status: 200,
     });
   } catch (error: unknown) {
+    // Log detailed error for debugging, but return generic message to client
     console.error("Error creating consultation payment:", error);
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
-    return new Response(JSON.stringify({ error: errorMessage }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 500,
-    });
+    return new Response(
+      JSON.stringify({ error: "Failed to create payment session. Please try again." }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
+    );
   }
 });
