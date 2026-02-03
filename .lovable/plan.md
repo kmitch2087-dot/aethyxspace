@@ -1,85 +1,89 @@
 
-## Global Visual Tidy + Navigation Update
 
-This plan covers navigation restructuring, button consistency, unified background treatment, logo replacement, and typography refinements across all pages.
+## Homepage Styling Refinement Plan
 
----
-
-### Task 1: Update Navigation Order + Highlight "Start Here"
-
-**Current order:** Home | About | Services | Start Here
-
-**New order:** Home | Services | About | Start Here (visually distinct)
-
-**Changes to Header.tsx:**
-- Reorder navLinks array to: Home, Services, About, Start Here
-- Style "Start Here" as a button with sage background color
-- Other nav items remain as text links
+This plan creates a calm, warm, and intentionally designed homepage by replacing the watercolor background with soft muted cream, refining the services section into distinct grounded cards, and polishing the overall visual hierarchy.
 
 ---
 
-### Task 2: Replace Logo with New Watercolor Logo
+### Overview of Changes
 
-**What we'll do:**
-- Copy the uploaded watercolor "VibeShift Studio" logo to `src/assets/`
-- Replace `vibe-shift-logo.jpg` references in Header.tsx and Index.tsx footer
-- Increase logo size by 100% (from `h-12 md:h-14` to `h-24 md:h-28`)
-
----
-
-### Task 3: Unified Fixed Background (All Pages)
-
-**Current state:** Each page has different section backgrounds with gradient overlays
-
-**New approach:**
-- Use the watercolor background image as a fixed layer on all pages
-- Increase opacity from 0.18 to approximately 0.27 (50% increase)
-- Content scrolls over the fixed background
-- Remove individual section gradient backgrounds for consistency
-
-**Pages to update:**
-- Index.tsx (homepage)
-- Services.tsx
-- StartHere.tsx
-- About.tsx (already has fixed background, just adjust opacity)
+| Area | Current State | New State |
+|------|--------------|-----------|
+| Background | Fixed watercolor image at 27% opacity | Soft, muted cream solid background |
+| Services Cards | `card-elevated` with warm shadow | Distinct cards with rounded corners, subtle border, light cream background |
+| Typography | Mixed weights | Cleaner hierarchy, consistent weight usage |
+| Overall Feel | Organic/watercolor aesthetic | Warm, calm, quietly confident |
 
 ---
 
-### Task 4: CTA Button Consistency Check
+### Task 1: Replace Watercolor Background with Muted Cream
 
-**Audit findings:**
-| Page | Button Text | Link | Status |
-|------|-------------|------|--------|
-| Index.tsx Hero | "Start Here" | /start-here | OK |
-| Index.tsx Final CTA | "Start Here" | /start-here | OK |
-| About.tsx | "Start Here" | /start-here | OK |
-| Services.tsx (all 3 cards) | "Start Here" | /start-here | OK |
-| Services.tsx Reassurance | "Start Here" | /start-here | OK |
-| **StartHere.tsx** | **"Get Started"** | **none** | **NEEDS FIX** |
+**File:** `src/pages/Index.tsx`
 
-**Fix required:** Change "Get Started" button on StartHere.tsx to say "Start Here" and ensure consistent styling.
+**What changes:**
+- Remove the fixed watercolor background `div` (lines 14-20)
+- Apply the existing `--cream` color variable (`42 38% 94%`) as the page background
+- This creates a soft, warm foundation without busy patterns
+
+**Result:** A clean, warm cream backdrop that feels intentional and calm.
 
 ---
 
-### Task 5: Button Style Consistency
+### Task 2: Refine Services Cards Styling
 
-**Standard button style (apply everywhere):**
-- Background: sage color
-- Shape: rounded-full
-- Hover: bg-sage/90, slight lift (-translate-y-0.5)
-- Shadow: shadow-warm, hover:shadow-warm-lg
-- Text: white
+**File:** `src/index.css`
 
-**Files to check/update:** All page files with buttons
+**What changes:**
+- Create a new utility class `.card-service` specifically for service cards:
+  - Background: `hsl(var(--warm-white))` (slightly lighter than page background for separation)
+  - Border: Very subtle `1px solid` using `hsl(var(--border) / 0.4)` 
+  - Border radius: `rounded-2xl` (16px) - softer than current `rounded-3xl`
+  - Shadow: Softer, more diffused shadow for grounded feel
+  - Remove the heavy warm shadow on hover
+
+**File:** `src/pages/Index.tsx`
+
+**What changes:**
+- Replace `card-elevated` with new `card-service` class on the three service cards
+- Reduce hover lift effect from `-translate-y-1` to `-translate-y-0.5` (more subtle)
+- Remove the `hover:shadow-warm-lg` in favor of consistent subtle elevation
 
 ---
 
-### Task 6: Typography Refinements
+### Task 3: Typography Cleanup
 
-**Subheadings:** Make them slightly bigger and bolder
-- Section labels (uppercase): Keep as-is
-- Section h2 headings: Increase from `text-3xl md:text-4xl` to `text-3xl md:text-4xl lg:text-5xl` and add `font-semibold`
-- Ensure one big headline per page (hero only)
+**File:** `src/pages/Index.tsx`
+
+**What changes:**
+- Ensure consistent heading weights:
+  - H1 (hero): Keep `font-medium` for elegance
+  - H2 (section titles): Keep `font-semibold`
+  - H3 (card titles): Change to `font-medium` (currently mixed)
+- Body text: Ensure `font-normal` or `font-light` for paragraph text (remove `font-bold` from "Choose Your Path" description)
+- Remove `heading-accent` underline decoration for cleaner look
+
+---
+
+### Task 4: Deliverables Section Refinement
+
+**File:** `src/pages/Index.tsx`
+
+**What changes:**
+- Apply same `card-service` styling to deliverable cards
+- Reduce visual weight of this section (smaller icons, subtler presentation)
+- Keep it functional but not competing with main services
+
+---
+
+### Task 5: Process Section Cards
+
+**File:** `src/pages/Index.tsx`
+
+**What changes:**
+- Apply `card-service` styling to process step cards
+- Reduce the hover shadow intensity
+- Keep step numbers in paint splats but ensure they feel integrated
 
 ---
 
@@ -87,38 +91,61 @@ This plan covers navigation restructuring, button consistency, unified backgroun
 
 | File | Changes |
 |------|---------|
-| `src/assets/` | Add new logo image |
-| `src/components/Header.tsx` | Reorder nav, style "Start Here" as button, update logo size and source |
-| `src/pages/Index.tsx` | Fixed watercolor background, remove section gradients, update logo reference, typography tweaks |
-| `src/pages/Services.tsx` | Fixed watercolor background, remove section gradients, consistent button styling |
-| `src/pages/StartHere.tsx` | Fixed watercolor background, fix "Get Started" button text, remove section gradients |
-| `src/pages/About.tsx` | Increase background opacity to ~0.27 |
+| `src/pages/Index.tsx` | Remove watercolor BG, apply cream background, update card classes, refine typography |
+| `src/index.css` | Add new `.card-service` utility class with calm, grounded styling |
 
 ---
 
 ### Visual Summary
 
+```text
+BEFORE:                              AFTER:
++-----------------------------+      +-----------------------------+
+| Watercolor BG (27% opacity) |      | Solid muted cream BG        |
+| Heavy warm shadows on cards |      | Subtle shadows + soft border|
+| Strong hover effects        |      | Gentle hover lift           |
+| Mixed typography weights    |      | Clean consistent hierarchy  |
++-----------------------------+      +-----------------------------+
+
+Service Card Comparison:
++------------------+              +------------------+
+| card-elevated    |              | card-service     |
+| - white bg       |      -->     | - warm-white bg  |
+| - warm shadows   |              | - subtle border  |
+| - heavy hover    |              | - gentle shadow  |
++------------------+              +------------------+
 ```
-text
-BEFORE:                           AFTER:
-+---------------------------+     +---------------------------+
-| [logo] Home About Svcs    |     | [BIG LOGO] Home Svcs About|
-|              Start Here   |     |              [Start Here] | <- button style
-+---------------------------+     +---------------------------+
-| Section 1 (gradient A)    |     | Fixed watercolor BG       |
-+---------------------------+     | (higher opacity, scrolls) |
-| Section 2 (gradient B)    |     |                           |
-+---------------------------+     | Content scrolls on top    |
-| Section 3 (gradient C)    |     |                           |
-+---------------------------+     +---------------------------+
+
+---
+
+### New CSS Class Definition
+
+```css
+.card-service {
+  @apply relative overflow-hidden rounded-2xl;
+  background: hsl(var(--warm-white));
+  border: 1px solid hsl(var(--border) / 0.5);
+  box-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.02),
+    0 2px 8px rgba(0, 0, 0, 0.03);
+  transition: all 0.3s ease;
+}
+
+.card-service:hover {
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.03),
+    0 4px 12px rgba(0, 0, 0, 0.05);
+}
 ```
 
 ---
 
 ### Implementation Order
 
-1. Copy new logo to assets
-2. Update Header.tsx (nav order, logo, Start Here styling)
-3. Update each page with fixed background treatment
-4. Fix button text consistency
-5. Apply typography refinements
+1. Add `.card-service` class to `src/index.css`
+2. Update `src/pages/Index.tsx`:
+   - Remove watercolor background
+   - Add cream background to page
+   - Replace card classes on services, deliverables, and process sections
+   - Clean up typography weights
+
