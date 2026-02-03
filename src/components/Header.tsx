@@ -58,10 +58,10 @@ const Header = () => {
               <Link
                 key={link.href}
                 to={link.href}
-                className={`text-[10px] font-semibold px-3 py-1 rounded-full transition-all duration-200 ${
+                className={`text-[10px] font-semibold px-3 py-1 rounded-full transition-all duration-300 ${
                   location.pathname === link.href
-                    ? "bg-white text-sage border border-sage"
-                    : "bg-white/90 text-sage hover:bg-white border border-transparent hover:border-sage"
+                    ? "bg-white text-sage border border-sage shadow-[0_0_12px_rgba(91,122,95,0.4)]"
+                    : "bg-white/90 text-sage hover:bg-white border border-transparent hover:border-sage hover:shadow-[0_0_16px_rgba(91,122,95,0.5)] hover:animate-pulse"
                 }`}
               >
                 {link.label}
@@ -69,7 +69,7 @@ const Header = () => {
             ))}
             <Link
               to="/start-here"
-              className="text-[10px] font-semibold px-3 py-1 rounded-full bg-sage text-white hover:bg-sage/90 transition-all duration-200 shadow-warm"
+              className="text-[10px] font-semibold px-3 py-1 rounded-full bg-sage text-white hover:bg-sage/90 transition-all duration-300 shadow-warm hover:shadow-[0_0_20px_rgba(91,122,95,0.6)] hover:animate-pulse"
             >
               Start Here
             </Link>

@@ -1,10 +1,12 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, RefreshCw, Shield, Zap } from "lucide-react";
 import Header from "@/components/Header";
 import watercolorBg from "@/assets/watercolor-bg.jpg";
+import WaitingListPopup from "@/components/WaitingListPopup";
 
 const Membership = () => {
+  const [waitingListOpen, setWaitingListOpen] = useState(false);
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -52,11 +54,11 @@ const Membership = () => {
               </p>
               
               <Button 
-                asChild 
                 size="lg"
+                onClick={() => setWaitingListOpen(true)}
                 className="w-full text-base px-8 py-6 rounded-full bg-sage hover:bg-sage/90 text-white shadow-warm transition-all duration-300 hover:shadow-warm-lg hover:-translate-y-0.5"
               >
-                <Link to="/start-here">Get Started</Link>
+                Get on the Waiting List
               </Button>
             </div>
           </div>
@@ -171,11 +173,11 @@ const Membership = () => {
               Let us handle the maintenance so you can focus on what you do best.
             </p>
             <Button 
-              asChild 
               size="lg"
+              onClick={() => setWaitingListOpen(true)}
               className="text-base px-10 py-6 rounded-full bg-sage hover:bg-sage/90 text-white shadow-warm transition-all duration-300 hover:shadow-warm-lg hover:-translate-y-0.5"
             >
-              <Link to="/start-here">Start Here</Link>
+              Get on the Waiting List
             </Button>
           </div>
         </div>
@@ -191,6 +193,9 @@ const Membership = () => {
           </div>
         </div>
       </footer>
+
+      {/* Waiting List Popup */}
+      <WaitingListPopup open={waitingListOpen} onOpenChange={setWaitingListOpen} />
     </div>
   );
 };
