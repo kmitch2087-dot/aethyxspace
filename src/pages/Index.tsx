@@ -1,21 +1,23 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, CheckCircle2, Sparkles, Layout, Palette } from "lucide-react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import PaintSplat from "@/components/PaintSplat";
 import vibeShiftLogo from "@/assets/vibe-shift-logo.jpg";
 import watercolorBg from "@/assets/watercolor-bg.jpg";
+
 const Index = () => {
-  return <div className="min-h-screen bg-background">
+  return (
+    <div className="min-h-screen bg-background">
       <Header />
       
       {/* Fixed watercolor background */}
       <div className="fixed inset-0 z-0 pointer-events-none" style={{
-      backgroundImage: `url(${watercolorBg})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      opacity: 0.27
-    }} />
+        backgroundImage: `url(${watercolorBg})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        opacity: 0.27
+      }} />
       
       {/* Hero Section */}
       <section className="relative z-10 overflow-hidden">
@@ -115,9 +117,7 @@ const Index = () => {
             <div className="grid md:grid-cols-3 gap-4">
               {/* Service Card 1 */}
               <div className="card-elevated rounded-3xl p-5 md:p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-warm-lg">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-sage-light to-sage-muted flex items-center justify-center mb-4 shadow-soft">
-                  <Sparkles className="h-5 w-5 text-sage" />
-                </div>
+                <PaintSplat number="1" color="sage" />
                 <h3 className="text-xl md:text-2xl text-foreground mb-2 font-serif font-medium">
                   Online Presence Starter
                 </h3>
@@ -129,9 +129,7 @@ const Index = () => {
 
               {/* Service Card 2 */}
               <div className="card-elevated rounded-3xl p-5 md:p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-warm-lg">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-ocean-light to-ocean-muted flex items-center justify-center mb-4 shadow-soft">
-                  <Layout className="h-5 w-5 text-ocean" />
-                </div>
+                <PaintSplat number="2" color="ocean" />
                 <h3 className="text-xl md:text-2xl text-foreground mb-2 font-serif font-medium">
                   Professional Brand Website
                 </h3>
@@ -143,9 +141,7 @@ const Index = () => {
 
               {/* Service Card 3 */}
               <div className="card-elevated rounded-3xl p-5 md:p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-warm-lg">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-sand to-sand-deep flex items-center justify-center mb-4 shadow-soft">
-                  <Palette className="h-5 w-5 text-foreground" />
-                </div>
+                <PaintSplat number="3" color="sage" />
                 <h3 className="text-xl md:text-2xl text-foreground mb-2 font-serif font-medium">
                   Signature Brand Presence
                 </h3>
@@ -153,6 +149,31 @@ const Index = () => {
                   A comprehensive website experience with premium design, 
                   strategic content, and everything you need to stand out.
                 </p>
+              </div>
+            </div>
+
+            {/* Deliverables Row */}
+            <div className="mt-6">
+              <div className="text-center mb-4">
+                <span className="block text-sm font-medium text-ocean tracking-wide uppercase mb-2">
+                  Quick add-ons
+                </span>
+                <h3 className="text-2xl md:text-3xl text-foreground font-semibold">
+                  Deliverables
+                </h3>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {[
+                  { num: "1", label: "Logo Creation", color: "sage" as const },
+                  { num: "2", label: "Brand Assets", color: "ocean" as const },
+                  { num: "3", label: "Full Package", color: "sage" as const },
+                  { num: "4", label: "Maintenance", color: "ocean" as const },
+                ].map((item, i) => (
+                  <div key={i} className="card-elevated rounded-2xl p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-warm-lg">
+                    <PaintSplat number={item.num} color={item.color} />
+                    <p className="text-sm font-medium text-foreground">{item.label}</p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -174,34 +195,46 @@ const Index = () => {
             
             <div className="grid md:grid-cols-4 gap-4">
               {[{
-              num: "1",
-              title: "Intake",
-              desc: "Fill out a simple form so we can understand your needs and vision.",
-              color: "sage" as const
-            }, {
-              num: "2",
-              title: "Design & Build",
-              desc: "We craft your website with care, handling all the details.",
-              color: "ocean" as const
-            }, {
-              num: "3",
-              title: "Review",
-              desc: "You review and we refine until everything feels just right.",
-              color: "sage" as const
-            }, {
-              num: "4",
-              title: "Launch",
-              desc: "Your polished website goes live, ready to welcome visitors.",
-              color: "ocean" as const
-            }].map((step, i) => <div key={i} className="card-elevated rounded-3xl p-5 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-warm-lg">
+                num: "1",
+                title: "Intake",
+                desc: "Fill out a simple form so we can understand your needs and vision.",
+                color: "sage" as const
+              }, {
+                num: "2",
+                title: "Design & Build",
+                desc: "We craft your website with care, handling all the details.",
+                color: "ocean" as const
+              }, {
+                num: "3",
+                title: "Review",
+                desc: "You review and we refine until everything feels just right.",
+                color: "sage" as const
+              }, {
+                num: "4",
+                title: "Launch",
+                desc: "Your polished website goes live, ready to welcome visitors.",
+                color: "ocean" as const
+              }].map((step, i) => (
+                <div key={i} className="card-elevated rounded-3xl p-5 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-warm-lg">
                   <PaintSplat number={step.num} color={step.color} />
-                  <h3 className="font-serif text-lg text-foreground mb-1 font-medium">
+                  <h3 className="font-serif text-xl md:text-2xl text-foreground mb-2 font-semibold">
                     {step.title}
                   </h3>
-                  <p className="text-xs text-foreground font-light leading-relaxed">
+                  <p className="text-base md:text-lg text-foreground font-medium leading-relaxed">
                     {step.desc}
                   </p>
-                </div>)}
+                </div>
+              ))}
+            </div>
+
+            {/* Choose Your Path */}
+            <div className="mt-10 text-center">
+              <h3 className="text-2xl md:text-3xl lg:text-4xl text-foreground font-bold mb-4">
+                Choose Your Path
+              </h3>
+              <p className="text-lg md:text-xl text-foreground font-semibold max-w-2xl mx-auto">
+                Whether you're starting from scratch or ready to level up, we have a service that fits your needs and budget.
+              </p>
             </div>
           </div>
         </div>
@@ -242,6 +275,8 @@ const Index = () => {
           </div>
         </div>
       </footer>
-    </div>;
+    </div>
+  );
 };
+
 export default Index;
