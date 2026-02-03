@@ -103,6 +103,10 @@ const tierDetails = {
         description: "Polished, on-brand bios for your social media profiles that maintain consistency with your website presence."
       },
       {
+        name: "Client & Admin Dashboards",
+        description: "A private client dashboard with Google/social login so your clients can access their content—plus an admin dashboard for you to manage clients, content, and interactions from the backend."
+      },
+      {
         name: "Post-launch support",
         description: "I don't disappear after launch. You get dedicated support to ensure everything runs smoothly as you start using your new site."
       },
