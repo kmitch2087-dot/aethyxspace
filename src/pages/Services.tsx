@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Check, HelpCircle, Info, Smartphone, Mail, Cloud, Users, ShoppingCart, Calendar, BarChart3 } from "lucide-react";
 import Header from "@/components/Header";
-import watercolorBg from "@/assets/watercolor-bg.jpg";
+
 import SeoPopup from "@/components/SeoPopup";
 import WaitingListPopup from "@/components/WaitingListPopup";
 import PaintSplat from "@/components/PaintSplat";
@@ -181,17 +181,6 @@ const Services = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-
-      {/* Fixed watercolor background */}
-      <div 
-        className="fixed inset-0 z-0 pointer-events-none"
-        style={{
-          backgroundImage: `url(${watercolorBg})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          opacity: 0.27,
-        }}
-      />
 
       {/* Page Intro */}
       <section className="relative z-10 overflow-hidden">

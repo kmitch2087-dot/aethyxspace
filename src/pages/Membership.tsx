@@ -2,20 +2,13 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, RefreshCw, Shield, Zap } from "lucide-react";
 import Header from "@/components/Header";
-import watercolorBg from "@/assets/watercolor-bg.jpg";
 import WaitingListPopup from "@/components/WaitingListPopup";
+
 const Membership = () => {
   const [waitingListOpen, setWaitingListOpen] = useState(false);
-  return <div className="min-h-screen bg-background">
+  return (
+    <div className="min-h-screen bg-background">
       <Header />
-      
-      {/* Fixed watercolor background */}
-      <div className="fixed inset-0 z-0 pointer-events-none" style={{
-      backgroundImage: `url(${watercolorBg})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      opacity: 0.27
-    }} />
       
       {/* Hero Section */}
       <section className="relative z-10 overflow-hidden">
@@ -157,6 +150,8 @@ const Membership = () => {
 
       {/* Waiting List Popup */}
       <WaitingListPopup open={waitingListOpen} onOpenChange={setWaitingListOpen} />
-    </div>;
+    </div>
+  );
 };
+
 export default Membership;
