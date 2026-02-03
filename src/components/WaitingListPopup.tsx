@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface WaitingListPopupProps {
   open: boolean;
@@ -33,12 +34,34 @@ const WaitingListPopup = ({ open, onOpenChange }: WaitingListPopupProps) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate form submission - in production, this would send to a backend
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      const { data, error } = await supabase.functions.invoke("submit-waiting-list", {
+        body: {
+          name: formData.name,
+          email: formData.email,
+          updateFrequency: formData.updateFrequency,
+          websiteUrl: formData.websiteUrl || undefined,
+        },
+      });
 
-    setFormData({ name: "", email: "", updateFrequency: "", websiteUrl: "" });
-    setIsSubmitting(false);
-    setIsSubmitted(true);
+      if (error) throw error;
+
+      if (data?.error) {
+        throw new Error(data.error);
+      }
+
+      setFormData({ name: "", email: "", updateFrequency: "", websiteUrl: "" });
+      setIsSubmitted(true);
+    } catch (error: unknown) {
+      console.error("Waiting list submission error:", error);
+      toast({
+        title: "Submission Failed",
+        description: error instanceof Error ? error.message : "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleClose = () => {
