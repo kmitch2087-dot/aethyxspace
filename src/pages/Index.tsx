@@ -4,20 +4,11 @@ import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import PaintSplat from "@/components/PaintSplat";
 import vibeShiftLogo from "@/assets/vibe-shift-logo.jpg";
-import watercolorBg from "@/assets/watercolor-bg.jpg";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-cream">
       <Header />
-      
-      {/* Fixed watercolor background */}
-      <div className="fixed inset-0 z-0 pointer-events-none" style={{
-        backgroundImage: `url(${watercolorBg})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        opacity: 0.27
-      }} />
       
       {/* Hero Section */}
       <section className="relative z-10 overflow-hidden">
@@ -44,7 +35,7 @@ const Index = () => {
               <span className="block text-sm font-medium text-sage tracking-wide uppercase mb-3">
                 The reality
               </span>
-              <h2 className="text-2xl md:text-3xl lg:text-4xl text-foreground mb-4 font-semibold heading-accent">
+              <h2 className="text-2xl md:text-3xl lg:text-4xl text-foreground mb-4 font-semibold">
                 Why your online presence matters
               </h2>
               <ul className="space-y-2 text-left">
@@ -84,7 +75,7 @@ const Index = () => {
             <span className="block text-sm font-medium text-ocean tracking-wide uppercase mb-3">
               Our approach
             </span>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground mb-4 font-semibold heading-accent">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground mb-4 font-semibold">
               What we do
             </h2>
             <div className="space-y-3">
@@ -116,7 +107,7 @@ const Index = () => {
             
             <div className="grid md:grid-cols-3 gap-4">
               {/* Service Card 1 */}
-              <div className="card-elevated rounded-3xl p-5 md:p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-warm-lg">
+              <div className="card-service p-5 md:p-6 transition-all duration-300 hover:-translate-y-0.5">
                 <PaintSplat number="1" color="sage" />
                 <h3 className="text-xl md:text-2xl text-foreground mb-2 font-serif font-medium">
                   Online Presence Starter
@@ -128,7 +119,7 @@ const Index = () => {
               </div>
 
               {/* Service Card 2 */}
-              <div className="card-elevated rounded-3xl p-5 md:p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-warm-lg">
+              <div className="card-service p-5 md:p-6 transition-all duration-300 hover:-translate-y-0.5">
                 <PaintSplat number="2" color="ocean" />
                 <h3 className="text-xl md:text-2xl text-foreground mb-2 font-serif font-medium">
                   Professional Brand Website
@@ -140,7 +131,7 @@ const Index = () => {
               </div>
 
               {/* Service Card 3 */}
-              <div className="card-elevated rounded-3xl p-5 md:p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-warm-lg">
+              <div className="card-service p-5 md:p-6 transition-all duration-300 hover:-translate-y-0.5">
                 <PaintSplat number="3" color="sage" />
                 <h3 className="text-xl md:text-2xl text-foreground mb-2 font-serif font-medium">
                   Signature Brand Presence
@@ -169,7 +160,7 @@ const Index = () => {
                   { num: "3", label: "Full Package", color: "sage" as const },
                   { num: "4", label: "Maintenance", color: "ocean" as const },
                 ].map((item, i) => (
-                  <div key={i} className="card-elevated rounded-2xl p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-warm-lg">
+                  <div key={i} className="card-service p-4 text-center transition-all duration-300 hover:-translate-y-0.5">
                     <PaintSplat number={item.num} color={item.color} />
                     <p className="text-sm font-medium text-foreground">{item.label}</p>
                   </div>
@@ -215,9 +206,9 @@ const Index = () => {
                 desc: "Your polished website goes live, ready to welcome visitors.",
                 color: "ocean" as const
               }].map((step, i) => (
-                <div key={i} className="card-elevated rounded-3xl p-5 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-warm-lg">
+                <div key={i} className="card-service p-5 text-center transition-all duration-300 hover:-translate-y-0.5">
                   <PaintSplat number={step.num} color={step.color} />
-                  <h3 className="font-serif text-xl md:text-2xl text-foreground mb-2 font-semibold">
+                  <h3 className="font-serif text-xl md:text-2xl text-foreground mb-2 font-medium">
                     {step.title}
                   </h3>
                   <p className="text-base md:text-lg text-foreground font-medium leading-relaxed">
@@ -229,10 +220,10 @@ const Index = () => {
 
             {/* Choose Your Path */}
             <div className="mt-10 text-center">
-              <h3 className="text-2xl md:text-3xl lg:text-4xl text-foreground font-bold mb-4">
+              <h3 className="text-2xl md:text-3xl lg:text-4xl text-foreground font-semibold mb-4">
                 Choose Your Path
               </h3>
-              <p className="text-lg md:text-xl text-foreground font-semibold max-w-2xl mx-auto">
+              <p className="text-lg md:text-xl text-foreground font-medium max-w-2xl mx-auto">
                 Whether you're starting from scratch or ready to level up, we have a service that fits your needs and budget.
               </p>
             </div>
