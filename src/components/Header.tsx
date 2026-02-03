@@ -53,24 +53,26 @@ const Header = () => {
             backgroundColor: 'transparent',
           }}
         >
-          {/* Navigation bubbles at bottom center of banner */}
-          <nav className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                to={link.href}
-                className={`text-[10px] font-semibold px-3 py-1 rounded-full transition-all duration-300 ${
-                  location.pathname === link.href
-                    ? "bg-white text-sage border border-sage shadow-[0_0_12px_rgba(91,122,95,0.4)]"
-                    : "bg-white/90 text-sage hover:bg-white border border-transparent hover:border-sage hover:shadow-[0_0_16px_rgba(91,122,95,0.5)] hover:animate-pulse"
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
+          {/* Navigation - left aligned nav links, right aligned Start Here */}
+          <nav className="absolute bottom-2 left-4 right-4 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  to={link.href}
+                  className={`text-xs font-semibold px-4 py-1.5 rounded-full transition-all duration-300 ${
+                    location.pathname === link.href
+                      ? "bg-white text-sage border border-sage shadow-[0_0_12px_rgba(91,122,95,0.4)]"
+                      : "bg-white/90 text-sage hover:bg-white border border-transparent hover:border-sage hover:shadow-[0_0_16px_rgba(91,122,95,0.5)] hover:animate-pulse"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
             <Link
               to="/start-here"
-              className="text-[10px] font-semibold px-3 py-1 rounded-full bg-sage text-white hover:bg-sage/90 transition-all duration-300 shadow-warm hover:shadow-[0_0_20px_rgba(91,122,95,0.6)] hover:animate-pulse"
+              className="text-xs font-semibold px-4 py-1.5 rounded-full bg-sage text-white hover:bg-sage/90 transition-all duration-300 shadow-warm hover:shadow-[0_0_20px_rgba(91,122,95,0.6)] hover:animate-pulse"
             >
               Start Here
             </Link>
