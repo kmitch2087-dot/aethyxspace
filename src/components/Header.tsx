@@ -40,13 +40,13 @@ const Header = () => {
       {/* Full-width banner as background with navigation */}
       <div 
         ref={bannerRef} 
-        className="fixed top-0 left-0 right-0 z-40 bg-background px-4 py-3"
+        className="fixed top-0 left-0 right-0 z-40 bg-background"
       >
         <div 
-          className="relative overflow-hidden h-[80px] md:h-[100px]"
+          className="relative overflow-hidden h-[120px] md:h-[180px] lg:h-[220px]"
           style={{
             backgroundImage: `url(${vibeShiftBanner})`,
-            backgroundSize: 'contain',
+            backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
           }}
