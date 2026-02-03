@@ -385,12 +385,12 @@ const Services = () => {
             </div>
 
             {/* SEO Link */}
-            <div className="mt-8 text-center">
+            <div className="mt-10 text-center">
               <button
                 onClick={() => setSeoPopupOpen(true)}
-                className="inline-flex items-center gap-2 text-ocean hover:text-ocean/80 font-semibold text-lg transition-colors underline underline-offset-4"
+                className="inline-flex items-center gap-3 text-ocean hover:text-ocean/80 font-semibold text-xl md:text-2xl transition-colors underline underline-offset-4"
               >
-                <HelpCircle className="h-5 w-5" />
+                <HelpCircle className="h-6 w-6 md:h-7 md:w-7" />
                 What is SEO and why is it so important for small businesses?
               </button>
             </div>
@@ -400,7 +400,7 @@ const Services = () => {
 
       {/* Add-ons Section */}
       <section className="relative z-10 overflow-hidden">
-        <div className="relative px-6 py-12 md:px-12 lg:px-24 xl:px-32 md:py-16">
+        <div className="relative px-6 py-8 md:px-12 lg:px-24 xl:px-32 md:py-10">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-10">
               <h2 className="text-3xl md:text-4xl lg:text-5xl text-foreground font-bold mb-4">
