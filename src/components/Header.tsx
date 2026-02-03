@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
-import vibeShiftBanner from "@/assets/vibe-shift-banner.png";
+import vibeShiftBanner from "@/assets/vibe-shift-banner-new.png";
 
 const Header = () => {
   const location = useLocation();
@@ -43,13 +43,12 @@ const Header = () => {
         className="fixed top-0 left-0 right-0 z-40 bg-background px-4 py-3"
       >
         <div 
-          className="relative border-4 border-foreground rounded-2xl overflow-hidden h-[70px] md:h-[90px]"
+          className="relative overflow-hidden h-[80px] md:h-[100px]"
           style={{
             backgroundImage: `url(${vibeShiftBanner})`,
             backgroundSize: 'contain',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
-            backgroundColor: 'hsl(var(--background))',
           }}
         >
           {/* Navigation bubbles at bottom center of banner */}
