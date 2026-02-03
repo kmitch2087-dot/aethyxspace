@@ -57,6 +57,7 @@ const services = [
       "Brand kit (colors, fonts, direction)",
       "Refined messaging",
       "Social bio copy",
+      "Client & Admin Dashboards",
       "Post-launch support",
       "Three revisions included"
     ],
@@ -111,8 +112,9 @@ const addOns = [
     name: "Client Dashboard with Login",
     addonPrice: "$250",
     standalonePrice: "$400",
-    description: "Google/social login integration with a private dashboard for clients to access their content.",
-    icon: <Users className="h-5 w-5 text-sage" />
+    description: "Included in Tier 3! Google/social login with a private client dashboard plus an admin dashboard for you to manage clients from the backend.",
+    icon: <Users className="h-5 w-5 text-sage" />,
+    includedInTier3: true
   },
   {
     name: "E-commerce Add-on",
@@ -421,6 +423,7 @@ const Services = () => {
                   description={addOn.description}
                   icon={addOn.icon}
                   onSelect={() => handleAddOnSelect(addOn)}
+                  includedInTier3={'includedInTier3' in addOn ? addOn.includedInTier3 : undefined}
                 />
               ))}
             </div>
