@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Check, HelpCircle, Info } from "lucide-react";
-import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import watercolorBg from "@/assets/watercolor-bg.jpg";
 import SeoPopup from "@/components/SeoPopup";
 import WaitingListPopup from "@/components/WaitingListPopup";
 import PaintSplat from "@/components/PaintSplat";
 import ServiceInfoPopup from "@/components/ServiceInfoPopup";
+import ServiceSelectionPopup from "@/components/ServiceSelectionPopup";
 
-const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLScleBGGZeacHU4B-gGHDPiZFzOwpPHu8n_80DkwiypsB2nlEw/viewform?usp=publish-editor";
+const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLScleBGGZeacHU4B-gGHDPiZFzOwpPHu8n_80DkwiypsB2nlEw/viewform";
 
 const services = [
   {
@@ -94,10 +94,17 @@ const Services = () => {
   const [waitingListOpen, setWaitingListOpen] = useState(false);
   const [serviceInfoOpen, setServiceInfoOpen] = useState(false);
   const [selectedTier, setSelectedTier] = useState<1 | 2 | 3>(1);
+  const [serviceSelectionOpen, setServiceSelectionOpen] = useState(false);
+  const [selectedServiceName, setSelectedServiceName] = useState<string>("");
 
   const handleOpenServiceInfo = (tier: 1 | 2 | 3) => {
     setSelectedTier(tier);
     setServiceInfoOpen(true);
+  };
+
+  const handleStartService = (serviceName: string) => {
+    setSelectedServiceName(serviceName);
+    setServiceSelectionOpen(true);
   };
   return (
     <div className="min-h-screen bg-background">
@@ -209,19 +216,13 @@ const Services = () => {
 
                   {/* CTA */}
                   <div className="mt-auto">
-                    <a 
-                      href={GOOGLE_FORM_URL}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block"
+                    <Button 
+                      onClick={() => handleStartService(service.name)}
+                      className="w-full rounded-full py-6 bg-sage hover:bg-sage/90 text-white shadow-warm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-warm-lg"
                     >
-                      <Button 
-                        className="w-full rounded-full py-6 bg-sage hover:bg-sage/90 text-white shadow-warm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-warm-lg"
-                      >
-                        Start Here
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
-                    </a>
+                      Start Here
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
                     <p className="text-center text-sm text-muted-foreground mt-3 font-medium">
                       (don't worry, we're not charging you anything yet)
                     </p>
@@ -317,19 +318,14 @@ const Services = () => {
             <p className="text-foreground text-xl md:text-2xl leading-relaxed font-semibold mb-8">
               Start with the intake form and I'll help guide you to the right choice.
             </p>
-            <a 
-              href={GOOGLE_FORM_URL}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Button 
+              onClick={() => handleStartService("")}
+              size="lg"
+              className="rounded-full px-10 py-6 bg-sage hover:bg-sage/90 text-white shadow-warm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-warm-lg"
             >
-              <Button 
-                size="lg"
-                className="rounded-full px-10 py-6 bg-sage hover:bg-sage/90 text-white shadow-warm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-warm-lg"
-              >
-                Start Here
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </a>
+              Start Here
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
             <p className="text-sm text-muted-foreground mt-4 font-medium">
               (don't worry, we're not charging you anything yet)
             </p>
@@ -355,6 +351,11 @@ const Services = () => {
         open={serviceInfoOpen} 
         onOpenChange={setServiceInfoOpen} 
         tier={selectedTier} 
+      />
+      <ServiceSelectionPopup 
+        open={serviceSelectionOpen} 
+        onOpenChange={setServiceSelectionOpen} 
+        serviceName={selectedServiceName}
       />
     </div>
   );
