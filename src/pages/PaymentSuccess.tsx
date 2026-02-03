@@ -1,11 +1,33 @@
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, CheckCircle } from "lucide-react";
+import { ArrowRight, CheckCircle, Loader2 } from "lucide-react";
 import Header from "@/components/Header";
 import watercolorBg from "@/assets/watercolor-bg.jpg";
 
-const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLScleBGGZeacHU4B-gGHDPiZFzOwpPHu8n_80DkwiypsB2nlEw/viewform?usp=publish-editor";
+const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLScleBGGZeacHU4B-gGHDPiZFzOwpPHu8n_80DkwiypsB2nlEw/viewform";
 
 const PaymentSuccess = () => {
+  const [countdown, setCountdown] = useState(5);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          window.location.href = GOOGLE_FORM_URL;
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const handleGoToForm = () => {
+    window.location.href = GOOGLE_FORM_URL;
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -34,7 +56,7 @@ const PaymentSuccess = () => {
               </h1>
               
               <p className="text-lg md:text-xl text-muted-foreground leading-relaxed font-light mb-4">
-                Thank you for your consultation payment. I'm excited to work with you!
+                Thank you for your payment! A receipt has been sent to your email.
               </p>
               
               <p className="text-base text-muted-foreground leading-relaxed font-light mb-8">
@@ -43,25 +65,23 @@ const PaymentSuccess = () => {
               </p>
 
               <div className="bg-sage-light/50 rounded-2xl p-6 mb-8">
-                <h3 className="text-lg font-medium text-foreground mb-2">What's Next?</h3>
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <Loader2 className="h-5 w-5 text-sage animate-spin" />
+                  <h3 className="text-lg font-medium text-foreground">Redirecting in {countdown} seconds...</h3>
+                </div>
                 <p className="text-sm text-muted-foreground font-light">
-                  Complete the client intake form so I can start preparing your personalized plan right away.
+                  You'll be automatically redirected to complete the client intake form.
                 </p>
               </div>
               
-              <a 
-                href={GOOGLE_FORM_URL}
-                target="_blank"
-                rel="noopener noreferrer"
+              <Button 
+                onClick={handleGoToForm}
+                size="lg" 
+                className="text-base px-12 py-8 rounded-full bg-sage hover:bg-sage/90 text-white shadow-warm transition-all duration-300 hover:shadow-warm-lg hover:-translate-y-0.5"
               >
-                <Button 
-                  size="lg" 
-                  className="text-base px-12 py-8 rounded-full bg-sage hover:bg-sage/90 text-white shadow-warm transition-all duration-300 hover:shadow-warm-lg hover:-translate-y-0.5"
-                >
-                  Complete Intake Form
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </a>
+                Go to Form Now
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
             </div>
           </div>
         </div>
