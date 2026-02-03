@@ -11,7 +11,7 @@ const allowedOrigins = [
 
 const getCorsHeaders = (origin: string | null) => {
   const isAllowed = origin && allowedOrigins.some(allowed => 
-    origin === allowed || origin.endsWith('.lovable.app')
+    origin === allowed || origin.endsWith('.lovable.app') || origin.endsWith('.lovableproject.com')
   );
   return {
     "Access-Control-Allow-Origin": isAllowed ? origin : "",
