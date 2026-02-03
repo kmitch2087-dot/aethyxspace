@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Check, HelpCircle } from "lucide-react";
+import { ArrowRight, Check, HelpCircle, Info } from "lucide-react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import watercolorBg from "@/assets/watercolor-bg.jpg";
 import SeoPopup from "@/components/SeoPopup";
 import WaitingListPopup from "@/components/WaitingListPopup";
 import PaintSplat from "@/components/PaintSplat";
+import ServiceInfoPopup from "@/components/ServiceInfoPopup";
 
 const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLScleBGGZeacHU4B-gGHDPiZFzOwpPHu8n_80DkwiypsB2nlEw/viewform?usp=publish-editor";
 
@@ -14,6 +15,7 @@ const services = [
   {
     name: "Online Presence Starter",
     price: "$750",
+    tier: 1 as const,
     whoFor: "Small businesses who need a clean, professional website without overcomplicating things.",
     features: [
       "One-page scrolling website",
@@ -28,28 +30,32 @@ const services = [
   {
     name: "Professional Brand Website",
     price: "$1,500–$2,000",
+    tier: 2 as const,
     whoFor: "Businesses ready to level up their online presence with clearer messaging and more structure.",
     features: [
+      "Everything in Tier 1, plus:",
       "Multi-section or multi-page website",
       "Done-for-you copywriting",
       "Contact forms",
       "SEO foundations",
       "Launch-ready build",
-      "One revision included"
+      "Two revisions included"
     ],
     accent: "ocean"
   },
   {
     name: "Signature Brand Presence",
     price: "Starting at $2,500",
+    tier: 3 as const,
     whoFor: "Brands that want a cohesive, aligned presence across their website and messaging.",
     features: [
+      "Everything in Tier 1 & 2, plus:",
       "Full website build",
       "Brand kit (colors, fonts, direction)",
       "Refined messaging",
       "Social bio copy",
       "Post-launch support",
-      "One revision included"
+      "Three revisions included"
     ],
     accent: "sand"
   }
@@ -86,7 +92,13 @@ const quickServices = [
 const Services = () => {
   const [seoPopupOpen, setSeoPopupOpen] = useState(false);
   const [waitingListOpen, setWaitingListOpen] = useState(false);
+  const [serviceInfoOpen, setServiceInfoOpen] = useState(false);
+  const [selectedTier, setSelectedTier] = useState<1 | 2 | 3>(1);
 
+  const handleOpenServiceInfo = (tier: 1 | 2 | 3) => {
+    setSelectedTier(tier);
+    setServiceInfoOpen(true);
+  };
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -147,10 +159,21 @@ const Services = () => {
                 >
                   {/* Header */}
                   <div className="mb-8 text-center">
-                    <h2 className="text-xl md:text-2xl text-foreground font-serif font-semibold mb-3">
-                      {service.name}
-                    </h2>
-                    <p className="text-2xl md:text-3xl font-bold text-sage">
+                    <p className="text-sm font-semibold text-sage uppercase tracking-wide mb-2">
+                      Tier {service.tier}
+                    </p>
+                    <button
+                      onClick={() => handleOpenServiceInfo(service.tier)}
+                      className="inline-flex items-center gap-2 group cursor-pointer"
+                    >
+                      <h2 className="text-xl md:text-2xl text-foreground font-serif font-semibold group-hover:text-sage transition-colors">
+                        {service.name}
+                      </h2>
+                      <div className="w-5 h-5 rounded-full border-2 border-sage flex items-center justify-center group-hover:bg-sage transition-colors">
+                        <Info className="h-3 w-3 text-sage group-hover:text-white transition-colors" />
+                      </div>
+                    </button>
+                    <p className="text-2xl md:text-3xl font-bold text-sage mt-3">
                       {service.price}
                     </p>
                   </div>
@@ -328,6 +351,11 @@ const Services = () => {
       {/* Popups */}
       <SeoPopup open={seoPopupOpen} onOpenChange={setSeoPopupOpen} />
       <WaitingListPopup open={waitingListOpen} onOpenChange={setWaitingListOpen} />
+      <ServiceInfoPopup 
+        open={serviceInfoOpen} 
+        onOpenChange={setServiceInfoOpen} 
+        tier={selectedTier} 
+      />
     </div>
   );
 };
