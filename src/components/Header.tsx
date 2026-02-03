@@ -11,6 +11,7 @@ const Header = () => {
     { href: "/services", label: "Services" },
     { href: "/membership", label: "Membership" },
     { href: "/about", label: "About" },
+    { href: "/seo", label: "SEO" },
   ];
 
   // Publish the banner's actual rendered height so pages can offset content reliably.

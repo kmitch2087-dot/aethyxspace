@@ -58,13 +58,14 @@ const About = () => {
               <br />
               <span className="italic text-foreground">"Okay… this feels doable."</span>
             </p>
+            
+            <p className="text-xl text-foreground font-serif mt-6">
+              If your business has evolved, your website should reflect that.
+            </p>
           </div>
           
           {/* Closing Line + CTA */}
-          <div className="mt-16 pt-12 border-t border-border/30">
-            <p className="text-xl text-foreground font-serif mb-8">
-              If your business has evolved, your website should reflect that.
-            </p>
+          <div className="mt-8 pt-8 border-t border-border/30">
             
             <Button 
               asChild 
