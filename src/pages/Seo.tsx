@@ -21,7 +21,7 @@ const Seo = () => {
       />
 
       {/* Page Intro */}
-      <section className="relative z-10 overflow-hidden" style={{ paddingTop: 'var(--fixed-banner-height, 220px)' }}>
+      <section className="relative z-10 overflow-hidden pt-[140px] md:pt-[200px] lg:pt-[240px]">
         <div className="relative px-6 pt-8 pb-12 md:px-12 lg:px-24 xl:px-32 md:pt-12 md:pb-16">
           <div className="max-w-3xl mx-auto text-center">
             <span className="block text-sm font-medium text-ocean tracking-wide uppercase mb-3">
