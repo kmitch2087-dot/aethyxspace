@@ -1,18 +1,43 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+// Allowed origins for CORS - restrict to your domains only
+const allowedOrigins = [
+  "https://vibeshiftstudio.lovable.app",
+  "https://id-preview--9d25c426-f64e-4f23-85cf-2cebfabb0756.lovable.app",
+  "http://localhost:8080",
+  "http://localhost:5173",
+];
+
+const getCorsHeaders = (origin: string | null) => {
+  const isAllowed = origin && allowedOrigins.some(allowed => 
+    origin === allowed || origin.endsWith('.lovable.app')
+  );
+  return {
+    "Access-Control-Allow-Origin": isAllowed ? origin : "",
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+  };
 };
 
 // Consultation fee price ID
 const CONSULTATION_PRICE_ID = "price_1SwQ4mCEyzqaryb8RIoTHGwM";
 
 serve(async (req) => {
+  const origin = req.headers.get("origin");
+  const corsHeaders = getCorsHeaders(origin);
+
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  // Block requests from non-allowed origins
+  if (!corsHeaders["Access-Control-Allow-Origin"]) {
+    console.warn("Blocked request from unauthorized origin:", origin);
+    return new Response(JSON.stringify({ error: "Unauthorized origin" }), {
+      headers: { "Content-Type": "application/json" },
+      status: 403,
+    });
   }
 
   try {
