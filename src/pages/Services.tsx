@@ -385,7 +385,7 @@ const Services = () => {
             </div>
 
             {/* SEO Link */}
-            <div className="mt-10 text-center">
+            <div className="mt-14 text-center">
               <button
                 onClick={() => setSeoPopupOpen(true)}
                 className="inline-flex items-center gap-3 text-ocean hover:text-ocean/80 font-semibold text-xl md:text-2xl transition-colors underline underline-offset-4"
