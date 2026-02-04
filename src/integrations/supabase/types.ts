@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      review_submissions: {
+        Row: {
+          city: string
+          created_at: string
+          id: string
+          name: string
+          photo_url: string | null
+          review_date: string
+          review_text: string
+          state: string
+          status: string
+        }
+        Insert: {
+          city: string
+          created_at?: string
+          id?: string
+          name: string
+          photo_url?: string | null
+          review_date?: string
+          review_text: string
+          state: string
+          status?: string
+        }
+        Update: {
+          city?: string
+          created_at?: string
+          id?: string
+          name?: string
+          photo_url?: string | null
+          review_date?: string
+          review_text?: string
+          state?: string
+          status?: string
+        }
+        Relationships: []
+      }
       waiting_list: {
         Row: {
           created_at: string
