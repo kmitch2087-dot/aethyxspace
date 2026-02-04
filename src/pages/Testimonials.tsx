@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Header from "@/components/Header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { CheckCircle, Info, Star, MessageSquarePlus } from "lucide-react";
+import ReviewSubmissionPopup from "@/components/ReviewSubmissionPopup";
 
 import testimonial1 from "@/assets/testimonial-1.jpg";
 import testimonial2 from "@/assets/testimonial-2.jpg";
@@ -70,9 +72,7 @@ const testimonials = [
 ];
 
 const Testimonials = () => {
-  const handleLeaveReview = () => {
-    window.open("https://g.page/r/your-google-review-link", "_blank");
-  };
+  const [reviewPopupOpen, setReviewPopupOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-background">
@@ -172,7 +172,7 @@ const Testimonials = () => {
           {/* Leave a Review Button */}
           <div className="text-center mt-12">
             <Button
-              onClick={handleLeaveReview}
+              onClick={() => setReviewPopupOpen(true)}
               size="lg"
               className="bg-sage hover:bg-sage/90 text-white font-semibold px-8 py-6 text-lg rounded-full shadow-warm hover:shadow-[0_0_20px_rgba(91,122,95,0.5)] transition-all duration-300"
             >
@@ -182,6 +182,11 @@ const Testimonials = () => {
           </div>
         </div>
       </main>
+
+      <ReviewSubmissionPopup 
+        open={reviewPopupOpen} 
+        onOpenChange={setReviewPopupOpen} 
+      />
     </div>
   );
 };
