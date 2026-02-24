@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, MessageCircle, Compass, Heart, ExternalLink } from "lucide-react";
 import Header from "@/components/Header";
@@ -144,6 +145,9 @@ const StartHere = () => {
             <p className="text-sm text-muted-foreground font-light">
               © {new Date().getFullYear()} Vibe Shift Studio. All rights reserved.
             </p>
+            <Link to="/privacy-policy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              Privacy Policy
+            </Link>
           </div>
         </div>
       </footer>

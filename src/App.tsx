@@ -11,6 +11,7 @@ import Testimonials from "./pages/Testimonials";
 import StartHere from "./pages/StartHere";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import Seo from "./pages/Seo";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/start-here" element={<StartHere />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/seo" element={<Seo />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
