@@ -260,9 +260,14 @@ const Index = () => {
         <div className="px-6 py-12 md:px-12 lg:px-24 xl:px-32">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <img src={vibeShiftLogo} alt="Vibe Shift Studio" className="h-20 md:h-24 w-auto opacity-90 rounded-xl shadow-soft" />
-            <p className="text-sm text-foreground font-light">
-              © {new Date().getFullYear()} Vibe Shift Studio. All rights reserved.
-            </p>
+            <div className="flex flex-col items-center md:items-end gap-2">
+              <p className="text-sm text-foreground font-light">
+                © {new Date().getFullYear()} Vibe Shift Studio. All rights reserved.
+              </p>
+              <Link to="/privacy-policy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                Privacy Policy
+              </Link>
+            </div>
           </div>
         </div>
       </footer>

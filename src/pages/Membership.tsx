@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, RefreshCw, Shield, Zap } from "lucide-react";
 import Header from "@/components/Header";
@@ -144,6 +145,9 @@ const Membership = () => {
             <p className="text-sm text-foreground font-light">
               © {new Date().getFullYear()} Vibe Shift Studio. All rights reserved.
             </p>
+            <Link to="/privacy-policy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              Privacy Policy
+            </Link>
           </div>
         </div>
       </footer>

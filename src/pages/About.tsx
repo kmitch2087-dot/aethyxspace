@@ -69,10 +69,13 @@ const About = () => {
       
       {/* Footer */}
       <footer className="relative z-10 py-12 px-6 md:px-12 lg:px-24 xl:px-32 border-t border-border/20">
-        <div className="max-w-6xl mx-auto text-center">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground">
             © {new Date().getFullYear()} Vibe Shift Studio. Designed with intention.
           </p>
+          <Link to="/privacy-policy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            Privacy Policy
+          </Link>
         </div>
       </footer>
     </div>
