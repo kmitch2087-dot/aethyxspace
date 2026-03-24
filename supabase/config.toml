@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.create-service-payment]
 verify_jwt = false
+
+[functions.upload-review-photo]
+verify_jwt = false
