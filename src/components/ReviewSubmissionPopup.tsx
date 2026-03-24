@@ -86,26 +86,27 @@ const ReviewSubmissionPopup = ({ open, onOpenChange }: ReviewSubmissionPopupProp
     try {
       let photoUrl: string | null = null;
 
-      // Upload photo if provided
+      // Upload photo via edge function for server-side validation
       if (photoFile) {
-        const fileExt = photoFile.name.split(".").pop();
-        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-        
-        const { error: uploadError } = await supabase.storage
-          .from("review-photos")
-          .upload(fileName, photoFile);
+        const formData = new FormData();
+        formData.append("file", photoFile);
 
-        if (uploadError) {
-          console.error("Photo upload error:", uploadError);
-          throw new Error("Failed to upload photo");
+        const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+        const response = await fetch(
+          `https://${projectId}.supabase.co/functions/v1/upload-review-photo`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || "Failed to upload photo");
         }
 
-        // Get public URL
-        const { data: urlData } = supabase.storage
-          .from("review-photos")
-          .getPublicUrl(fileName);
-        
-        photoUrl = urlData.publicUrl;
+        const { url } = await response.json();
+        photoUrl = url;
       }
 
       // Insert review submission
