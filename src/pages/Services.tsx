@@ -53,7 +53,7 @@ const services = [
   },
   {
     name: "Signature Brand Presence",
-    price: "Starting at $2,500",
+    
     tier: 3 as const,
     whoFor: "Brands that want a cohesive, aligned presence across their website and messaging.",
     features: [
