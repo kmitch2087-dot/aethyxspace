@@ -22,7 +22,7 @@ const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLScleBGGZeacHU4
 const services = [
   {
     name: "Online Presence Starter",
-    price: "$750",
+    
     tier: 1 as const,
     whoFor: "Small businesses who need a clean, professional website without overcomplicating things.",
     features: [
