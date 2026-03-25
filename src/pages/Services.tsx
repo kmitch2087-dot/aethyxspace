@@ -318,9 +318,6 @@ const Services = () => {
                         <Info className="h-3 w-3 text-sage group-hover:text-white transition-colors" />
                       </div>
                     </button>
-                    <p className="text-2xl md:text-3xl font-bold text-sage mt-3">
-                      {service.price}
-                    </p>
                   </div>
 
                   {/* Who it's for */}
