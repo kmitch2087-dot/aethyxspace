@@ -22,7 +22,7 @@ const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLScleBGGZeacHU4
 const services = [
   {
     name: "Online Presence Starter",
-    price: "$750",
+    
     tier: 1 as const,
     whoFor: "Small businesses who need a clean, professional website without overcomplicating things.",
     features: [
@@ -37,7 +37,7 @@ const services = [
   },
   {
     name: "Professional Brand Website",
-    price: "$1,500–$2,000",
+    
     tier: 2 as const,
     whoFor: "Businesses ready to level up their online presence with clearer messaging and more structure.",
     features: [
@@ -53,7 +53,7 @@ const services = [
   },
   {
     name: "Signature Brand Presence",
-    price: "Starting at $2,500",
+    
     tier: 3 as const,
     whoFor: "Brands that want a cohesive, aligned presence across their website and messaging.",
     features: [
@@ -318,9 +318,6 @@ const Services = () => {
                         <Info className="h-3 w-3 text-sage group-hover:text-white transition-colors" />
                       </div>
                     </button>
-                    <p className="text-2xl md:text-3xl font-bold text-sage mt-3">
-                      {service.price}
-                    </p>
                   </div>
 
                   {/* Who it's for */}
