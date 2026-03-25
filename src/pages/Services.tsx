@@ -37,7 +37,7 @@ const services = [
   },
   {
     name: "Professional Brand Website",
-    price: "$1,500–$2,000",
+    
     tier: 2 as const,
     whoFor: "Businesses ready to level up their online presence with clearer messaging and more structure.",
     features: [
