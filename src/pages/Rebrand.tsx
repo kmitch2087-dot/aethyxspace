@@ -78,32 +78,24 @@ const Rebrand = () => {
   };
 
   return (
-    <div className="min-h-screen text-[#e8e6e1] relative overflow-hidden" style={{ background: "radial-gradient(ellipse at 50% 0%, #111827 0%, #0c1220 30%, #080d18 60%, #060a12 100%)" }}>
-      {/* Ambient nebula glows to match the video's space environment */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[-5%] left-[20%] w-[700px] h-[700px] bg-[#1e2a4a]/25 rounded-full blur-[180px]" />
-        <div className="absolute top-[5%] right-[15%] w-[500px] h-[500px] bg-[#1a2540]/30 rounded-full blur-[150px]" />
-        <div className="absolute top-[25%] left-[35%] w-[800px] h-[400px] bg-[#15203a]/20 rounded-full blur-[200px]" />
-        <div className="absolute bottom-[30%] right-[25%] w-[400px] h-[400px] bg-[#1a1535]/20 rounded-full blur-[140px]" />
-        <div className="absolute bottom-[10%] left-[10%] w-[500px] h-[300px] bg-[#0f1a2e]/25 rounded-full blur-[160px]" />
+    <div className="min-h-screen text-[#e8e6e1] relative overflow-hidden" style={{ background: "#060a12" }}>
+      {/* Video as full-width background hero */}
+      <div className="fixed inset-0 z-0">
+        <video
+          ref={videoRef}
+          src="/aethyx-intro.mov"
+          autoPlay
+          muted
+          playsInline
+          onLoadedData={handleVideoLoaded}
+          className="w-full h-full object-cover"
+        />
+        {/* Bottom fade so content below blends smoothly */}
+        <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 30%, #060a12 85%)" }} />
       </div>
 
       {/* Main content */}
-      <div className="relative z-10 flex flex-col items-center px-6 py-16 md:py-24">
-        {/* Video — no hard edges, blends into background */}
-        <div className="relative w-[70vw] max-w-xl mb-10">
-          <div className="absolute inset-0 rounded-3xl" style={{ boxShadow: "0 0 80px 40px #0c1220, 0 0 160px 80px #080d18" }} />
-          <video
-            ref={videoRef}
-            src="/aethyx-intro.mov"
-            autoPlay
-            muted
-            playsInline
-            onLoadedData={handleVideoLoaded}
-            className="w-full rounded-3xl"
-            style={{ maskImage: "radial-gradient(ellipse 90% 85% at 50% 50%, black 60%, transparent 100%)" }}
-          />
-        </div>
+      <div className="relative z-10 flex flex-col items-center px-6 pt-[55vh] md:pt-[60vh] pb-16">
 
         {/* Tagline */}
         <p className="font-serif text-lg md:text-xl tracking-[0.2em] uppercase text-[#4ECDC4]/70 mb-12">
