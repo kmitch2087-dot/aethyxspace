@@ -91,7 +91,7 @@ const Rebrand = () => {
       {/* Main content */}
       <div className="relative z-10 flex flex-col items-center px-6 py-16 md:py-24">
         {/* Video — no hard edges, blends into background */}
-        <div className="relative w-[85vw] max-w-3xl mb-10">
+        <div className="relative w-[70vw] max-w-xl mb-10">
           <div className="absolute inset-0 rounded-3xl" style={{ boxShadow: "0 0 80px 40px #0c1220, 0 0 160px 80px #080d18" }} />
           <video
             ref={videoRef}
