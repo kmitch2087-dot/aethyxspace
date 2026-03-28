@@ -78,26 +78,32 @@ const Rebrand = () => {
   };
 
   return (
-    <div className="min-h-screen text-[#e8e6e1] relative overflow-hidden" style={{ background: "radial-gradient(ellipse at 50% 20%, #0d1117 0%, #080a10 40%, #050608 100%)" }}>
-      {/* Subtle space-like ambient glows */}
+    <div className="min-h-screen text-[#e8e6e1] relative overflow-hidden" style={{ background: "radial-gradient(ellipse at 50% 0%, #111827 0%, #0c1220 30%, #080d18 60%, #060a12 100%)" }}>
+      {/* Ambient nebula glows to match the video's space environment */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[10%] left-[15%] w-[500px] h-[500px] bg-[#1a1a3e]/20 rounded-full blur-[150px]" />
-        <div className="absolute top-[30%] right-[10%] w-[400px] h-[400px] bg-[#0e2a3a]/25 rounded-full blur-[130px]" />
-        <div className="absolute bottom-[20%] left-[40%] w-[600px] h-[300px] bg-[#1a0e2e]/15 rounded-full blur-[160px]" />
+        <div className="absolute top-[-5%] left-[20%] w-[700px] h-[700px] bg-[#1e2a4a]/25 rounded-full blur-[180px]" />
+        <div className="absolute top-[5%] right-[15%] w-[500px] h-[500px] bg-[#1a2540]/30 rounded-full blur-[150px]" />
+        <div className="absolute top-[25%] left-[35%] w-[800px] h-[400px] bg-[#15203a]/20 rounded-full blur-[200px]" />
+        <div className="absolute bottom-[30%] right-[25%] w-[400px] h-[400px] bg-[#1a1535]/20 rounded-full blur-[140px]" />
+        <div className="absolute bottom-[10%] left-[10%] w-[500px] h-[300px] bg-[#0f1a2e]/25 rounded-full blur-[160px]" />
       </div>
 
       {/* Main content */}
       <div className="relative z-10 flex flex-col items-center px-6 py-16 md:py-24">
-        {/* Video */}
-        <video
-          ref={videoRef}
-          src="/aethyx-intro.mov"
-          autoPlay
-          muted
-          playsInline
-          onLoadedData={handleVideoLoaded}
-          className="w-[80vw] max-w-2xl mb-10"
-        />
+        {/* Video — no hard edges, blends into background */}
+        <div className="relative w-[85vw] max-w-3xl mb-10">
+          <div className="absolute inset-0 rounded-3xl" style={{ boxShadow: "0 0 80px 40px #0c1220, 0 0 160px 80px #080d18" }} />
+          <video
+            ref={videoRef}
+            src="/aethyx-intro.mov"
+            autoPlay
+            muted
+            playsInline
+            onLoadedData={handleVideoLoaded}
+            className="w-full rounded-3xl"
+            style={{ maskImage: "radial-gradient(ellipse 90% 85% at 50% 50%, black 60%, transparent 100%)" }}
+          />
+        </div>
 
         {/* Tagline */}
         <p className="font-serif text-lg md:text-xl tracking-[0.2em] uppercase text-[#4ECDC4]/70 mb-12">
