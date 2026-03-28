@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Phone, Mail, Calendar, ArrowRight, Loader2, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -70,6 +70,8 @@ const Rebrand = () => {
   };
 
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoProgress, setVideoProgress] = useState(0);
+  const [videoEnded, setVideoEnded] = useState(false);
 
   const handleVideoLoaded = () => {
     if (videoRef.current) {
@@ -77,25 +79,74 @@ const Rebrand = () => {
     }
   };
 
+  const handleTimeUpdate = () => {
+    if (videoRef.current && videoRef.current.duration) {
+      const progress = videoRef.current.currentTime / videoRef.current.duration;
+      setVideoProgress(progress);
+    }
+  };
+
+  const handleVideoEnded = () => {
+    setVideoEnded(true);
+    setVideoProgress(1);
+  };
+
+  // Interpolate: starts full-screen (scale 1), ends as a small logo-sized element
+  // Scale goes from 1.0 → 0.3, and we translate it upward
+  const scale = videoEnded ? 0.28 : 1 - videoProgress * 0.72;
+  const yOffset = videoEnded ? 0 : 0;
+
   return (
     <div className="min-h-screen text-[#e8e6e1] relative overflow-hidden" style={{ background: "#060a12" }}>
-      {/* Video as full-width background hero */}
-      <div className="fixed inset-0 z-0">
-        <video
-          ref={videoRef}
-          src="/aethyx-intro.mov"
-          autoPlay
-          muted
-          playsInline
-          onLoadedData={handleVideoLoaded}
-          className="w-full h-full object-cover"
-        />
-        {/* Bottom fade so content below blends smoothly */}
-        <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 30%, #060a12 85%)" }} />
+      {/* Video - starts full-screen, shrinks to logo */}
+      <div
+        className="flex justify-center w-full"
+        style={{
+          position: videoEnded ? "relative" : "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: videoEnded ? "auto" : 0,
+          zIndex: videoEnded ? 10 : 0,
+          paddingTop: videoEnded ? "6rem" : 0,
+          transition: "padding-top 0.8s ease-out",
+        }}
+      >
+        <div
+          style={{
+            width: videoEnded ? "340px" : "100%",
+            height: videoEnded ? "auto" : "100%",
+            transform: videoEnded ? "none" : `scale(${scale})`,
+            transformOrigin: "top center",
+            transition: videoEnded ? "width 1s ease-out, height 1s ease-out" : "none",
+          }}
+        >
+          <video
+            ref={videoRef}
+            src="/aethyx-intro.mov"
+            autoPlay
+            muted
+            playsInline
+            onLoadedData={handleVideoLoaded}
+            onTimeUpdate={handleTimeUpdate}
+            onEnded={handleVideoEnded}
+            className={videoEnded ? "w-full h-auto rounded-2xl" : "w-full h-full object-cover"}
+          />
+        </div>
+        {/* Bottom fade - only when full-screen */}
+        {!videoEnded && (
+          <div className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(to bottom, transparent 30%, #060a12 85%)" }} />
+        )}
       </div>
 
       {/* Main content */}
-      <div className="relative z-10 flex flex-col items-center px-6 pt-[55vh] md:pt-[60vh] pb-16">
+      <div
+        className="relative z-10 flex flex-col items-center px-6 pb-16"
+        style={{
+          paddingTop: videoEnded ? "2rem" : "55vh",
+          transition: "padding-top 1s ease-out",
+        }}
+      >
 
         {/* Tagline */}
         <p className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold tracking-[0.15em] uppercase text-[#4ECDC4] mb-8 text-center" style={{ textShadow: "0 0 30px rgba(78,205,196,0.3)" }}>
