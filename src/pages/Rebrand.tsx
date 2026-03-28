@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import aethyxLogo from "@/assets/aethyx-logo.png";
+
 
 const CALENDAR_URL =
   "https://calendar.proton.me/api/calendar/v1/url/CtK3M_QydYnTFm4aU0KJt59M2M-dPR7-q-O_3QTq8PyyPgKxGGaO-KWqFxlRpO_U5B4mi6ciJEh6aQEv_QpU7Q==/calendar.ics?CacheKey=fceIC3PAtEgsv-OL4bgVkA%3D%3D";
