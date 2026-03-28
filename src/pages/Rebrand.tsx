@@ -98,28 +98,28 @@ const Rebrand = () => {
       <div className="relative z-10 flex flex-col items-center px-6 pt-[55vh] md:pt-[60vh] pb-16">
 
         {/* Tagline */}
-        <p className="font-serif text-lg md:text-xl tracking-[0.2em] uppercase text-[#4ECDC4]/70 mb-12">
+        <p className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold tracking-[0.15em] uppercase text-[#4ECDC4] mb-8 text-center" style={{ textShadow: "0 0 30px rgba(78,205,196,0.3)" }}>
           Crafting Identity in the Unseen
         </p>
 
         {/* Rebrand announcement */}
-        <div className="max-w-xl text-center mb-16 md:mb-24">
-          <h1 className="text-2xl md:text-3xl font-light mb-4 leading-relaxed">
+        <div className="max-w-3xl text-center mb-20 md:mb-28">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>
             Something new is taking shape.
           </h1>
-          <p className="text-[#e8e6e1]/60 text-base md:text-lg font-light">
+          <p className="text-2xl md:text-3xl lg:text-4xl font-bold leading-snug" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>
             Vibe Shift Studio is becoming{" "}
-            <span className="text-[#e8e6e1] font-medium">Aethyx</span>. Same
+            <span className="text-[#e8e6e1]">Aethyx</span>. Same
             vision. Bolder execution. Stay tuned.
           </p>
         </div>
 
         {/* Contact cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl w-full mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl w-full mb-16 mt-8">
           {/* Emergency */}
           <a
             href="tel:+14015891023"
-            className="group rounded-2xl border border-[#e8e6e1]/[0.08] bg-[#e8e6e1]/[0.03] backdrop-blur-sm p-8 text-center transition-all duration-300 hover:border-[#ff6b6b]/30 hover:bg-[#ff6b6b]/[0.05]"
+            className="group rounded-2xl border border-[#e8e6e1]/[0.1] bg-[#0c1528]/80 backdrop-blur-md p-8 text-center transition-all duration-300 hover:border-[#ff6b6b]/30 hover:bg-[#121d35]/90" style={{ boxShadow: "0 0 40px 5px rgba(12,21,40,0.6), inset 0 1px 0 rgba(255,255,255,0.05)" }}
           >
             <div className="w-12 h-12 rounded-full bg-[#ff6b6b]/10 flex items-center justify-center mx-auto mb-5">
               <Phone className="h-5 w-5 text-[#ff6b6b]" />
@@ -139,7 +139,7 @@ const Rebrand = () => {
           {/* General contact */}
           <a
             href="mailto:Aethyxspace@protonmail.com"
-            className="group rounded-2xl border border-[#e8e6e1]/[0.08] bg-[#e8e6e1]/[0.03] backdrop-blur-sm p-8 text-center transition-all duration-300 hover:border-[#4ECDC4]/30 hover:bg-[#4ECDC4]/[0.05]"
+            className="group rounded-2xl border border-[#e8e6e1]/[0.1] bg-[#0c1528]/80 backdrop-blur-md p-8 text-center transition-all duration-300 hover:border-[#4ECDC4]/30 hover:bg-[#121d35]/90" style={{ boxShadow: "0 0 40px 5px rgba(12,21,40,0.6), inset 0 1px 0 rgba(255,255,255,0.05)" }}
           >
             <div className="w-12 h-12 rounded-full bg-[#4ECDC4]/10 flex items-center justify-center mx-auto mb-5">
               <Mail className="h-5 w-5 text-[#4ECDC4]" />
@@ -158,7 +158,7 @@ const Rebrand = () => {
           {/* Consultation */}
           <button
             onClick={() => setShowForm(!showForm)}
-            className="group rounded-2xl border border-[#e8e6e1]/[0.08] bg-[#e8e6e1]/[0.03] backdrop-blur-sm p-8 text-center transition-all duration-300 hover:border-[#7B68EE]/30 hover:bg-[#7B68EE]/[0.05] text-left"
+            className="group rounded-2xl border border-[#e8e6e1]/[0.1] bg-[#0c1528]/80 backdrop-blur-md p-8 text-center transition-all duration-300 hover:border-[#7B68EE]/30 hover:bg-[#121d35]/90 text-left" style={{ boxShadow: "0 0 40px 5px rgba(12,21,40,0.6), inset 0 1px 0 rgba(255,255,255,0.05)" }}
           >
             <div className="w-12 h-12 rounded-full bg-[#7B68EE]/10 flex items-center justify-center mx-auto mb-5">
               <Calendar className="h-5 w-5 text-[#7B68EE]" />
