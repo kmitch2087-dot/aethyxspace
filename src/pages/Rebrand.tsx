@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Phone, Mail, Calendar, ArrowRight, Loader2, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -69,24 +69,34 @@ const Rebrand = () => {
     }
   };
 
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const handleVideoLoaded = () => {
+    if (videoRef.current) {
+      videoRef.current.playbackRate = 0.6;
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-[#e8e6e1] relative overflow-hidden">
-      {/* Subtle gradient accents */}
+    <div className="min-h-screen text-[#e8e6e1] relative overflow-hidden" style={{ background: "radial-gradient(ellipse at 50% 20%, #0d1117 0%, #080a10 40%, #050608 100%)" }}>
+      {/* Subtle space-like ambient glows */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-[#4ECDC4]/[0.03] rounded-full blur-[120px]" />
-        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-[#7B68EE]/[0.04] rounded-full blur-[120px]" />
+        <div className="absolute top-[10%] left-[15%] w-[500px] h-[500px] bg-[#1a1a3e]/20 rounded-full blur-[150px]" />
+        <div className="absolute top-[30%] right-[10%] w-[400px] h-[400px] bg-[#0e2a3a]/25 rounded-full blur-[130px]" />
+        <div className="absolute bottom-[20%] left-[40%] w-[600px] h-[300px] bg-[#1a0e2e]/15 rounded-full blur-[160px]" />
       </div>
 
       {/* Main content */}
       <div className="relative z-10 flex flex-col items-center px-6 py-16 md:py-24">
-        {/* Logo */}
+        {/* Video */}
         <video
+          ref={videoRef}
           src="/aethyx-intro.mov"
           autoPlay
           muted
           playsInline
-          loop
-          className="w-64 md:w-80 mb-6 opacity-95"
+          onLoadedData={handleVideoLoaded}
+          className="w-[80vw] max-w-2xl mb-10"
         />
 
         {/* Tagline */}
