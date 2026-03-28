@@ -80,10 +80,13 @@ const Rebrand = () => {
       {/* Main content */}
       <div className="relative z-10 flex flex-col items-center px-6 py-16 md:py-24">
         {/* Logo */}
-        <img
-          src={aethyxLogo}
-          alt="Aethyx"
-          className="w-48 md:w-64 mb-6 opacity-95"
+        <video
+          src="/aethyx-intro.mov"
+          autoPlay
+          muted
+          playsInline
+          loop
+          className="w-64 md:w-80 mb-6 opacity-95"
         />
 
         {/* Tagline */}
