@@ -48,8 +48,7 @@ const Home = () => {
         <div className="absolute inset-0 z-[1]" style={{ background: "linear-gradient(to bottom, transparent 20%, hsl(0 0% 4%) 85%)" }} />
 
         <div className="relative z-10 text-center px-6 pt-20">
-          <div className="bg-black/50 backdrop-blur-sm rounded-2xl px-8 py-10 max-w-3xl mx-auto">
-          <AethyxLogo className="h-24 md:h-36 mx-auto mb-10" />
+          <div className="bg-black/20 backdrop-blur-[2px] rounded-2xl px-8 py-10 max-w-3xl mx-auto">
           <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold tracking-wide text-primary mb-6 glow-teal">
             Elevate & Evolve Unapologetically
           </h1>
