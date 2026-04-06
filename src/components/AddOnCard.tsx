@@ -19,7 +19,7 @@ const AddOnCard = ({ name, addonPrice, standalonePrice, description, icon, onSel
         <div className="w-10 h-10 rounded-full bg-sage-light flex items-center justify-center">
           {icon}
         </div>
-        <h3 className="text-base font-serif font-semibold text-foreground">
+        <h3 className="text-base font-display font-semibold text-foreground">
           {name}
         </h3>
       </div>

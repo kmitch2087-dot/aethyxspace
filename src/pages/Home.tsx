@@ -43,12 +43,12 @@ const Home = () => {
             onLoadedData={handleVideoLoaded}
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 20%, hsl(222 47% 4%) 85%)" }} />
+          <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 20%, hsl(0 0% 4%) 85%)" }} />
         </div>
 
         <div className="relative z-10 text-center px-6 pt-20">
           <img src={aethyxLogo} alt="Aethyx" className="h-20 md:h-28 mx-auto mb-8" />
-          <h1 className="font-serif text-4xl md:text-6xl lg:text-7xl font-bold tracking-wide text-primary mb-6 glow-teal">
+          <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold tracking-wide text-primary mb-6 glow-teal">
             Elevate & Evolve Unapologetically
           </h1>
           <p className="text-lg md:text-xl text-foreground/70 max-w-2xl mx-auto mb-10">
@@ -66,7 +66,7 @@ const Home = () => {
       {/* Services Teaser */}
       <section className="py-24 px-6">
         <div className="max-w-6xl mx-auto">
-          <h2 className="font-serif text-3xl md:text-5xl text-center mb-16">What We Build</h2>
+          <h2 className="font-display text-3xl md:text-5xl text-center mb-16">What We Build</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {services.map((s) => (
               <Link
@@ -77,7 +77,7 @@ const Home = () => {
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
                   <s.icon className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="font-serif text-2xl mb-3">{s.title}</h3>
+                <h3 className="font-display text-2xl mb-3">{s.title}</h3>
                 <p className="text-muted-foreground text-sm">{s.desc}</p>
               </Link>
             ))}
@@ -88,7 +88,7 @@ const Home = () => {
       {/* Portfolio Highlights */}
       <section className="py-24 px-6 border-t border-border/20">
         <div className="max-w-6xl mx-auto">
-          <h2 className="font-serif text-3xl md:text-5xl text-center mb-16">Selected Work</h2>
+          <h2 className="font-display text-3xl md:text-5xl text-center mb-16">Selected Work</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {portfolioHighlights.map((p) => (
               <Link
@@ -104,7 +104,7 @@ const Home = () => {
                   />
                 </div>
                 <div className="p-6">
-                  <h3 className="font-serif text-xl mb-1">{p.title}</h3>
+                  <h3 className="font-display text-xl mb-1">{p.title}</h3>
                   <p className="text-muted-foreground text-sm">{p.subtitle}</p>
                 </div>
               </Link>
@@ -115,7 +115,7 @@ const Home = () => {
 
       {/* CTA */}
       <section className="py-24 px-6 border-t border-border/20 text-center">
-        <h2 className="font-serif text-3xl md:text-5xl mb-6">Ready to Shift?</h2>
+        <h2 className="font-display text-3xl md:text-5xl mb-6">Ready to Shift?</h2>
         <p className="text-muted-foreground text-lg max-w-xl mx-auto mb-10">
           Book a consultation and let's build something that actually represents you.
         </p>

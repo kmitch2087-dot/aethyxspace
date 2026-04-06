@@ -40,7 +40,7 @@ const Services = () => (
 
     <div className="pt-28 pb-24 px-6">
       <div className="max-w-6xl mx-auto">
-        <h1 className="font-serif text-4xl md:text-6xl text-center mb-4">Services</h1>
+        <h1 className="font-display text-4xl md:text-6xl text-center mb-4">Services</h1>
         <p className="text-center text-muted-foreground text-lg mb-20 max-w-2xl mx-auto">
           Every project is tailored. Pick your tier, add what you need, and let's build.
         </p>
@@ -57,7 +57,7 @@ const Services = () => (
                   <Star className="h-3 w-3" /> Most Popular
                 </div>
               )}
-              <h3 className="font-serif text-2xl mb-2">{tier.name}</h3>
+              <h3 className="font-display text-2xl mb-2">{tier.name}</h3>
               <p className="text-primary text-2xl font-bold mb-6">{tier.price}</p>
               <ul className="space-y-3 mb-8 flex-1">
                 {tier.features.map((f) => (
@@ -78,7 +78,7 @@ const Services = () => (
         </div>
 
         {/* Quick Services */}
-        <h2 className="font-serif text-3xl text-center mb-10">Quick Services</h2>
+        <h2 className="font-display text-3xl text-center mb-10">Quick Services</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-24">
           {quickServices.map((s) => (
             <div key={s.name} className="glass-card p-6 text-center">
@@ -89,7 +89,7 @@ const Services = () => (
         </div>
 
         {/* Add-Ons */}
-        <h2 className="font-serif text-3xl text-center mb-4">Add-Ons</h2>
+        <h2 className="font-display text-3xl text-center mb-4">Add-Ons</h2>
         <p className="text-center text-muted-foreground text-sm mb-10">
           Bundle with a tier for discounted pricing, or purchase standalone.
         </p>
@@ -106,11 +106,11 @@ const Services = () => (
         </div>
 
         {/* App Development */}
-        <h2 className="font-serif text-3xl text-center mb-10">App Development</h2>
+        <h2 className="font-display text-3xl text-center mb-10">App Development</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-24">
           {appDev.map((a) => (
             <div key={a.name} className="glass-card p-8">
-              <h4 className="font-serif text-xl mb-4">{a.name}</h4>
+              <h4 className="font-display text-xl mb-4">{a.name}</h4>
               <div className="flex gap-8 text-sm">
                 <span className="text-muted-foreground">With tier: <span className="text-primary font-bold">{a.addonPrice}</span></span>
                 <span className="text-muted-foreground">Standalone: <span className="text-foreground font-bold">{a.standalonePrice}</span></span>

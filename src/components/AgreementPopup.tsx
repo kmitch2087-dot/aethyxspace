@@ -53,7 +53,7 @@ const AgreementPopup = ({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-lg bg-cream">
         <DialogHeader className="text-center pb-4">
-          <DialogTitle className="text-xl md:text-2xl font-serif font-semibold text-foreground">
+          <DialogTitle className="text-xl md:text-2xl font-display font-semibold text-foreground">
             Service Agreement Required
           </DialogTitle>
           <DialogDescription className="text-base text-muted-foreground mt-2">

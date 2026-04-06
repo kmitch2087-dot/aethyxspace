@@ -92,7 +92,7 @@ const ServiceSelectionPopup = ({ open, onOpenChange, serviceName }: ServiceSelec
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-lg md:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-serif text-foreground">
+          <DialogTitle className="text-2xl font-display text-foreground">
             {showPayment ? "Complete Your Payment" : "How Would You Like to Begin?"}
           </DialogTitle>
           <DialogDescription className="text-base text-muted-foreground">

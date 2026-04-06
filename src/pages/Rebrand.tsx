@@ -78,7 +78,7 @@ const Rebrand = () => {
   };
 
   return (
-    <div className="min-h-screen text-[#e8e6e1] relative overflow-hidden" style={{ background: "#060a12" }}>
+    <div className="min-h-screen text-foreground relative overflow-hidden bg-background">
       {/* Video as full-width background hero */}
       <div className="fixed inset-0 z-0">
         <video
@@ -90,26 +90,25 @@ const Rebrand = () => {
           onLoadedData={handleVideoLoaded}
           className="w-full h-full object-cover"
         />
-        {/* Bottom fade so content below blends smoothly */}
-        <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 30%, #060a12 85%)" }} />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 30%, hsl(0 0% 4%) 85%)" }} />
       </div>
 
       {/* Main content */}
       <div className="relative z-10 flex flex-col items-center px-6 pt-[55vh] md:pt-[60vh] pb-16">
 
         {/* Tagline */}
-        <p className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold tracking-[0.15em] uppercase text-[#4ECDC4] mb-8 text-center" style={{ textShadow: "0 0 30px rgba(78,205,196,0.3)" }}>
+        <p className="font-display text-3xl md:text-4xl lg:text-5xl font-bold tracking-[0.15em] uppercase text-primary mb-8 text-center glow-teal">
           Crafting Identity in the Unseen
         </p>
 
         {/* Rebrand announcement */}
         <div className="max-w-3xl text-center mb-20 md:mb-28">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight">
             Something new is taking shape.
           </h1>
-          <p className="text-2xl md:text-3xl lg:text-4xl font-bold leading-snug" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>
+          <p className="text-2xl md:text-3xl lg:text-4xl font-bold leading-snug">
             Vibe Shift Studio is becoming{" "}
-            <span className="text-[#e8e6e1]">Aethyx</span>. Same
+            <span className="text-foreground">Aethyx</span>. Same
             vision. Bolder execution. Stay tuned.
           </p>
         </div>
@@ -119,19 +118,19 @@ const Rebrand = () => {
           {/* Emergency */}
           <a
             href="tel:+14015891023"
-            className="group rounded-2xl border border-[#e8e6e1]/[0.1] bg-[#0c1528]/80 backdrop-blur-md p-8 text-center transition-all duration-300 hover:border-[#ff6b6b]/30 hover:bg-[#121d35]/90" style={{ boxShadow: "0 0 40px 5px rgba(12,21,40,0.6), inset 0 1px 0 rgba(255,255,255,0.05)" }}
+            className="glass-card group p-8 text-center transition-all duration-300 hover:border-destructive/30"
           >
-            <div className="w-12 h-12 rounded-full bg-[#ff6b6b]/10 flex items-center justify-center mx-auto mb-5">
-              <Phone className="h-5 w-5 text-[#ff6b6b]" />
+            <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-5">
+              <Phone className="h-5 w-5 text-destructive" />
             </div>
-            <h3 className="text-sm font-medium uppercase tracking-widest mb-3 text-[#e8e6e1]/80">
+            <h3 className="text-sm font-medium uppercase tracking-widest mb-3 text-foreground/80">
               Client Emergency
             </h3>
-            <p className="text-[#e8e6e1]/50 text-sm font-light mb-4 leading-relaxed">
+            <p className="text-muted-foreground text-sm mb-4 leading-relaxed">
               Issues with your website inhibiting payment collection or business
               operations?
             </p>
-            <span className="text-[#ff6b6b]/80 text-sm font-medium group-hover:text-[#ff6b6b] transition-colors">
+            <span className="text-destructive/80 text-sm font-medium group-hover:text-destructive transition-colors">
               Call anytime — 401-589-1023
             </span>
           </a>
@@ -139,18 +138,18 @@ const Rebrand = () => {
           {/* General contact */}
           <a
             href="mailto:Aethyxspace@protonmail.com"
-            className="group rounded-2xl border border-[#e8e6e1]/[0.1] bg-[#0c1528]/80 backdrop-blur-md p-8 text-center transition-all duration-300 hover:border-[#4ECDC4]/30 hover:bg-[#121d35]/90" style={{ boxShadow: "0 0 40px 5px rgba(12,21,40,0.6), inset 0 1px 0 rgba(255,255,255,0.05)" }}
+            className="glass-card group p-8 text-center transition-all duration-300 hover:border-primary/30"
           >
-            <div className="w-12 h-12 rounded-full bg-[#4ECDC4]/10 flex items-center justify-center mx-auto mb-5">
-              <Mail className="h-5 w-5 text-[#4ECDC4]" />
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-5">
+              <Mail className="h-5 w-5 text-primary" />
             </div>
-            <h3 className="text-sm font-medium uppercase tracking-widest mb-3 text-[#e8e6e1]/80">
+            <h3 className="text-sm font-medium uppercase tracking-widest mb-3 text-foreground/80">
               General Contact
             </h3>
-            <p className="text-[#e8e6e1]/50 text-sm font-light mb-4 leading-relaxed">
+            <p className="text-muted-foreground text-sm mb-4 leading-relaxed">
               Non-urgent inquiries, questions, or just want to say hey.
             </p>
-            <span className="text-[#4ECDC4]/80 text-sm font-medium group-hover:text-[#4ECDC4] transition-colors">
+            <span className="text-primary/80 text-sm font-medium group-hover:text-primary transition-colors">
               Aethyxspace@protonmail.com
             </span>
           </a>
@@ -158,18 +157,18 @@ const Rebrand = () => {
           {/* Consultation */}
           <button
             onClick={() => setShowForm(!showForm)}
-            className="group rounded-2xl border border-[#e8e6e1]/[0.1] bg-[#0c1528]/80 backdrop-blur-md p-8 text-center transition-all duration-300 hover:border-[#7B68EE]/30 hover:bg-[#121d35]/90 text-left" style={{ boxShadow: "0 0 40px 5px rgba(12,21,40,0.6), inset 0 1px 0 rgba(255,255,255,0.05)" }}
+            className="glass-card group p-8 text-center transition-all duration-300 hover:border-accent/30 text-left"
           >
-            <div className="w-12 h-12 rounded-full bg-[#7B68EE]/10 flex items-center justify-center mx-auto mb-5">
-              <Calendar className="h-5 w-5 text-[#7B68EE]" />
+            <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-5">
+              <Calendar className="h-5 w-5 text-accent" />
             </div>
-            <h3 className="text-sm font-medium uppercase tracking-widest mb-3 text-[#e8e6e1]/80 text-center">
+            <h3 className="text-sm font-medium uppercase tracking-widest mb-3 text-foreground/80 text-center">
               Book a Consultation
             </h3>
-            <p className="text-[#e8e6e1]/50 text-sm font-light mb-4 leading-relaxed text-center">
+            <p className="text-muted-foreground text-sm mb-4 leading-relaxed text-center">
               $50 one-time fee, credited toward your project total.
             </p>
-            <span className="text-[#7B68EE]/80 text-sm font-medium group-hover:text-[#7B68EE] transition-colors block text-center">
+            <span className="text-accent text-sm font-medium group-hover:text-accent/80 transition-colors block text-center">
               Get started →
             </span>
           </button>
@@ -177,9 +176,9 @@ const Rebrand = () => {
 
         {/* Consultation form */}
         {showForm && (
-          <div className="max-w-lg w-full rounded-2xl border border-[#7B68EE]/20 bg-[#e8e6e1]/[0.03] backdrop-blur-sm p-8 md:p-10 mb-16 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <h2 className="text-xl font-medium mb-2">Book Your Consultation</h2>
-            <p className="text-[#e8e6e1]/50 text-sm font-light mb-6">
+          <div className="max-w-lg w-full glass-card p-8 md:p-10 mb-16 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <h2 className="text-xl font-display font-bold mb-2">Book Your Consultation</h2>
+            <p className="text-muted-foreground text-sm mb-6">
               Fill out the details below, then complete the $50 payment to
               secure your spot.
             </p>
@@ -188,7 +187,7 @@ const Rebrand = () => {
               href={CALENDAR_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-[#7B68EE] text-sm mb-6 hover:text-[#7B68EE]/80 transition-colors"
+              className="inline-flex items-center gap-2 text-primary text-sm mb-6 hover:text-primary/80 transition-colors"
             >
               <ExternalLink className="h-3.5 w-3.5" />
               View available times (subscribe to calendar)
@@ -196,7 +195,7 @@ const Rebrand = () => {
 
             <form onSubmit={handleConsultationSubmit} className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="consult-name" className="text-[#e8e6e1]/70 text-sm">
+                <Label htmlFor="consult-name" className="text-foreground/70 text-sm">
                   Your Name
                 </Label>
                 <Input
@@ -205,13 +204,13 @@ const Rebrand = () => {
                   placeholder="Jane Smith"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="rounded-xl bg-[#e8e6e1]/[0.05] border-[#e8e6e1]/10 text-[#e8e6e1] placeholder:text-[#e8e6e1]/30 focus:border-[#7B68EE]/40"
+                  className="rounded-xl bg-muted/50 border-border text-foreground placeholder:text-muted-foreground/40 focus:border-primary/40"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="consult-email" className="text-[#e8e6e1]/70 text-sm">
-                  Email Address <span className="text-[#ff6b6b]">*</span>
+                <Label htmlFor="consult-email" className="text-foreground/70 text-sm">
+                  Email Address <span className="text-destructive">*</span>
                 </Label>
                 <Input
                   id="consult-email"
@@ -220,12 +219,12 @@ const Rebrand = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="rounded-xl bg-[#e8e6e1]/[0.05] border-[#e8e6e1]/10 text-[#e8e6e1] placeholder:text-[#e8e6e1]/30 focus:border-[#7B68EE]/40"
+                  className="rounded-xl bg-muted/50 border-border text-foreground placeholder:text-muted-foreground/40 focus:border-primary/40"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="consult-business" className="text-[#e8e6e1]/70 text-sm">
+                <Label htmlFor="consult-business" className="text-foreground/70 text-sm">
                   Business Name
                 </Label>
                 <Input
@@ -234,12 +233,12 @@ const Rebrand = () => {
                   placeholder="Your Business"
                   value={businessName}
                   onChange={(e) => setBusinessName(e.target.value)}
-                  className="rounded-xl bg-[#e8e6e1]/[0.05] border-[#e8e6e1]/10 text-[#e8e6e1] placeholder:text-[#e8e6e1]/30 focus:border-[#7B68EE]/40"
+                  className="rounded-xl bg-muted/50 border-border text-foreground placeholder:text-muted-foreground/40 focus:border-primary/40"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="consult-details" className="text-[#e8e6e1]/70 text-sm">
+                <Label htmlFor="consult-details" className="text-foreground/70 text-sm">
                   Tell us about your project
                 </Label>
                 <Textarea
@@ -248,14 +247,14 @@ const Rebrand = () => {
                   value={projectDetails}
                   onChange={(e) => setProjectDetails(e.target.value)}
                   rows={4}
-                  className="rounded-xl bg-[#e8e6e1]/[0.05] border-[#e8e6e1]/10 text-[#e8e6e1] placeholder:text-[#e8e6e1]/30 focus:border-[#7B68EE]/40 resize-none"
+                  className="rounded-xl bg-muted/50 border-border text-foreground placeholder:text-muted-foreground/40 focus:border-primary/40 resize-none"
                 />
               </div>
 
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full rounded-full py-6 bg-[#7B68EE] hover:bg-[#7B68EE]/85 text-white transition-all duration-300 hover:-translate-y-0.5 mt-2"
+                className="w-full rounded-full py-6 bg-primary hover:bg-primary/85 text-primary-foreground transition-all duration-300 hover:-translate-y-0.5 mt-2"
               >
                 {isLoading ? (
                   <>
@@ -271,7 +270,7 @@ const Rebrand = () => {
               </Button>
             </form>
 
-            <p className="text-center text-xs text-[#e8e6e1]/30 mt-4 font-light">
+            <p className="text-center text-xs text-muted-foreground/50 mt-4">
               Secure payment powered by Stripe. Your $50 fee is credited toward
               your final project total.
             </p>
@@ -280,8 +279,8 @@ const Rebrand = () => {
       </div>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t border-[#e8e6e1]/[0.06] py-8 px-6 text-center">
-        <p className="text-xs text-[#e8e6e1]/30 font-light">
+      <footer className="relative z-10 border-t border-border/20 py-8 px-6 text-center">
+        <p className="text-xs text-muted-foreground">
           © {new Date().getFullYear()} Aethyx. All rights reserved.
         </p>
       </footer>

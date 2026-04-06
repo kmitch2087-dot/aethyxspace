@@ -9,7 +9,7 @@ const About = () => (
 
     <div className="pt-28 pb-24 px-6">
       <div className="max-w-2xl mx-auto">
-        <h1 className="font-serif text-4xl md:text-6xl mb-12">About Aethyx</h1>
+        <h1 className="font-display text-4xl md:text-6xl mb-12">About Aethyx</h1>
 
         <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
           <p>
@@ -38,7 +38,7 @@ const About = () => (
             <span className="text-primary italic">"Who built this?"</span>
           </p>
 
-          <p className="text-foreground font-serif text-2xl mt-8">
+          <p className="text-foreground font-display text-2xl mt-8">
             If your business has evolved, your website should prove it.
           </p>
         </div>

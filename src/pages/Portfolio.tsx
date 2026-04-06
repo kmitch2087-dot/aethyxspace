@@ -62,7 +62,7 @@ const Portfolio = () => {
 
       <div className="pt-28 pb-24 px-6">
         <div className="max-w-5xl mx-auto">
-          <h1 className="font-serif text-4xl md:text-6xl text-center mb-4">Portfolio</h1>
+          <h1 className="font-display text-4xl md:text-6xl text-center mb-4">Portfolio</h1>
           <p className="text-center text-muted-foreground text-lg mb-20 max-w-2xl mx-auto">
             Real projects. Real results. Every site built with intention.
           </p>
@@ -76,7 +76,7 @@ const Portfolio = () => {
                   className="w-full flex items-center justify-between p-8 text-left hover:bg-muted/10 transition-colors"
                 >
                   <div>
-                    <h2 className="font-serif text-2xl md:text-3xl mb-1">{project.title}</h2>
+                    <h2 className="font-display text-2xl md:text-3xl mb-1">{project.title}</h2>
                     <p className="text-primary text-sm tracking-widest uppercase">{project.tagline}</p>
                     <p className="text-muted-foreground text-sm mt-1">{project.subtitle}</p>
                   </div>

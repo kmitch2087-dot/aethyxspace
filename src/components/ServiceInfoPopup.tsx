@@ -129,7 +129,7 @@ const ServiceInfoPopup = ({ open, onOpenChange, tier }: ServiceInfoPopupProps) =
           <p className="text-sm font-semibold text-sage uppercase tracking-wide mb-1">
             {details.subtitle}
           </p>
-          <DialogTitle className="text-2xl md:text-3xl font-serif font-semibold text-foreground">
+          <DialogTitle className="text-2xl md:text-3xl font-display font-semibold text-foreground">
             {details.title}
           </DialogTitle>
           <DialogDescription className="text-base text-foreground font-medium leading-relaxed pt-2">
