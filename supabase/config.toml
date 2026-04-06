@@ -1,13 +1,1 @@
-project_id = "fgznivtvdhacdcqyumqs"
-
-[functions.create-consultation-payment]
-verify_jwt = false
-
-[functions.submit-waiting-list]
-verify_jwt = false
-
-[functions.create-service-payment]
-verify_jwt = false
-
-[functions.upload-review-photo]
-verify_jwt = false
+project_id = "kjobyawxvdycizbfmlfe"
