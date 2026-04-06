@@ -1,8 +1,14 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Check, Star } from "lucide-react";
+import { ArrowRight, Check, Star, Globe, Diamond, Play } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { SERVICE_TIERS, QUICK_SERVICES, ADD_ONS, APP_DEVELOPMENT } from "@/lib/stripePrices";
+
+const categories = [
+  { icon: Globe, title: "Web Design", desc: "Custom-built websites that are fast, responsive, and designed to convert visitors into clients." },
+  { icon: Diamond, title: "Branding & Identity", desc: "Complete brand systems — logos, color palettes, typography, and guidelines that define who you are." },
+  { icon: Play, title: "Digital Experiences", desc: "Interactive dashboards, booking systems, e-commerce, and custom integrations that elevate your business." },
+];
 
 const tiers: Array<{ priceId: string; name: string; price: string; features: string[]; featured?: boolean }> = [
   {
@@ -42,10 +48,32 @@ const Services = () => (
       <div className="max-w-6xl mx-auto">
         <h1 className="font-display text-4xl md:text-6xl text-center mb-4">Services</h1>
         <p className="text-center text-muted-foreground text-lg mb-20 max-w-2xl mx-auto">
-          Every project is tailored. Pick your tier, add what you need, and let's build.
+          Elevate your digital presence with our bespoke solutions.
         </p>
 
+        {/* Service Categories */}
+        <div className="space-y-6 mb-24">
+          {categories.map((cat) => (
+            <div key={cat.title} className="glass-card p-8 flex flex-col md:flex-row items-start md:items-center gap-6 hover:border-primary/30 transition-all">
+              <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                <cat.icon className="h-6 w-6 text-primary" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-display text-2xl mb-2">{cat.title}</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">{cat.desc}</p>
+              </div>
+              <Link
+                to="/contact"
+                className="text-primary text-sm uppercase tracking-widest hover:text-primary/80 transition-colors shrink-0"
+              >
+                Learn More →
+              </Link>
+            </div>
+          ))}
+        </div>
+
         {/* Tiers */}
+        <h2 className="font-display text-3xl text-center mb-10">Pricing Tiers</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
           {tiers.map((tier) => (
             <div

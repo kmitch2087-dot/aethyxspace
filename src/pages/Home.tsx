@@ -1,17 +1,17 @@
 import { useRef } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Palette, Globe, Layers } from "lucide-react";
+import { ArrowRight, Globe, Palette, Layers } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import aethyxLogo from "@/assets/aethyx-logo.png";
+import AethyxLogo from "@/components/AethyxLogo";
 import reRetreats1 from "@/assets/portfolio/re-retreats-1.jpg";
 import kokopelli1 from "@/assets/portfolio/kokopelli-1.jpg";
 import vibeshift1 from "@/assets/portfolio/vibeshift-1.jpg";
 
 const services = [
   { icon: Globe, title: "Web Design", desc: "Custom websites that command attention and convert." },
-  { icon: Palette, title: "Branding", desc: "Logos, assets, and identity systems built to last." },
-  { icon: Layers, title: "Add-Ons", desc: "E-commerce, dashboards, booking — everything you need." },
+  { icon: Palette, title: "Branding & Identity", desc: "Logos, assets, and identity systems built to last." },
+  { icon: Layers, title: "Digital Experiences", desc: "E-commerce, dashboards, booking — everything you need." },
 ];
 
 const portfolioHighlights = [
@@ -47,19 +47,22 @@ const Home = () => {
         </div>
 
         <div className="relative z-10 text-center px-6 pt-20">
-          <img src={aethyxLogo} alt="Aethyx" className="h-20 md:h-28 mx-auto mb-8" />
+          <AethyxLogo className="h-24 md:h-36 mx-auto mb-10" />
           <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold tracking-wide text-primary mb-6 glow-teal">
             Elevate & Evolve Unapologetically
           </h1>
           <p className="text-lg md:text-xl text-foreground/70 max-w-2xl mx-auto mb-10">
-            High-end web design for businesses that refuse to blend in.
+            Premium web design & digital experiences for ambitious brands.
           </p>
           <Link
             to="/contact"
             className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-primary-foreground font-semibold tracking-wide uppercase text-sm hover:bg-primary/90 transition-all hover:-translate-y-0.5"
           >
-            Start a Project <ArrowRight className="h-4 w-4" />
+            Get Started <ArrowRight className="h-4 w-4" />
           </Link>
+          <p className="text-muted-foreground text-sm mt-6 tracking-widest uppercase">
+            RI-based • Serving USA
+          </p>
         </div>
       </section>
 
