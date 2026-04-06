@@ -3,19 +3,15 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Rebrand from "./pages/Rebrand";
+import Home from "./pages/Home";
+import Services from "./pages/Services";
+import Portfolio from "./pages/Portfolio";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
 import PaymentSuccess from "./pages/PaymentSuccess";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
 import NotFound from "./pages/NotFound";
-
-// Legacy routes — preserved but disabled during rebrand
-// import Index from "./pages/Index";
-// import About from "./pages/About";
-// import Services from "./pages/Services";
-// import Membership from "./pages/Membership";
-// import Testimonials from "./pages/Testimonials";
-// import StartHere from "./pages/StartHere";
-// import Seo from "./pages/Seo";
-// import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 const queryClient = new QueryClient();
 
@@ -26,16 +22,14 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Rebrand />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/services" element={<Services />} />
+          <Route path="/portfolio" element={<Portfolio />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
-          {/* Legacy routes — disabled during rebrand */}
-          {/* <Route path="/about" element={<About />} /> */}
-          {/* <Route path="/services" element={<Services />} /> */}
-          {/* <Route path="/membership" element={<Membership />} /> */}
-          {/* <Route path="/testimonials" element={<Testimonials />} /> */}
-          {/* <Route path="/start-here" element={<StartHere />} /> */}
-          {/* <Route path="/seo" element={<Seo />} /> */}
-          {/* <Route path="/privacy-policy" element={<PrivacyPolicy />} /> */}
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfService />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
