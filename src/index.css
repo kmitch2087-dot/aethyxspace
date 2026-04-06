@@ -1,124 +1,57 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Source+Sans+3:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Vibe Shift Studio Design System
-   Warm, grounded, calm palette with organic depth
-   All colors in HSL
-*/
-
 @layer base {
   :root {
-    /* Warm cream/paper background */
-    --background: 42 35% 96%;
-    --foreground: 25 20% 16%;
+    --background: 222 47% 4%;
+    --foreground: 40 20% 92%;
 
-    /* Card uses slightly warmer white */
-    --card: 40 45% 99%;
-    --card-foreground: 25 20% 16%;
+    --card: 222 40% 7%;
+    --card-foreground: 40 20% 92%;
 
-    --popover: 40 45% 99%;
-    --popover-foreground: 25 20% 16%;
+    --popover: 222 40% 7%;
+    --popover-foreground: 40 20% 92%;
 
-    /* Primary: Deep warm charcoal */
-    --primary: 25 18% 22%;
-    --primary-foreground: 42 35% 96%;
+    --primary: 174 58% 55%;
+    --primary-foreground: 222 47% 4%;
 
-    /* Secondary: Deeper sage green */
-    --secondary: 152 28% 88%;
-    --secondary-foreground: 152 40% 26%;
+    --secondary: 222 30% 14%;
+    --secondary-foreground: 40 20% 85%;
 
-    /* Muted: Warm taupe */
-    --muted: 38 22% 92%;
-    --muted-foreground: 25 15% 32%;
+    --muted: 222 25% 12%;
+    --muted-foreground: 220 15% 55%;
 
-    /* Accent: Deeper blue-green */
-    --accent: 188 32% 86%;
-    --accent-foreground: 188 38% 26%;
+    --accent: 255 70% 67%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 38 28% 85%;
-    --input: 38 28% 85%;
-    --ring: 152 35% 38%;
+    --border: 220 20% 16%;
+    --input: 220 20% 16%;
+    --ring: 174 58% 55%;
 
     --radius: 0.75rem;
 
-    /* Custom brand colors - deeper and richer */
-    --sage: 152 35% 38%;
-    --sage-medium: 152 30% 52%;
-    --sage-light: 152 28% 90%;
-    --sage-muted: 152 22% 82%;
-    
-    --ocean: 198 38% 44%;
-    --ocean-medium: 198 32% 58%;
-    --ocean-light: 198 38% 90%;
-    --ocean-muted: 198 28% 82%;
-    
-    --sand: 38 40% 85%;
-    --sand-deep: 35 35% 78%;
-    --sand-rich: 32 38% 72%;
-    
-    --warm-white: 42 45% 98%;
-    --cream: 42 38% 94%;
-    --cream-deep: 40 32% 90%;
-    --cream-rich: 38 28% 86%;
+    /* Brand tokens */
+    --teal: 174 58% 55%;
+    --purple: 255 70% 67%;
+    --navy: 222 47% 4%;
+    --navy-light: 222 40% 10%;
+    --off-white: 40 20% 92%;
+    --glass: 222 40% 7%;
 
-    /* Organic shape colors */
-    --shape-sage: 152 30% 75%;
-    --shape-ocean: 198 32% 78%;
-    --shape-sand: 38 35% 80%;
-
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 25 15% 8%;
-    --foreground: 40 28% 92%;
-
-    --card: 25 15% 10%;
-    --card-foreground: 40 28% 92%;
-
-    --popover: 25 15% 10%;
-    --popover-foreground: 40 28% 92%;
-
-    --primary: 40 28% 92%;
-    --primary-foreground: 25 15% 8%;
-
-    --secondary: 152 18% 18%;
-    --secondary-foreground: 152 28% 82%;
-
-    --muted: 25 15% 16%;
-    --muted-foreground: 38 14% 55%;
-
-    --accent: 188 20% 18%;
-    --accent-foreground: 188 32% 82%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 25 15% 18%;
-    --input: 25 15% 18%;
-    --ring: 152 32% 48%;
-
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 222 40% 7%;
+    --sidebar-foreground: 40 20% 92%;
+    --sidebar-primary: 174 58% 55%;
+    --sidebar-primary-foreground: 222 47% 4%;
+    --sidebar-accent: 222 30% 14%;
+    --sidebar-accent-foreground: 40 20% 85%;
+    --sidebar-border: 220 20% 16%;
+    --sidebar-ring: 174 58% 55%;
   }
 }
 
@@ -130,151 +63,35 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Source Sans 3', system-ui, sans-serif;
-    font-feature-settings: "kern" 1, "liga" 1;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Cormorant Garamond', Georgia, serif;
-    @apply tracking-normal;
   }
 }
 
-/* Smooth scrolling */
 html {
   scroll-behavior: smooth;
 }
 
-/* Rich watercolor-inspired backgrounds with organic shapes */
+/* Glass card */
 @layer utilities {
-  .bg-hero {
-    background: 
-      radial-gradient(ellipse 120% 80% at 90% 20%, hsl(152 30% 90% / 0.45), transparent 50%),
-      radial-gradient(ellipse 100% 60% at 10% 80%, hsl(198 32% 88% / 0.35), transparent 50%),
-      radial-gradient(ellipse 80% 100% at 50% 100%, hsl(38 35% 88% / 0.3), transparent 60%),
-      linear-gradient(180deg, hsl(42 38% 97%) 0%, hsl(40 35% 95%) 100%);
+  .glass-card {
+    @apply rounded-2xl border border-border/50 backdrop-blur-md;
+    background: hsl(var(--glass) / 0.8);
+    box-shadow: 0 0 40px 5px hsl(var(--navy) / 0.6), inset 0 1px 0 hsl(0 0% 100% / 0.05);
   }
 
-  .bg-section-warm {
-    background: 
-      radial-gradient(ellipse 90% 70% at 85% 30%, hsl(38 40% 90% / 0.4), transparent 50%),
-      radial-gradient(ellipse 70% 50% at 15% 70%, hsl(152 28% 92% / 0.3), transparent 50%),
-      hsl(42 45% 98%);
+  .glass-card-teal {
+    @apply glass-card;
+    box-shadow: 0 0 30px 5px hsl(var(--teal) / 0.08), inset 0 1px 0 hsl(0 0% 100% / 0.05);
   }
 
-  .bg-section-sage {
-    background: 
-      radial-gradient(ellipse 100% 80% at 20% 20%, hsl(152 30% 88% / 0.55), transparent 50%),
-      radial-gradient(ellipse 80% 60% at 80% 80%, hsl(198 28% 90% / 0.4), transparent 50%),
-      radial-gradient(ellipse 60% 40% at 60% 30%, hsl(38 32% 92% / 0.3), transparent 50%),
-      linear-gradient(180deg, hsl(152 25% 94%) 0%, hsl(150 22% 92%) 100%);
+  .glow-teal {
+    text-shadow: 0 0 30px hsl(var(--teal) / 0.3);
   }
 
-  .bg-section-sand {
-    background: 
-      radial-gradient(ellipse 90% 70% at 75% 25%, hsl(38 38% 86% / 0.5), transparent 50%),
-      radial-gradient(ellipse 80% 60% at 25% 75%, hsl(152 25% 90% / 0.35), transparent 50%),
-      radial-gradient(ellipse 60% 50% at 50% 50%, hsl(198 30% 92% / 0.25), transparent 50%),
-      linear-gradient(180deg, hsl(38 32% 93%) 0%, hsl(36 30% 91%) 100%);
+  .glow-purple {
+    text-shadow: 0 0 30px hsl(var(--purple) / 0.3);
   }
-
-  .bg-section-ocean {
-    background: 
-      radial-gradient(ellipse 100% 80% at 30% 30%, hsl(198 35% 88% / 0.5), transparent 50%),
-      radial-gradient(ellipse 80% 70% at 70% 70%, hsl(152 28% 90% / 0.4), transparent 50%),
-      radial-gradient(ellipse 70% 50% at 90% 20%, hsl(38 30% 92% / 0.3), transparent 50%),
-      linear-gradient(180deg, hsl(198 30% 94%) 0%, hsl(195 28% 92%) 100%);
-  }
-
-  .bg-section-cream {
-    background: 
-      radial-gradient(ellipse 80% 60% at 10% 40%, hsl(152 25% 92% / 0.3), transparent 50%),
-      radial-gradient(ellipse 70% 50% at 90% 60%, hsl(198 28% 92% / 0.25), transparent 50%),
-      linear-gradient(180deg, hsl(40 35% 96%) 0%, hsl(38 32% 94%) 100%);
-  }
-
-  .section-divider-subtle {
-    @apply relative;
-  }
-  
-  .section-divider-subtle::before {
-    content: '';
-    @apply absolute left-1/2 -translate-x-1/2 w-24 h-px;
-    background: linear-gradient(90deg, transparent, hsl(var(--sage) / 0.25), hsl(var(--ocean) / 0.25), transparent);
-  }
-
-  .heading-accent {
-    @apply relative inline-block;
-  }
-  
-  .heading-accent::after {
-    content: '';
-    @apply absolute -bottom-3 left-0 w-12 h-0.5 rounded-full;
-    background: linear-gradient(90deg, hsl(var(--sage) / 0.5), hsl(var(--ocean) / 0.3));
-  }
-}
-
-/* Subtle paper texture overlay */
-.texture-paper {
-  position: relative;
-}
-
-.texture-paper::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  opacity: 0.025;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 1;
-}
-
-.texture-paper > * {
-  position: relative;
-  z-index: 2;
-}
-
-/* Organic blob shapes */
-.organic-shape {
-  position: absolute;
-  border-radius: 60% 40% 50% 50% / 50% 60% 40% 50%;
-  opacity: 0.08;
-  filter: blur(40px);
-  pointer-events: none;
-}
-
-/* Card enhancements */
-.card-elevated {
-  @apply relative overflow-hidden bg-white;
-  box-shadow: 
-    0 1px 3px rgba(0, 0, 0, 0.04),
-    0 4px 12px rgba(0, 0, 0, 0.05),
-    0 8px 24px rgba(139, 115, 85, 0.08);
-}
-
-.card-elevated > * {
-  position: relative;
-  z-index: 1;
-}
-
-/* Process step connector line */
-.process-connector {
-  @apply hidden md:block absolute top-7 left-1/2 w-full h-px;
-  background: linear-gradient(90deg, transparent 10%, hsl(var(--border)) 30%, hsl(var(--border)) 70%, transparent 90%);
-}
-
-/* Service card - calm, grounded styling */
-.card-service {
-  @apply relative overflow-hidden rounded-2xl;
-  background: hsl(var(--warm-white));
-  border: 1px solid hsl(var(--border) / 0.5);
-  box-shadow: 
-    0 1px 2px rgba(0, 0, 0, 0.02),
-    0 2px 8px rgba(0, 0, 0, 0.03);
-  transition: all 0.3s ease;
-}
-
-.card-service:hover {
-  box-shadow: 
-    0 2px 4px rgba(0, 0, 0, 0.03),
-    0 4px 12px rgba(0, 0, 0, 0.05);
 }
