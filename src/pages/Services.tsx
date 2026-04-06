@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { SERVICE_TIERS, QUICK_SERVICES, ADD_ONS, APP_DEVELOPMENT } from "@/lib/stripePrices";
 
-const tiers = [
+const tiers: Array<{ priceId: string; name: string; price: string; features: string[]; featured?: boolean }> = [
   {
     ...SERVICE_TIERS.tier1,
     features: ["Single-page or multi-page site", "Mobile responsive", "Basic SEO setup", "Contact form", "1 round of revisions"],
