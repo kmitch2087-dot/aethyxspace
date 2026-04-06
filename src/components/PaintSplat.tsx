@@ -23,7 +23,7 @@ const PaintSplat = ({ number, color }: PaintSplatProps) => {
         {/* Small drip 2 */}
         <ellipse cx="72" cy="85" rx="3" ry="5" fill={fillColor} />
       </svg>
-      <span className="absolute inset-0 flex items-center justify-center text-white font-serif font-semibold text-lg">
+      <span className="absolute inset-0 flex items-center justify-center text-white font-display font-semibold text-lg">
         {number}
       </span>
     </div>

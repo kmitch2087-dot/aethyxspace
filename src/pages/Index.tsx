@@ -109,7 +109,7 @@ const Index = () => {
               {/* Service Card 1 */}
               <div className="card-service p-5 md:p-6 transition-all duration-300 hover:-translate-y-0.5">
                 <PaintSplat number="1" color="sage" />
-                <h3 className="text-xl md:text-2xl text-foreground mb-2 font-serif font-medium">
+                <h3 className="text-xl md:text-2xl text-foreground mb-2 font-display font-medium">
                   Online Presence Starter
                 </h3>
                 <p className="text-foreground leading-relaxed font-light text-sm">
@@ -121,7 +121,7 @@ const Index = () => {
               {/* Service Card 2 */}
               <div className="card-service p-5 md:p-6 transition-all duration-300 hover:-translate-y-0.5">
                 <PaintSplat number="2" color="ocean" />
-                <h3 className="text-xl md:text-2xl text-foreground mb-2 font-serif font-medium">
+                <h3 className="text-xl md:text-2xl text-foreground mb-2 font-display font-medium">
                   Professional Brand Website
                 </h3>
                 <p className="text-foreground leading-relaxed font-light text-sm">
@@ -133,7 +133,7 @@ const Index = () => {
               {/* Service Card 3 */}
               <div className="card-service p-5 md:p-6 transition-all duration-300 hover:-translate-y-0.5">
                 <PaintSplat number="3" color="sage" />
-                <h3 className="text-xl md:text-2xl text-foreground mb-2 font-serif font-medium">
+                <h3 className="text-xl md:text-2xl text-foreground mb-2 font-display font-medium">
                   Signature Brand Presence
                 </h3>
                 <p className="text-foreground leading-relaxed font-light text-sm">
@@ -208,7 +208,7 @@ const Index = () => {
               }].map((step, i) => (
                 <div key={i} className="card-service p-5 text-center transition-all duration-300 hover:-translate-y-0.5">
                   <PaintSplat number={step.num} color={step.color} />
-                  <h3 className="font-serif text-xl md:text-2xl text-foreground mb-2 font-medium">
+                  <h3 className="font-display text-xl md:text-2xl text-foreground mb-2 font-medium">
                     {step.title}
                   </h3>
                   <p className="text-base md:text-lg text-foreground font-medium leading-relaxed">

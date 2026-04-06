@@ -43,7 +43,7 @@ const Home = () => {
             onLoadedData={handleVideoLoaded}
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 20%, hsl(222 47% 4%) 85%)" }} />
+          <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 20%, hsl(0 0% 4%) 85%)" }} />
         </div>
 
         <div className="relative z-10 text-center px-6 pt-20">

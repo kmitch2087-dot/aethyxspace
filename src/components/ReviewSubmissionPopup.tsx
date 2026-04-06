@@ -163,7 +163,7 @@ const ReviewSubmissionPopup = ({ open, onOpenChange }: ReviewSubmissionPopupProp
             <div className="w-16 h-16 rounded-full bg-sage/20 flex items-center justify-center mx-auto mb-6">
               <Check className="h-8 w-8 text-sage" />
             </div>
-            <DialogTitle className="text-2xl font-serif font-semibold text-foreground mb-4">
+            <DialogTitle className="text-2xl font-display font-semibold text-foreground mb-4">
               Thank You!
             </DialogTitle>
             <DialogDescription className="text-base text-muted-foreground mb-6">
@@ -185,7 +185,7 @@ const ReviewSubmissionPopup = ({ open, onOpenChange }: ReviewSubmissionPopupProp
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto bg-cream">
         <DialogHeader className="text-center pb-2">
-          <DialogTitle className="text-xl md:text-2xl font-serif font-semibold text-foreground">
+          <DialogTitle className="text-xl md:text-2xl font-display font-semibold text-foreground">
             Share Your Experience
           </DialogTitle>
           <DialogDescription className="text-base text-muted-foreground mt-2">

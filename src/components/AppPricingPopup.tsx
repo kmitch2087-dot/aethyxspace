@@ -19,7 +19,7 @@ const AppPricingPopup = ({ open, onOpenChange, onSelectOption }: AppPricingPopup
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-cream">
         <DialogHeader className="text-center pb-4">
-          <DialogTitle className="text-2xl md:text-3xl font-serif font-semibold text-foreground">
+          <DialogTitle className="text-2xl md:text-3xl font-display font-semibold text-foreground">
             App Development Options
           </DialogTitle>
           <DialogDescription className="text-base text-muted-foreground mt-2">
