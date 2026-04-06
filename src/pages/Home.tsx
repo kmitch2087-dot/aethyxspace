@@ -65,6 +65,7 @@ const Home = () => {
           <p className="text-muted-foreground text-sm mt-6 tracking-widest uppercase">
             RI-based • Serving USA
           </p>
+          </div>
         </div>
       </section>
 
