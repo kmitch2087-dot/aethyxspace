@@ -1,88 +1,67 @@
 
 
-## Aethyx Full Website Build
+## Apply Grok Brand Package to Aethyx Website
 
-### Overview
-Transform the current single-page rebrand landing into a complete 5-page premium website for Aethyx, a high-end web design company. Dark minimalist aesthetic, black and white with bold teal accents. The uploaded reference images will be copied into the project for use in portfolio galleries.
+### What Changes
 
-### Brand Identity
-- **Tagline**: "Elevate & Evolve Unapologetically"
-- **Logo**: Existing `src/assets/aethyx-logo.png` (teal accent on the A)
-- **Palette**: Near-black background (#060a12 / #0a0f1a), white text, teal accent (#4ECDC4)
-- **Typography**: Keep Cormorant Garamond for headings, Source Sans 3 for body. Bold, lots of negative space.
+Update the entire site's visual identity to match the Grok brand package specifications.
 
-### Pages & Routing
+### 1. Color Palette Update (`src/index.css`)
 
-**1. Homepage (`/`)**
-- Hero: Background video (existing `aethyx-intro.mov`), logo, tagline "Elevate & Evolve Unapologetically"
-- Services teaser: 3 cards linking to Services page (Web Design, Branding, Add-ons)
-- Portfolio highlights: 3 thumbnail previews of Re Retreats, Kokopelli Kabin, Vibe Shift → Aethyx
-- Strong CTA to Contact/Consultation
+| Token | Current | New (Brand Package) |
+|-------|---------|-------------------|
+| Background | `222 47% 4%` (navy #060a12) | `0 0% 4%` (near-black #0A0A0A) |
+| Primary (teal) | `174 58% 55%` (#4ECDC4) | `174 100% 45%` (#00E6D8) |
+| Card/glass | navy-tinted | neutral dark gray (#1A1A1A) |
+| Foreground | warm off-white | pure white #FFFFFF |
+| Muted/secondary | navy-tinted grays | neutral grays |
+| Accent (purple) | Remove purple accent, replace with teal variations |
 
-**2. Services (`/services`)**
-- Preserve all existing service tiers, pricing, and add-ons from `stripePrices.ts`
-- Tier 1: Online Presence Starter ($750)
-- Tier 2: Professional Brand Website ($1,500-$2,000)
-- Tier 3: Signature Brand Presence (Starting at $2,500)
-- Quick services (Logo, Brand Assets, Maintenance)
-- Add-ons grid (Email, Cloud, Dashboard, E-commerce, Booking, Analytics)
-- App development section (Native + PWA)
-- Consultation CTA at bottom (reuse existing Stripe edge function)
+All gradient overlays in Home.tsx and other pages updated from navy hsl to true black.
 
-**3. Portfolio (`/portfolio`)**
-- Three project albums with lightbox galleries:
-  - **Re Retreats** (re-retreats.com): Women's Wellness Retreats in Southern Vermont. Tagline: "reset * restore * reimagine" / "Where Women Come Home to Themselves"
-  - **Kokopelli Kabin** (kokopellikabin.com): Modern Mountain Retreat / luxury cabin rental
-  - **Vibe Shift Studio → Aethyx** (vibe-shift.com): Rebranding story
-- Each album: cover image, description, expandable photo gallery with lightbox
-- Upload all 9 reference images into `src/assets/portfolio/`
+### 2. Typography Update
 
-**4. About (`/about`)**
-- Rewrite existing About copy with Aethyx brand voice (bold, direct, unapologetic)
-- Keep the core narrative about building websites for businesses that deserve better
-- Updated brand positioning as Aethyx
+**Current**: Cormorant Garamond (serif) for headings, Source Sans 3 for body.
+**Brand Package**: Bold geometric sans-serif (Montserrat Black) for headings, Inter for body.
 
-**5. Contact (`/contact`)**
-- Consultation booking form (reuse existing `create-consultation-payment` edge function and form logic from Rebrand.tsx)
-- Direct contact info cards (phone, email)
-- Calendar link for scheduling
+- Replace Google Fonts import in `index.css`
+- Update `tailwind.config.ts` font families
+- Change heading CSS rule from serif to the new geometric sans
+- Update all `font-serif` class references across pages to `font-sans` or a new `font-display` utility
 
-### Shared Components
+### 3. Tailwind Config Cleanup (`tailwind.config.ts`)
 
-**Navigation** — New dark header component:
-- Logo left, nav links right: Home, Services, Portfolio, About, Contact
-- Sticky, glass-morphism dark style
-- Mobile hamburger menu
+- Remove old Vibe Shift color tokens (sage, ocean, sand, cream, warm-white) that are no longer used
+- Update font families to Montserrat + Inter
+- Update box shadows from warm brown tints to neutral black
 
-**Footer** — Present on all pages:
-- © Aethyx
-- aethyxspace@protonmail.com
-- 401.589.1023
-- Rhode Island, serving the entire USA
-- Privacy Policy link
-- Terms of Service link
+### 4. Files to Update
 
-### File Changes
+| File | Changes |
+|------|---------|
+| `src/index.css` | New color vars, new font imports, updated glass-card utilities |
+| `tailwind.config.ts` | New fonts, remove legacy color tokens, update shadows |
+| `src/pages/Home.tsx` | Update gradient overlay color from navy to black, update font classes |
+| `src/pages/Services.tsx` | Update font classes from `font-serif` to new display font |
+| `src/pages/Portfolio.tsx` | Same font class updates |
+| `src/pages/About.tsx` | Same font class updates |
+| `src/pages/Contact.tsx` | Same font class updates |
+| `src/pages/TermsOfService.tsx` | Same font class updates |
+| `src/components/Navbar.tsx` | No major changes needed |
+| `src/components/Footer.tsx` | No major changes needed |
 
-| Action | File |
-|--------|------|
-| Create | `src/components/Navbar.tsx` — New dark nav with mobile menu |
-| Create | `src/components/Footer.tsx` — Shared footer |
-| Create | `src/components/LightboxGallery.tsx` — Portfolio image lightbox |
-| Create | `src/pages/Home.tsx` — New homepage |
-| Create | `src/pages/Portfolio.tsx` — Portfolio with 3 albums |
-| Create | `src/pages/Contact.tsx` — Contact + consultation form |
-| Rewrite | `src/pages/Services.tsx` — Dark theme, same pricing data |
-| Rewrite | `src/pages/About.tsx` — Aethyx brand voice |
-| Update | `src/App.tsx` — New routes for all 5 pages |
-| Update | `src/index.css` — Dark-first CSS variables, remove old Vibe Shift styles |
-| Copy | 9 uploaded images → `src/assets/portfolio/` |
-| Create | `src/pages/TermsOfService.tsx` — Basic terms page |
+### 5. Brand Rules Applied
 
-### Technical Details
-- No new dependencies needed (lightbox built with native React state + Tailwind)
-- Reuses existing `create-consultation-payment` edge function and all Stripe price IDs
-- No new database tables or edge functions
-- CSS variables updated to dark-first palette; old warm/sage/cream styles replaced
-- All pages fully responsive with mobile-first approach
+- 80% black/white for structure, 15% teal for energy
+- Teal used sparingly: CTAs, highlights, logo accent, hover states
+- No purple accent (removed)
+- High contrast, lots of negative space
+- Uppercase tracking on taglines and nav links (already done)
+
+### Technical Notes
+
+- Montserrat is available via Google Fonts (free)
+- Inter is available via Google Fonts (free)
+- No new dependencies needed
+- All changes are CSS/styling only, no functional changes
 
