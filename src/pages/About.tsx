@@ -1,85 +1,61 @@
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import Header from "@/components/Header";
+import { ArrowRight } from "lucide-react";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
-const About = () => {
-  return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      
-      <main className="relative z-10 pt-28 pb-24 px-6 md:px-12 lg:px-24 xl:px-32">
-        <div className="max-w-2xl mx-auto">
-          
-          {/* Headline */}
-          <h1 className="font-serif text-4xl md:text-5xl text-foreground mb-12 heading-accent">
-            About Vibe Shift Studio
-          </h1>
-          
-          {/* Body Copy */}
-          <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
-            <p>
-              I started Vibe Shift Studio because I kept seeing great businesses with websites that didn't reflect how capable, thoughtful, or professional they actually were.
-            </p>
-            
-            <p>
-              Too cluttered. Too confusing. Too overwhelming to deal with — so they stayed unfinished or ignored.
-            </p>
-            
-            <p>
-              I believe your website should feel like an extension of your business at its best: clear, intentional, easy to navigate, and easy to trust.
-            </p>
-            
-            <p>
-              At Vibe Shift Studio, I design and build websites that remove friction — for you and for your customers. I handle the structure, the copy, and the details so you don't have to get lost in tech or second-guess every decision.
-            </p>
-            
-            <p className="text-foreground font-medium">
-              My approach is calm on purpose.
-            </p>
-            
-            <p>
-              No chaos. No pressure. No unnecessary complexity.
-            </p>
-            
-            <p>
-              Just thoughtful design, clear messaging, and a process that makes people say,
-              <br />
-              <span className="italic text-foreground">"Okay… this feels doable."</span>
-            </p>
-            
-            <p className="text-xl text-foreground font-serif mt-6">
-              If your business has evolved, your website should reflect that.
-            </p>
-          </div>
-          
-          {/* Closing Line + CTA */}
-          <div className="mt-8 pt-8 border-t border-border/30">
-            
-            <Button 
-              asChild 
-              size="lg"
-              className="bg-sage hover:bg-sage/90 text-primary-foreground rounded-full px-8 py-6 text-base shadow-warm"
-            >
-              <Link to="/start-here">Start Here</Link>
-            </Button>
-          </div>
-          
-        </div>
-      </main>
-      
-      {/* Footer */}
-      <footer className="relative z-10 py-12 px-6 md:px-12 lg:px-24 xl:px-32 border-t border-border/20">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Vibe Shift Studio. Designed with intention.
+const About = () => (
+  <div className="min-h-screen bg-background text-foreground">
+    <Navbar />
+
+    <div className="pt-28 pb-24 px-6">
+      <div className="max-w-2xl mx-auto">
+        <h1 className="font-serif text-4xl md:text-6xl mb-12">About Aethyx</h1>
+
+        <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
+          <p>
+            Most businesses deserve better than the website they have. We started Aethyx because we kept seeing capable, thoughtful businesses hiding behind cluttered, confusing, or straight-up unfinished websites.
           </p>
-          <Link to="/privacy-policy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-            Privacy Policy
+
+          <p>
+            Too overwhelming. Too generic. Too easy to ignore.
+          </p>
+
+          <p>
+            We build websites that hit different — clear, intentional, impossible to scroll past. Your site should feel like the best version of your business, not an afterthought.
+          </p>
+
+          <p className="text-foreground font-semibold text-xl">
+            Our approach is bold on purpose.
+          </p>
+
+          <p>
+            No fluff. No filler. No templates pretending to be custom. We handle the design, the copy, the details — so you can focus on running your business while your online presence actually works for you.
+          </p>
+
+          <p>
+            Every project gets the same energy: deep attention to brand, obsessive detail on the user experience, and a final product that makes people stop and say,
+            <br />
+            <span className="text-primary italic">"Who built this?"</span>
+          </p>
+
+          <p className="text-foreground font-serif text-2xl mt-8">
+            If your business has evolved, your website should prove it.
+          </p>
+        </div>
+
+        <div className="mt-12 pt-8 border-t border-border/20">
+          <Link
+            to="/contact"
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-primary-foreground font-semibold tracking-wide uppercase text-sm hover:bg-primary/90 transition-all hover:-translate-y-0.5"
+          >
+            Start a Project <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
-      </footer>
+      </div>
     </div>
-  );
-};
+
+    <Footer />
+  </div>
+);
 
 export default About;
