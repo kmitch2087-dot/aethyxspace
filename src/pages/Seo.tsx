@@ -91,7 +91,7 @@ const Seo = () => {
                 <div className="w-14 h-14 rounded-full bg-ocean-light flex items-center justify-center mx-auto mb-4">
                   <Target className="h-7 w-7 text-ocean" />
                 </div>
-                <h3 className="font-serif text-xl text-foreground mb-3 font-semibold">
+                <h3 className="font-display text-xl text-foreground mb-3 font-semibold">
                   Reach Local Customers
                 </h3>
                 <p className="text-foreground font-medium leading-relaxed">
@@ -103,7 +103,7 @@ const Seo = () => {
                 <div className="w-14 h-14 rounded-full bg-sage-light flex items-center justify-center mx-auto mb-4">
                   <BarChart3 className="h-7 w-7 text-sage" />
                 </div>
-                <h3 className="font-serif text-xl text-foreground mb-3 font-semibold">
+                <h3 className="font-display text-xl text-foreground mb-3 font-semibold">
                   Cost-Effective Marketing
                 </h3>
                 <p className="text-foreground font-medium leading-relaxed">
@@ -115,7 +115,7 @@ const Seo = () => {
                 <div className="w-14 h-14 rounded-full bg-ocean-light flex items-center justify-center mx-auto mb-4">
                   <Globe className="h-7 w-7 text-ocean" />
                 </div>
-                <h3 className="font-serif text-xl text-foreground mb-3 font-semibold">
+                <h3 className="font-display text-xl text-foreground mb-3 font-semibold">
                   Compete with Larger Brands
                 </h3>
                 <p className="text-foreground font-medium leading-relaxed">

@@ -131,7 +131,7 @@ const StartHere = () => {
             <p className="text-xl md:text-2xl text-foreground leading-relaxed font-light mb-4">
               If your business has evolved, your website should reflect that.
             </p>
-            <p className="text-2xl md:text-3xl text-foreground font-serif font-medium">
+            <p className="text-2xl md:text-3xl text-foreground font-display font-medium">
               This is where the shift begins.
             </p>
           </div>

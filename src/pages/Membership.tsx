@@ -34,7 +34,7 @@ const Membership = () => {
           <div className="max-w-lg mx-auto">
             <div className="card-elevated rounded-3xl p-8 md:p-10 text-center">
               <div className="mb-6">
-                <span className="text-5xl md:text-6xl font-serif font-medium text-foreground">$100</span>
+                <span className="text-5xl md:text-6xl font-display font-medium text-foreground">$100</span>
                 <span className="text-xl text-muted-foreground font-light">/month</span>
               </div>
               
@@ -88,7 +88,7 @@ const Membership = () => {
                   <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 shadow-soft ${item.color === 'sage' ? 'bg-gradient-to-br from-sage-light to-sage-muted' : 'bg-gradient-to-br from-ocean-light to-ocean-muted'}`}>
                     <item.icon className={`h-5 w-5 ${item.color === 'sage' ? 'text-sage' : 'text-ocean'}`} />
                   </div>
-                  <h3 className="text-xl text-foreground mb-2 font-serif font-medium">
+                  <h3 className="text-xl text-foreground mb-2 font-display font-medium">
                     {item.title}
                   </h3>
                   <p className="text-foreground leading-relaxed font-light text-sm">

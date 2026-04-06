@@ -8,7 +8,7 @@ const PrivacyPolicy = () => {
 
       <main className="relative z-10 pt-[calc(var(--fixed-banner-height)+32px)] pb-24 px-6 md:px-12 lg:px-24 xl:px-32">
         <div className="max-w-2xl mx-auto">
-          <h1 className="font-serif text-4xl md:text-5xl text-foreground mb-4 heading-accent">
+          <h1 className="font-display text-4xl md:text-5xl text-foreground mb-4 heading-accent">
             Privacy Policy
           </h1>
           <p className="text-sm text-muted-foreground mb-12">Last Updated: 2/23/26</p>

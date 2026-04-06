@@ -98,7 +98,7 @@ const Rebrand = () => {
       <div className="relative z-10 flex flex-col items-center px-6 pt-[55vh] md:pt-[60vh] pb-16">
 
         {/* Tagline */}
-        <p className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold tracking-[0.15em] uppercase text-[#4ECDC4] mb-8 text-center" style={{ textShadow: "0 0 30px rgba(78,205,196,0.3)" }}>
+        <p className="font-display text-3xl md:text-4xl lg:text-5xl font-bold tracking-[0.15em] uppercase text-[#4ECDC4] mb-8 text-center" style={{ textShadow: "0 0 30px rgba(78,205,196,0.3)" }}>
           Crafting Identity in the Unseen
         </p>
 

@@ -29,7 +29,7 @@ const AddOnPricingPopup = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md bg-cream">
         <DialogHeader className="text-center pb-4">
-          <DialogTitle className="text-xl md:text-2xl font-serif font-semibold text-foreground">
+          <DialogTitle className="text-xl md:text-2xl font-display font-semibold text-foreground">
             {addOnName}
           </DialogTitle>
           <DialogDescription className="text-base text-muted-foreground mt-2">

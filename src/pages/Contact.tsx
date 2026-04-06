@@ -54,7 +54,7 @@ const Contact = () => {
 
       <div className="pt-28 pb-24 px-6">
         <div className="max-w-5xl mx-auto">
-          <h1 className="font-serif text-4xl md:text-6xl text-center mb-4">Get in Touch</h1>
+          <h1 className="font-display text-4xl md:text-6xl text-center mb-4">Get in Touch</h1>
           <p className="text-center text-muted-foreground text-lg mb-20 max-w-2xl mx-auto">
             Ready to build something bold? Reach out directly or book a paid consultation to get started.
           </p>
@@ -98,7 +98,7 @@ const Contact = () => {
 
           {/* Consultation Form */}
           <div className="max-w-lg mx-auto glass-card p-8 md:p-10">
-            <h2 className="font-serif text-2xl mb-2">Book Your Consultation</h2>
+            <h2 className="font-display text-2xl mb-2">Book Your Consultation</h2>
             <p className="text-muted-foreground text-sm mb-8">
               Fill out the details below, then complete the $50 payment to secure your spot.
             </p>
