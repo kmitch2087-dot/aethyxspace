@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Check, Star, Globe, Diamond, Play } from "lucide-react";
+import { ArrowRight, Check, Star, Globe, Diamond, Play, Shield, Search } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { SERVICE_TIERS, QUICK_SERVICES, ADD_ONS, APP_DEVELOPMENT } from "@/lib/stripePrices";
@@ -10,18 +10,21 @@ const categories = [
   { icon: Play, title: "Digital Experiences", desc: "Interactive dashboards, booking systems, e-commerce, and custom integrations that elevate your business." },
 ];
 
-const tiers: Array<{ priceId: string; name: string; price: string; features: string[]; featured?: boolean }> = [
+const tiers = [
   {
-    ...SERVICE_TIERS.tier1,
+    name: "Online Presence Starter",
+    tier: "Tier 1",
     features: ["Single-page or multi-page site", "Mobile responsive", "Basic SEO setup", "Contact form", "1 round of revisions"],
   },
   {
-    ...SERVICE_TIERS.tier2,
+    name: "Professional Brand Website",
+    tier: "Tier 2",
     features: ["Custom multi-page design", "Brand-aligned copywriting", "Advanced SEO", "Blog or CMS integration", "2 revision sessions after simmer period"],
     featured: true,
   },
   {
-    ...SERVICE_TIERS.tier3,
+    name: "Signature Brand Presence",
+    tier: "Tier 3",
     features: ["Full brand website experience", "Client & Admin Dashboards", "Advanced integrations", "Priority support", "3 revision sessions after simmer period"],
   },
 ];
@@ -72,8 +75,40 @@ const Services = () => (
           ))}
         </div>
 
+        {/* Built Into Every Project */}
+        <div className="glass-card-teal p-8 md:p-10 mb-24">
+          <h2 className="font-display text-2xl md:text-3xl mb-6 text-center">Built Into Every Project</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="flex gap-4">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-1">
+                <Search className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <h4 className="font-display text-lg mb-2">SEO & Search Optimization</h4>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  Every site is built with search visibility in mind — from metadata and structured content to performance optimization — so your business gets found by the right people.
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-4">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-1">
+                <Shield className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <h4 className="font-display text-lg mb-2">Industry & Compliance Research</h4>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  We research the laws, regulations, and best practices specific to your industry and location — ensuring your site isn't just beautiful, but fully compliant and trustworthy.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Tiers */}
-        <h2 className="font-display text-3xl text-center mb-10">Pricing Tiers</h2>
+        <h2 className="font-display text-3xl text-center mb-4">Service Tiers</h2>
+        <p className="text-center text-muted-foreground text-sm mb-10 max-w-2xl mx-auto">
+          Every project is priced based on your unique needs. These tiers represent the range of experience levels — from a clean, functional web presence to a fully automated brand ecosystem. Your quote is always customized after consultation.
+        </p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
           {tiers.map((tier) => (
             <div
@@ -85,8 +120,8 @@ const Services = () => (
                   <Star className="h-3 w-3" /> Most Popular
                 </div>
               )}
-              <h3 className="font-display text-2xl mb-2">{tier.name}</h3>
-              <p className="text-primary text-2xl font-bold mb-6">{tier.price}</p>
+              <p className="text-primary text-xs uppercase tracking-widest mb-2">{tier.tier}</p>
+              <h3 className="font-display text-2xl mb-6">{tier.name}</h3>
               <ul className="space-y-3 mb-8 flex-1">
                 {tier.features.map((f) => (
                   <li key={f} className="flex items-start gap-2 text-sm text-muted-foreground">
