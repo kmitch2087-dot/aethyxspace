@@ -1,82 +1,88 @@
 
 
-## Aethyx Rebrand Landing Page
+## Aethyx Full Website Build
 
 ### Overview
-Create a new single-page rebrand announcement at the root route. All existing Vibe Shift Studio pages remain in the codebase but are removed from routing. The page has a dark, refined aesthetic with subtle cyan/teal and purple accents — bold and unconventional but professional.
+Transform the current single-page rebrand landing into a complete 5-page premium website for Aethyx, a high-end web design company. Dark minimalist aesthetic, black and white with bold teal accents. The uploaded reference images will be copied into the project for use in portfolio galleries.
 
-### Brand Voice Direction
-Bold, direct, unapologetic. Minimal copy, high impact. "Crafting Identity in the Unseen" as the tagline (from the uploaded logo). Language that signals creative authority without being corporate or trying too hard.
+### Brand Identity
+- **Tagline**: "Elevate & Evolve Unapologetically"
+- **Logo**: Existing `src/assets/aethyx-logo.png` (teal accent on the A)
+- **Palette**: Near-black background (#060a12 / #0a0f1a), white text, teal accent (#4ECDC4)
+- **Typography**: Keep Cormorant Garamond for headings, Source Sans 3 for body. Bold, lots of negative space.
 
-### Page Structure
+### Pages & Routing
 
-```text
-┌─────────────────────────────────────────┐
-│  AETHYX logo image (centered)           │
-│  "Crafting Identity in the Unseen"      │
-│                                         │
-│  Something new is taking shape.         │
-│  Vibe Shift Studio is becoming Aethyx.  │
-│                                         │
-├─────────────────────────────────────────┤
-│  THREE CONTACT CARDS (responsive grid)  │
-│                                         │
-│  [Emergency]     [Email]    [Consult]   │
-│  Phone icon      Mail icon  Calendar    │
-│  Call anytime     Non-urgent  Book $50  │
-│  401-589-1023    Email btn   consultation│
-│                                         │
-├─────────────────────────────────────────┤
-│  Consultation form (expands or modal)   │
-│  Name, email, business name, textarea   │
-│  for project details → Stripe $50 pay   │
-│  → "Thank you! We will be in touch      │
-│     very soon to confirm an appointment!"│
-│                                         │
-├─────────────────────────────────────────┤
-│  Footer: © 2026 Aethyx                  │
-└─────────────────────────────────────────┘
-```
+**1. Homepage (`/`)**
+- Hero: Background video (existing `aethyx-intro.mov`), logo, tagline "Elevate & Evolve Unapologetically"
+- Services teaser: 3 cards linking to Services page (Web Design, Branding, Add-ons)
+- Portfolio highlights: 3 thumbnail previews of Re Retreats, Kokopelli Kabin, Vibe Shift → Aethyx
+- Strong CTA to Contact/Consultation
 
-### Changes
+**2. Services (`/services`)**
+- Preserve all existing service tiers, pricing, and add-ons from `stripePrices.ts`
+- Tier 1: Online Presence Starter ($750)
+- Tier 2: Professional Brand Website ($1,500-$2,000)
+- Tier 3: Signature Brand Presence (Starting at $2,500)
+- Quick services (Logo, Brand Assets, Maintenance)
+- Add-ons grid (Email, Cloud, Dashboard, E-commerce, Booking, Analytics)
+- App development section (Native + PWA)
+- Consultation CTA at bottom (reuse existing Stripe edge function)
 
-**1. Copy uploaded logo to project**
-- Copy `1E9E43F7-F3A7-4564-93F7-352810872ADE.png` to `src/assets/aethyx-logo.png`
+**3. Portfolio (`/portfolio`)**
+- Three project albums with lightbox galleries:
+  - **Re Retreats** (re-retreats.com): Women's Wellness Retreats in Southern Vermont. Tagline: "reset * restore * reimagine" / "Where Women Come Home to Themselves"
+  - **Kokopelli Kabin** (kokopellikabin.com): Modern Mountain Retreat / luxury cabin rental
+  - **Vibe Shift Studio → Aethyx** (vibe-shift.com): Rebranding story
+- Each album: cover image, description, expandable photo gallery with lightbox
+- Upload all 9 reference images into `src/assets/portfolio/`
 
-**2. Create `src/pages/Rebrand.tsx`**
-- Dark background (`#0a0a0f` or similar near-black) with subtle radial gradient accents in teal/purple
-- Aethyx logo at the top, centered
-- Brief rebrand announcement copy (bold, minimal)
-- Three contact cards in a responsive grid:
-  - **Emergency**: Red/warm accent, phone icon, "Client emergency? Call anytime" with tel: link to 401-589-1023
-  - **General Contact**: Teal accent, mail icon, mailto: link to Aethyxspace@protonmail.com
-  - **Book Consultation**: Purple accent, calendar icon, opens an inline form below or a dialog
-- Consultation form collects: name, email, business name, brief project description (textarea)
-- On submit: calls existing `create-consultation-payment` edge function → redirects to Stripe
-- After Stripe success, show confirmation message
-- Proton Calendar ICS link integrated as "View available times" link within the consultation card
-- Minimal footer with copyright
+**4. About (`/about`)**
+- Rewrite existing About copy with Aethyx brand voice (bold, direct, unapologetic)
+- Keep the core narrative about building websites for businesses that deserve better
+- Updated brand positioning as Aethyx
 
-**3. Update `src/App.tsx` routing**
-- Change `/` route to render `Rebrand` instead of `Index`
-- Comment out (not delete) all other routes so they're disabled but preserved
-- Keep `/payment-success` active for Stripe redirect
+**5. Contact (`/contact`)**
+- Consultation booking form (reuse existing `create-consultation-payment` edge function and form logic from Rebrand.tsx)
+- Direct contact info cards (phone, email)
+- Calendar link for scheduling
 
-**4. Update `src/pages/PaymentSuccess.tsx`**
-- Update branding text from "Vibe Shift Studio" to "Aethyx"
-- Update the confirmation message to: "Thank you! We will be in touch very soon to confirm an appointment!"
-- Link back to `/` instead of other pages
+### Shared Components
 
-**5. Styling approach**
-- Dark refined palette: near-black background, off-white text, subtle teal (#4ECDC4) and purple (#7B68EE) accents on cards/borders
-- Cards with glass-morphism effect (semi-transparent backgrounds, subtle borders)
-- Clean sans-serif typography (Inter or system font stack for body, keep Cormorant Garamond for the tagline)
-- Smooth hover transitions on cards
-- No starfields or particle effects — just color, spacing, and typography
+**Navigation** — New dark header component:
+- Logo left, nav links right: Home, Services, Portfolio, About, Contact
+- Sticky, glass-morphism dark style
+- Mobile hamburger menu
+
+**Footer** — Present on all pages:
+- © Aethyx
+- aethyxspace@protonmail.com
+- 401.589.1023
+- Rhode Island, serving the entire USA
+- Privacy Policy link
+- Terms of Service link
+
+### File Changes
+
+| Action | File |
+|--------|------|
+| Create | `src/components/Navbar.tsx` — New dark nav with mobile menu |
+| Create | `src/components/Footer.tsx` — Shared footer |
+| Create | `src/components/LightboxGallery.tsx` — Portfolio image lightbox |
+| Create | `src/pages/Home.tsx` — New homepage |
+| Create | `src/pages/Portfolio.tsx` — Portfolio with 3 albums |
+| Create | `src/pages/Contact.tsx` — Contact + consultation form |
+| Rewrite | `src/pages/Services.tsx` — Dark theme, same pricing data |
+| Rewrite | `src/pages/About.tsx` — Aethyx brand voice |
+| Update | `src/App.tsx` — New routes for all 5 pages |
+| Update | `src/index.css` — Dark-first CSS variables, remove old Vibe Shift styles |
+| Copy | 9 uploaded images → `src/assets/portfolio/` |
+| Create | `src/pages/TermsOfService.tsx` — Basic terms page |
 
 ### Technical Details
-- Reuses the existing `create-consultation-payment` edge function and Stripe price ID
-- The Proton Calendar `.ics` URL will be linked as "View available times" — users can subscribe to see open slots
-- No new database tables or edge functions needed
-- No new dependencies needed
+- No new dependencies needed (lightbox built with native React state + Tailwind)
+- Reuses existing `create-consultation-payment` edge function and all Stripe price IDs
+- No new database tables or edge functions
+- CSS variables updated to dark-first palette; old warm/sage/cream styles replaced
+- All pages fully responsive with mobile-first approach
 
