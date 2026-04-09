@@ -167,19 +167,19 @@ const MedSpa = () => {
         </div>
 
         <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
-          <div className="bg-[hsl(40,5%,8%)/0.6] backdrop-blur-md rounded-3xl px-8 py-12 md:px-14 md:py-16">
+          <div className="relative bg-[hsl(40,5%,8%)/0.6] backdrop-blur-md rounded-3xl px-8 py-12 md:px-14 md:py-16">
             <p className="text-[hsl(40,30%,55%)] font-medium tracking-[0.3em] uppercase text-sm mb-6 font-['Inter',sans-serif]">
               Med Spa & Aesthetics
             </p>
             <h1 className="mb-6">
-              <span className="block font-['Satisfy',cursive] text-5xl md:text-7xl lg:text-8xl tracking-wide text-[hsl(40,5%,8%)]">
+              <span className="block font-['Great_Vibes',cursive] text-5xl md:text-7xl lg:text-8xl tracking-wide text-[hsl(40,20%,95%)]">
                 Your Work is Art.
               </span>
               <span className={`block ${serif} text-3xl md:text-5xl lg:text-6xl font-bold tracking-wide text-[hsl(40,30%,55%)] mt-2`}>
                 Your Website Should Be, Too.
               </span>
             </h1>
-            <p className="text-lg md:text-xl text-[hsl(40,10%,70%)] max-w-2xl mx-auto mb-10 leading-relaxed font-['Inter',sans-serif]">
+            <p className="text-lg md:text-xl text-[hsl(40,15%,75%)] max-w-2xl mx-auto mb-10 leading-relaxed font-['Inter',sans-serif]">
               We build high-performance digital experiences for Med Spas and
               Aesthetic Clinics. Turn your website into your highest-converting
               patient coordinator with seamless booking, luxury branding, and
@@ -188,13 +188,13 @@ const MedSpa = () => {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
                 to="/contact"
-                className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-[hsl(40,30%,45%)] text-[hsl(40,5%,8%)] font-semibold tracking-wide uppercase text-sm hover:bg-[hsl(40,30%,55%)] transition-all hover:-translate-y-0.5 font-['Inter',sans-serif]"
+                className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-[hsl(40,30%,50%)] text-[hsl(40,5%,8%)] font-semibold tracking-wide uppercase text-sm hover:bg-[hsl(40,30%,60%)] transition-all hover:-translate-y-0.5 font-['Inter',sans-serif]"
               >
                 Get My Free Digital Audit <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
                 to="/portfolio"
-                className="inline-flex items-center gap-2 px-8 py-4 rounded-full border border-[hsl(40,15%,35%)] hover:border-[hsl(40,30%,45%)] text-[hsl(40,20%,90%)] font-semibold tracking-wide uppercase text-sm transition-all hover:-translate-y-0.5 font-['Inter',sans-serif]"
+                className="inline-flex items-center gap-2 px-8 py-4 rounded-full border-2 border-[hsl(40,20%,50%)] hover:border-[hsl(40,30%,60%)] text-[hsl(40,20%,95%)] font-semibold tracking-wide uppercase text-sm transition-all hover:-translate-y-0.5 font-['Inter',sans-serif]"
               >
                 View Our Aesthetic Portfolio
               </Link>
