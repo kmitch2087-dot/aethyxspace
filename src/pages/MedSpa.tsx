@@ -104,12 +104,12 @@ const BeforeAfterSlider = () => {
       <div className="relative overflow-hidden rounded-2xl border border-[hsl(40,15%,25%)] aspect-[16/9]">
         {/* "Before" — full width */}
         <div className="absolute inset-0">
-          <div className="w-full h-full bg-[hsl(40,5%,18%)] flex items-center justify-center">
-            <div className="text-center p-8">
-              <p className={`${serif} text-3xl text-[hsl(40,15%,40%)] mb-2`}>Before</p>
-              <p className="text-[hsl(40,10%,45%)] text-sm">Outdated, clinical, low-converting</p>
-            </div>
-          </div>
+          <img
+            src={beforeWebsiteImg}
+            alt="Before: outdated clinical website"
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
         </div>
         {/* "After" — clipped by slider */}
         <div
@@ -118,10 +118,11 @@ const BeforeAfterSlider = () => {
         >
           <div className="w-full h-full" style={{ width: `${10000 / position[0]}%` }}>
             <img
-              src={practitionerImg}
-              alt="After redesign"
+              src={afterWebsiteImg}
+              alt="After: luxury modern redesign"
               className="w-full h-full object-cover"
               style={{ maxWidth: "none", width: `100%` }}
+              loading="lazy"
             />
           </div>
         </div>
