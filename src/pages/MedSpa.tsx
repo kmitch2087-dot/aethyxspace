@@ -19,6 +19,8 @@ import lobbyImg from "@/assets/medspa/lobby.png";
 import webMockupImg from "@/assets/medspa/web-mockup.png";
 import practitionerImg from "@/assets/medspa/hero-landing.png";
 import detailShotImg from "@/assets/medspa/detail-shot.png";
+import beforeWebsiteImg from "@/assets/medspa/before-website.jpg";
+import afterWebsiteImg from "@/assets/medspa/after-website.jpg";
 
 const serif = "font-['Playfair_Display',serif]";
 
