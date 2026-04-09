@@ -11,6 +11,7 @@ import Contact from "./pages/Contact";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
+import MedSpa from "./pages/MedSpa";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/medspa" element={<MedSpa />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
