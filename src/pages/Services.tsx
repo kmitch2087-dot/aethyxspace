@@ -251,7 +251,7 @@ const Services = () => (
           Every project is custom scoped based on system complexity, number of features, integrations required, and long-term business goals.
         </p>
         <p className="text-foreground font-display text-xl mb-8">
-          Most projects fall between <span className="text-primary">$5,000</span> and <span className="text-primary">$60,000+</span>, depending on scope and infrastructure needs.
+          Every build is tailored to your goals — reach out and we'll scope a solution that fits.
         </p>
         <Link
           to="/contact"
