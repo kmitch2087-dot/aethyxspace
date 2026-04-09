@@ -172,7 +172,7 @@ const MedSpa = () => {
               Med Spa & Aesthetics
             </p>
             <h1 className="mb-6">
-              <span className="block font-['Cormorant_Garamond',serif] italic text-5xl md:text-7xl lg:text-8xl font-light tracking-wide text-[hsl(40,20%,95%)]">
+              <span className="block font-['Cormorant_Garamond',serif] italic text-5xl md:text-7xl lg:text-8xl font-light tracking-wide text-[hsl(40,5%,8%)]">
                 Your Work is Art.
               </span>
               <span className={`block ${serif} text-3xl md:text-5xl lg:text-6xl font-bold tracking-wide text-[hsl(40,30%,55%)] mt-2`}>
