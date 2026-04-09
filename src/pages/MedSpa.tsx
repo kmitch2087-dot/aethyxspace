@@ -172,7 +172,8 @@ const MedSpa = () => {
               Med Spa & Aesthetics
             </p>
             <h1 className={`${serif} text-4xl md:text-6xl lg:text-7xl font-bold tracking-wide mb-6 text-[hsl(40,20%,95%)]`}>
-              Your Work is Art.{" "}
+              Your Work is Art.
+              <br />
               <span className="text-[hsl(40,30%,55%)]">Your Website Should Be, Too.</span>
             </h1>
             <p className="text-lg md:text-xl text-[hsl(40,10%,70%)] max-w-2xl mx-auto mb-10 leading-relaxed font-['Inter',sans-serif]">
