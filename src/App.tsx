@@ -11,6 +11,7 @@ import Contact from "./pages/Contact";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
+import MedSpa from "./pages/MedSpa";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
