@@ -167,19 +167,19 @@ const MedSpa = () => {
         </div>
 
         <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
-          <div className="relative bg-[hsl(40,5%,8%)/0.6] backdrop-blur-md rounded-3xl px-8 py-12 md:px-14 md:py-16">
+          <div className="relative bg-[hsl(40,5%,8%)/0.6] backdrop-blur-md rounded-3xl px-8 py-12 md:px-14 md:py-16 opacity-65 bg-current">
             <p className="text-[hsl(40,30%,55%)] font-medium tracking-[0.3em] uppercase text-sm mb-6 font-['Inter',sans-serif]">
               Med Spa & Aesthetics
             </p>
             <h1 className="mb-6">
-              <span className="block font-['Great_Vibes',cursive] text-5xl md:text-7xl lg:text-8xl tracking-wide text-[hsl(40,20%,95%)]">
+              <span className="block text-5xl md:text-7xl lg:text-8xl tracking-wide font-serif text-primary-foreground opacity-100">
                 Your Work is Art.
               </span>
               <span className={`block ${serif} text-3xl md:text-5xl lg:text-6xl font-bold tracking-wide text-[hsl(40,30%,55%)] mt-2`}>
                 Your Website Should Be, Too.
               </span>
             </h1>
-            <p className="text-lg md:text-xl text-[hsl(40,15%,75%)] max-w-2xl mx-auto mb-10 leading-relaxed font-['Inter',sans-serif]">
+            <p className="text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed font-['Inter',sans-serif] text-primary-foreground">
               We build high-performance digital experiences for Med Spas and
               Aesthetic Clinics. Turn your website into your highest-converting
               patient coordinator with seamless booking, luxury branding, and
@@ -194,7 +194,7 @@ const MedSpa = () => {
               </Link>
               <Link
                 to="/portfolio"
-                className="inline-flex items-center gap-2 px-8 py-4 rounded-full border-2 border-[hsl(40,20%,50%)] hover:border-[hsl(40,30%,60%)] text-[hsl(40,20%,95%)] font-semibold tracking-wide uppercase text-sm transition-all hover:-translate-y-0.5 font-['Inter',sans-serif]"
+                className="inline-flex items-center gap-2 px-8 py-4 rounded-full border-2 border-[hsl(40,20%,50%)] hover:border-[hsl(40,30%,60%)] font-semibold tracking-wide uppercase text-sm transition-all hover:-translate-y-0.5 font-['Inter',sans-serif] text-primary-foreground"
               >
                 View Our Aesthetic Portfolio
               </Link>
