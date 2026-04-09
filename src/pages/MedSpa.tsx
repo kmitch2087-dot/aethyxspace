@@ -171,10 +171,13 @@ const MedSpa = () => {
             <p className="text-[hsl(40,30%,55%)] font-medium tracking-[0.3em] uppercase text-sm mb-6 font-['Inter',sans-serif]">
               Med Spa & Aesthetics
             </p>
-            <h1 className={`${serif} text-4xl md:text-6xl lg:text-7xl font-bold tracking-wide mb-6 text-[hsl(40,20%,95%)]`}>
-              Your Work is Art.
-              <br />
-              <span className="text-[hsl(40,30%,55%)]">Your Website Should Be, Too.</span>
+            <h1 className="mb-6">
+              <span className="block font-['Cormorant_Garamond',serif] italic text-5xl md:text-7xl lg:text-8xl font-light tracking-wide text-[hsl(40,20%,95%)]">
+                Your Work is Art.
+              </span>
+              <span className={`block ${serif} text-3xl md:text-5xl lg:text-6xl font-bold tracking-wide text-[hsl(40,30%,55%)] mt-2`}>
+                Your Website Should Be, Too.
+              </span>
             </h1>
             <p className="text-lg md:text-xl text-[hsl(40,10%,70%)] max-w-2xl mx-auto mb-10 leading-relaxed font-['Inter',sans-serif]">
               We build high-performance digital experiences for Med Spas and
