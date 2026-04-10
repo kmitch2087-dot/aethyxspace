@@ -17,6 +17,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -44,7 +45,9 @@ const BlogManager = () => {
   const [editorOpen, setEditorOpen] = useState(false);
   const [previewMode, setPreviewMode] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [form, setForm] = useState({
     title: "",
     slug: "",
@@ -74,6 +77,7 @@ const BlogManager = () => {
     setEditingPost(null);
     setForm({ title: "", slug: "", content: "", excerpt: "", cover_image_url: "", published: false });
     setPreviewMode(false);
+    setFormErrors({});
     setEditorOpen(true);
   };
 
@@ -88,6 +92,7 @@ const BlogManager = () => {
       published: post.published,
     });
     setPreviewMode(false);
+    setFormErrors({});
     setEditorOpen(true);
   };
 
@@ -108,44 +113,57 @@ const BlogManager = () => {
     setUploading(false);
   };
 
+  const validateForm = () => {
+    const errors: Record<string, string> = {};
+    if (!form.title.trim()) errors.title = "Title is required";
+    if (!form.slug.trim()) errors.slug = "Slug is required";
+    if (!form.content.trim()) errors.content = "Content is required";
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSave = async () => {
-    if (!form.title.trim() || !form.slug.trim()) {
-      toast({ title: "Title and slug are required", variant: "destructive" });
-      return;
-    }
+    if (!validateForm()) return;
+    if (saving) return;
+
+    setSaving(true);
 
     const payload = {
-      title: form.title,
-      slug: form.slug,
+      title: form.title.trim(),
+      slug: form.slug.trim(),
       content: form.content,
-      excerpt: form.excerpt || null,
-      cover_image_url: form.cover_image_url || null,
+      excerpt: form.excerpt.trim() || null,
+      cover_image_url: form.cover_image_url.trim() || null,
       published: form.published,
       published_at: form.published ? new Date().toISOString() : null,
       author_id: user?.id,
     };
 
-    if (editingPost) {
-      const { error } = await supabase
-        .from("blog_posts")
-        .update(payload)
-        .eq("id", editingPost.id);
-      if (error) {
-        toast({ title: "Update failed", description: error.message, variant: "destructive" });
-        return;
+    try {
+      if (editingPost) {
+        const { error } = await supabase
+          .from("blog_posts")
+          .update(payload)
+          .eq("id", editingPost.id);
+        if (error) {
+          toast({ title: "Update failed", description: error.message, variant: "destructive" });
+          return;
+        }
+        toast({ title: "Post updated!" });
+      } else {
+        const { error } = await supabase.from("blog_posts").insert(payload);
+        if (error) {
+          toast({ title: "Create failed", description: error.message, variant: "destructive" });
+          return;
+        }
+        toast({ title: "Post created!" });
       }
-      toast({ title: "Post updated!" });
-    } else {
-      const { error } = await supabase.from("blog_posts").insert(payload);
-      if (error) {
-        toast({ title: "Create failed", description: error.message, variant: "destructive" });
-        return;
-      }
-      toast({ title: "Post created!" });
-    }
 
-    setEditorOpen(false);
-    fetchPosts();
+      setEditorOpen(false);
+      fetchPosts();
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -247,31 +265,43 @@ const BlogManager = () => {
             <DialogTitle className="font-display tracking-wider">
               {editingPost ? "Edit Post" : "New Post"}
             </DialogTitle>
+            <DialogDescription>
+              {editingPost ? "Update your blog post details below." : "Fill in the details to create a new blog post."}
+            </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 mt-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Title</Label>
+                <Label>Title <span className="text-destructive">*</span></Label>
                 <Input
                   value={form.title}
                   onChange={(e) => {
+                    const title = e.target.value;
                     setForm((f) => ({
                       ...f,
-                      title: e.target.value,
-                      slug: editingPost ? f.slug : generateSlug(e.target.value),
+                      title,
+                      slug: editingPost ? f.slug : generateSlug(title),
                     }));
+                    if (title.trim()) setFormErrors((e) => ({ ...e, title: "" }));
                   }}
                   placeholder="Post title"
+                  className={formErrors.title ? "border-destructive" : ""}
                 />
+                {formErrors.title && <p className="text-xs text-destructive">{formErrors.title}</p>}
               </div>
               <div className="space-y-2">
-                <Label>Slug</Label>
+                <Label>Slug <span className="text-destructive">*</span></Label>
                 <Input
                   value={form.slug}
-                  onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))}
+                  onChange={(e) => {
+                    setForm((f) => ({ ...f, slug: e.target.value }));
+                    if (e.target.value.trim()) setFormErrors((err) => ({ ...err, slug: "" }));
+                  }}
                   placeholder="post-url-slug"
+                  className={formErrors.slug ? "border-destructive" : ""}
                 />
+                {formErrors.slug && <p className="text-xs text-destructive">{formErrors.slug}</p>}
               </div>
             </div>
 
@@ -310,7 +340,7 @@ const BlogManager = () => {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label>Content (Markdown)</Label>
+                <Label>Content (Markdown) <span className="text-destructive">*</span></Label>
                 <Button variant="ghost" size="sm" onClick={() => setPreviewMode(!previewMode)}>
                   {previewMode ? "Edit" : "Preview"}
                 </Button>
@@ -322,11 +352,15 @@ const BlogManager = () => {
               ) : (
                 <Textarea
                   value={form.content}
-                  onChange={(e) => setForm((f) => ({ ...f, content: e.target.value }))}
+                  onChange={(e) => {
+                    setForm((f) => ({ ...f, content: e.target.value }));
+                    if (e.target.value.trim()) setFormErrors((err) => ({ ...err, content: "" }));
+                  }}
                   placeholder="Write your post in Markdown..."
-                  className="min-h-[300px] font-mono text-sm"
+                  className={`min-h-[300px] font-mono text-sm ${formErrors.content ? "border-destructive" : ""}`}
                 />
               )}
+              {formErrors.content && <p className="text-xs text-destructive">{formErrors.content}</p>}
             </div>
 
             <div className="flex items-center gap-3">
@@ -339,8 +373,8 @@ const BlogManager = () => {
 
             <div className="flex justify-end gap-3 pt-4">
               <Button variant="outline" onClick={() => setEditorOpen(false)}>Cancel</Button>
-              <Button onClick={handleSave}>
-                {editingPost ? "Update Post" : "Create Post"}
+              <Button onClick={handleSave} disabled={saving}>
+                {saving ? "Saving..." : editingPost ? "Update Post" : "Create Post"}
               </Button>
             </div>
           </div>
