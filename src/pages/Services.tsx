@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Check, Star, Globe, Diamond, Play, Shield, Search, Layers, Zap, TrendingUp, Lock, ChevronRight } from "lucide-react";
+import { ArrowRight, Check, Star, Globe, Diamond, Play, Shield, Search, Layers, Zap, TrendingUp, Lock, ChevronRight, Bot, Video, Eye } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { QUICK_SERVICES, ADD_ONS, APP_DEVELOPMENT } from "@/lib/stripePrices";
@@ -44,6 +44,7 @@ const coreServices = [
     title: "Growth & Visibility",
     items: [
       "SEO architecture",
+      "AI search optimization (GEO)",
       "Content structuring",
       "Marketing strategy alignment",
       "Platform scalability planning",
@@ -363,6 +364,54 @@ const Services = () => (
         <p className="text-xs text-muted-foreground text-center max-w-2xl mx-auto mb-16">
           Some integrated services (e.g., cloud storage, scheduling, e-commerce platforms) may require separate third-party subscriptions not included in Aethyx service fees.
         </p>
+      </div>
+    </section>
+
+    {/* CUTTING EDGE */}
+    <section className="py-20 px-6 border-t border-border/20">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-16">
+          <p className="text-primary text-xs uppercase tracking-[0.3em] mb-4">Stay Ahead of the Curve</p>
+          <h2 className="font-display text-3xl md:text-5xl mb-4">Cutting-Edge Capabilities</h2>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            The digital landscape is shifting fast. We build with tomorrow's technology so you're never playing catch-up.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="glass-card p-8 hover:border-primary/30 transition-all">
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+              <Bot className="h-5 w-5 text-primary" />
+            </div>
+            <h3 className="font-display text-xl mb-3">AI Search Optimization</h3>
+            <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+              Google isn't the only search engine anymore. ChatGPT, Perplexity, and Gemini are now how people discover businesses. We structure your digital presence so AI engines cite <em>you</em> as the answer — not your competitor.
+            </p>
+            <p className="text-primary/70 text-xs uppercase tracking-widest font-semibold">Generative Engine Optimization (GEO)</p>
+          </div>
+
+          <div className="glass-card p-8 hover:border-primary/30 transition-all">
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+              <Video className="h-5 w-5 text-primary" />
+            </div>
+            <h3 className="font-display text-xl mb-3">Cinematic Brand Media</h3>
+            <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+              Static websites are becoming background noise. We create video-first brand experiences — cinematic practice previews, motion-driven storytelling, and dynamic content that stops the scroll and builds trust before a single word is read.
+            </p>
+            <p className="text-primary/70 text-xs uppercase tracking-widest font-semibold">Video-First Digital Presence</p>
+          </div>
+
+          <div className="glass-card p-8 hover:border-primary/30 transition-all">
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+              <Eye className="h-5 w-5 text-primary" />
+            </div>
+            <h3 className="font-display text-xl mb-3">Competitive Intelligence</h3>
+            <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+              Software platforms are bundling cookie-cutter marketing into their tools. We ensure your brand stands so far above template-driven competitors that no SaaS dashboard can replicate what you have — a bespoke digital identity built for <em>your</em> business.
+            </p>
+            <p className="text-primary/70 text-xs uppercase tracking-widest font-semibold">Beyond Template Marketing</p>
+          </div>
+        </div>
       </div>
     </section>
 
