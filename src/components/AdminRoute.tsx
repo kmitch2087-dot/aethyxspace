@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 const AdminRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, isAdmin, loading } = useAuth();
 
+  // Still resolving auth — show spinner, don't redirect
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
