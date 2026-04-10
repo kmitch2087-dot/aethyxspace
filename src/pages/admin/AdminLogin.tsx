@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,30 +13,38 @@ const AdminLogin = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
-  const { signIn } = useAuth();
+  const { signIn, user, isAdmin, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+
+  // Redirect if already logged in as admin
+  useEffect(() => {
+    if (!authLoading && user && isAdmin) {
+      navigate("/admin", { replace: true });
+    }
+  }, [user, isAdmin, authLoading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    if (isSignUp) {
-      const { error } = await supabase.auth.signUp({ email, password });
-      setLoading(false);
-      if (error) {
-        toast({ title: "Sign up failed", description: error.message, variant: "destructive" });
+    try {
+      if (isSignUp) {
+        const { error } = await supabase.auth.signUp({ email, password });
+        if (error) {
+          toast({ title: "Sign up failed", description: error.message, variant: "destructive" });
+        } else {
+          toast({ title: "Account created!", description: "You can now sign in." });
+          setIsSignUp(false);
+        }
       } else {
-        toast({ title: "Account created!", description: "You can now sign in." });
-        setIsSignUp(false);
+        const { error } = await signIn(email, password);
+        if (error) {
+          toast({ title: "Login failed", description: error.message, variant: "destructive" });
+        }
+        // Navigation handled by useEffect above after auth state updates
       }
-    } else {
-      const { error } = await signIn(email, password);
+    } finally {
       setLoading(false);
-      if (error) {
-        toast({ title: "Login failed", description: error.message, variant: "destructive" });
-      } else {
-        navigate("/admin");
-      }
     }
   };
 
