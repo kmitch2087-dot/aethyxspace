@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,42 +10,56 @@ import { toast } from "@/hooks/use-toast";
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
-  const { signIn, user, isAdmin, loading: authLoading } = useAuth();
+  const [submitting, setSubmitting] = useState(false);
+  const { signIn, user, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect if already logged in as admin
+  // Redirect once auth has resolved and user is admin
   useEffect(() => {
-    if (!authLoading && user && isAdmin) {
+    if (!loading && user && isAdmin) {
       navigate("/admin", { replace: true });
     }
-  }, [user, isAdmin, authLoading, navigate]);
+  }, [loading, user, isAdmin, navigate]);
+
+  // Show message if signed in but not admin
+  useEffect(() => {
+    if (!loading && user && !isAdmin && !submitting) {
+      toast({
+        title: "Access denied",
+        description: "Your account does not have admin privileges.",
+        variant: "destructive",
+      });
+    }
+  }, [loading, user, isAdmin, submitting]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    if (submitting) return;
+    setSubmitting(true);
 
     try {
-      if (isSignUp) {
-        const { error } = await supabase.auth.signUp({ email, password });
-        if (error) {
-          toast({ title: "Sign up failed", description: error.message, variant: "destructive" });
-        } else {
-          toast({ title: "Account created!", description: "You can now sign in." });
-          setIsSignUp(false);
-        }
-      } else {
-        const { error } = await signIn(email, password);
-        if (error) {
-          toast({ title: "Login failed", description: error.message, variant: "destructive" });
-        }
-        // Navigation handled by useEffect above after auth state updates
+      const { error } = await signIn(email, password);
+      if (error) {
+        toast({ title: "Login failed", description: error.message, variant: "destructive" });
+        setSubmitting(false);
       }
-    } finally {
-      setLoading(false);
+      // On success, don't reset submitting — let the redirect useEffect handle it
+      // This prevents the button from flickering back to "Sign In"
+    } catch {
+      toast({ title: "Login failed", description: "An unexpected error occurred.", variant: "destructive" });
+      setSubmitting(false);
     }
   };
+
+  // Reset submitting state once auth fully resolves after login
+  useEffect(() => {
+    if (!loading && submitting) {
+      // Auth resolved — if we're not redirecting (not admin), reset
+      if (!isAdmin) {
+        setSubmitting(false);
+      }
+    }
+  }, [loading, isAdmin, submitting]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
@@ -67,6 +80,7 @@ const AdminLogin = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                disabled={submitting}
               />
             </div>
             <div className="space-y-2">
@@ -78,18 +92,13 @@ const AdminLogin = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={6}
+                disabled={submitting}
               />
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Please wait..." : isSignUp ? "Create Account" : "Sign In"}
+            <Button type="submit" className="w-full" disabled={submitting || loading}>
+              {submitting ? "Signing in..." : "Sign In"}
             </Button>
           </form>
-          <button
-            onClick={() => setIsSignUp(!isSignUp)}
-            className="mt-4 text-sm text-muted-foreground hover:text-foreground w-full text-center"
-          >
-            {isSignUp ? "Already have an account? Sign in" : "Need an account? Sign up"}
-          </button>
         </CardContent>
       </Card>
     </div>

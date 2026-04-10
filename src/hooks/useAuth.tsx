@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, useRef, useCallback, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 
@@ -18,82 +18,84 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const adminCheckRef = useRef<string | null>(null);
 
-  const checkAdmin = async (userId: string) => {
-    const { data, error } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId)
-      .eq("role", "admin")
-      .maybeSingle();
+  const checkAdmin = useCallback(async (userId: string): Promise<boolean> => {
+    // Deduplicate: skip if we're already checking this user
+    if (adminCheckRef.current === userId) return isAdmin;
+    adminCheckRef.current = userId;
 
-    if (error) {
-      setIsAdmin(false);
-      return;
+    try {
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId)
+        .eq("role", "admin")
+        .maybeSingle();
+
+      if (adminCheckRef.current !== userId) return false; // stale
+      const result = !error && !!data;
+      setIsAdmin(result);
+      return result;
+    } catch {
+      if (adminCheckRef.current === userId) setIsAdmin(false);
+      return false;
     }
-
-    setIsAdmin(!!data);
-  };
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const applySession = (nextSession: Session | null) => {
-      if (!isMounted) return;
-
-      setSession(nextSession);
-      setUser(nextSession?.user ?? null);
-
-      if (nextSession?.user) {
-        setLoading(true);
-      } else {
-        setIsAdmin(false);
-        setLoading(false);
-      }
-    };
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-      applySession(nextSession);
-    });
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      applySession(session);
-    }).catch(() => {
-      if (!isMounted) return;
-      setLoading(false);
-      setIsAdmin(false);
-    });
-
-    return () => {
-      isMounted = false;
-      subscription.unsubscribe();
-    };
   }, []);
 
   useEffect(() => {
-    let isMounted = true;
+    let mounted = true;
 
-    if (!user) return;
+    const processSession = async (newSession: Session | null) => {
+      if (!mounted) return;
 
-    checkAdmin(user.id).finally(() => {
-      if (!isMounted) return;
-      setLoading(false);
+      setSession(newSession);
+      setUser(newSession?.user ?? null);
+
+      if (newSession?.user) {
+        await checkAdmin(newSession.user.id);
+      } else {
+        adminCheckRef.current = null;
+        setIsAdmin(false);
+      }
+
+      if (mounted) setLoading(false);
+    };
+
+    // 1. Set up listener FIRST (captures events during getSession)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, newSession) => {
+        // Don't block the callback — process async
+        processSession(newSession);
+      }
+    );
+
+    // 2. Hydrate current session
+    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      processSession(currentSession);
+    }).catch(() => {
+      if (mounted) {
+        setLoading(false);
+        setIsAdmin(false);
+      }
     });
 
     return () => {
-      isMounted = false;
+      mounted = false;
+      subscription.unsubscribe();
     };
-  }, [user?.id]);
+  }, [checkAdmin]);
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = useCallback(async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     return { error: error as Error | null };
-  };
+  }, []);
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
+  const signOut = useCallback(async () => {
+    adminCheckRef.current = null;
     setIsAdmin(false);
-  };
+    await supabase.auth.signOut();
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, session, isAdmin, loading, signIn, signOut }}>
