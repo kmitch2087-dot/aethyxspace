@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Globe, Palette, Layers } from "lucide-react";
 import Navbar from "@/components/Navbar";
