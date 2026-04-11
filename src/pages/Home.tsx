@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Globe, Palette, Layers } from "lucide-react";
+import aethyxBanner from "@/assets/aethyx-hero-banner.png";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AethyxLogo from "@/components/AethyxLogo";
