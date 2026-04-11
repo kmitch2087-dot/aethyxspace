@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Globe, Palette, Layers } from "lucide-react";
-import aethyxBanner from "@/assets/aethyx-hero-banner.png";
+
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AethyxLogo from "@/components/AethyxLogo";
@@ -27,12 +27,7 @@ const Home = () => {
       <Navbar />
 
       {/* Hero */}
-      <section className="relative min-h-screen flex items-center justify-center">
-        <img
-          src={aethyxBanner}
-          alt="Aethyx banner"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
+      <section className="relative min-h-screen flex items-center justify-center bg-white">
         <div className="relative z-10 text-center px-6 pt-20">
           <div className="rounded-2xl px-8 py-10 max-w-3xl mx-auto">
           <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold tracking-wide text-primary mb-6">
