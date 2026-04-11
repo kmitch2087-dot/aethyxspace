@@ -27,13 +27,18 @@ const Home = () => {
       <Navbar />
 
       {/* Hero */}
-      <section className="relative min-h-screen flex items-center justify-center bg-white">
+      <section className="relative min-h-screen flex items-center justify-center">
+        <img
+          src={aethyxBanner}
+          alt="Aethyx banner"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
         <div className="relative z-10 text-center px-6 pt-20">
           <div className="rounded-2xl px-8 py-10 max-w-3xl mx-auto">
           <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold tracking-wide text-primary mb-6">
             Elevate & Evolve Unapologetically
           </h1>
-          <p className="text-lg md:text-xl text-background/70 max-w-2xl mx-auto mb-10">
+          <p className="text-lg md:text-xl text-foreground/70 max-w-2xl mx-auto mb-10">
             Premium web design & digital experiences for ambitious brands.
           </p>
           <Link
@@ -42,7 +47,7 @@ const Home = () => {
           >
             Get Started <ArrowRight className="h-4 w-4" />
           </Link>
-          <p className="text-background/50 text-sm mt-6 tracking-widest uppercase">
+          <p className="text-foreground/50 text-sm mt-6 tracking-widest uppercase">
             RI-based • Serving USA
           </p>
           </div>
