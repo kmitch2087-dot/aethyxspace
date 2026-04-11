@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Globe, Palette, Layers } from "lucide-react";
 import Navbar from "@/components/Navbar";
@@ -21,38 +21,18 @@ const portfolioHighlights = [
 ];
 
 const Home = () => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-
-  const handleVideoLoaded = () => {
-    if (videoRef.current) videoRef.current.playbackRate = 0.6;
-  };
-
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
 
       {/* Hero */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 z-0 opacity-75">
-          <video
-            ref={videoRef}
-            src="/aethyx-bg-loop.mov"
-            autoPlay
-            muted
-            loop
-            playsInline
-            onLoadedData={handleVideoLoaded}
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="absolute inset-0 z-[1]" style={{ background: "linear-gradient(to bottom, transparent 20%, hsl(0 0% 4%) 85%)" }} />
-
+      <section className="relative min-h-screen flex items-center justify-center bg-white">
         <div className="relative z-10 text-center px-6 pt-20">
-          <div className="bg-black/20 backdrop-blur-[2px] rounded-2xl px-8 py-10 max-w-3xl mx-auto">
-          <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold tracking-wide text-primary mb-6 glow-teal">
+          <div className="rounded-2xl px-8 py-10 max-w-3xl mx-auto">
+          <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold tracking-wide text-primary mb-6">
             Elevate & Evolve Unapologetically
           </h1>
-          <p className="text-lg md:text-xl text-foreground/70 max-w-2xl mx-auto mb-10">
+          <p className="text-lg md:text-xl text-background/70 max-w-2xl mx-auto mb-10">
             Premium web design & digital experiences for ambitious brands.
           </p>
           <Link
@@ -61,7 +41,7 @@ const Home = () => {
           >
             Get Started <ArrowRight className="h-4 w-4" />
           </Link>
-          <p className="text-muted-foreground text-sm mt-6 tracking-widest uppercase">
+          <p className="text-background/50 text-sm mt-6 tracking-widest uppercase">
             RI-based • Serving USA
           </p>
           </div>
