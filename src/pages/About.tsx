@@ -12,7 +12,7 @@ const DotDivider = () => (
 );
 
 const About = () => (
-  <div className="min-h-screen bg-background text-foreground">
+  <div className="min-h-screen bg-transparent text-foreground">
     <Navbar />
 
     <div className="pt-28 pb-24 px-6">

@@ -46,7 +46,7 @@ const Contact = () => {
   const inputClass = "rounded-xl bg-muted/50 border-border text-foreground placeholder:text-muted-foreground/40 focus:border-primary/40";
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-transparent text-foreground">
       <Navbar />
 
       <div className="pt-28 pb-24 px-6">

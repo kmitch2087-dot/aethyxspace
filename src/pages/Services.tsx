@@ -74,7 +74,7 @@ const appDev = Object.entries(APP_DEVELOPMENT).map(([, v]) => ({
 }));
 
 const Services = () => (
-  <div className="min-h-screen bg-background text-foreground">
+  <div className="min-h-screen bg-transparent text-foreground">
     <Navbar />
 
     {/* 1. HERO */}

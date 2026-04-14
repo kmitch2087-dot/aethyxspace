@@ -43,7 +43,7 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-transparent text-foreground">
       <Navbar />
 
       {/* Hero */}
