@@ -34,6 +34,7 @@ const navItems = [
   { title: "Reviews", url: "/admin/reviews", icon: Star },
   { title: "Agreements", url: "/admin/agreements", icon: FileSignature },
   { title: "Financials", url: "/admin/financials", icon: DollarSign },
+  { title: "Clients", url: "/admin/clients", icon: Users },
 ];
 
 function AdminSidebar() {
