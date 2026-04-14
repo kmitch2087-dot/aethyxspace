@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, MessageSquare, Star, DollarSign, FileSignature } from "lucide-react";
+import { FileText, MessageSquare, Star, DollarSign, FileSignature, BarChart3 } from "lucide-react";
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -14,22 +14,32 @@ const Dashboard = () => {
     totalRevenue: 0,
     pendingPayments: 0,
   });
+  const [trafficStats, setTrafficStats] = useState({ tiktok: 0, instagram: 0, facebook: 0, other: 0, total: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchStats = async () => {
-      const [postsRes, inquiriesRes, reviewsRes, agreementsRes, financialsRes] =
+      const [postsRes, inquiriesRes, reviewsRes, agreementsRes, financialsRes, trafficRes] =
         await Promise.all([
           supabase.from("blog_posts").select("id, published"),
           supabase.from("waiting_list").select("id"),
           supabase.from("review_submissions").select("id, status"),
           supabase.from("client_agreements").select("id"),
           supabase.from("financial_records").select("amount, payment_status"),
+          supabase.from("traffic_clicks").select("source"),
         ]);
 
       const posts = postsRes.data || [];
       const reviews = reviewsRes.data || [];
       const financials = financialsRes.data || [];
+      const traffic = trafficRes.data || [];
+
+      const tiktok = traffic.filter((t: any) => t.source === "tiktok").length;
+      const instagram = traffic.filter((t: any) => t.source === "instagram").length;
+      const facebook = traffic.filter((t: any) => t.source === "facebook").length;
+      const other = traffic.filter((t: any) => t.source === "other").length;
+
+      setTrafficStats({ tiktok, instagram, facebook, other, total: traffic.length });
 
       setStats({
         posts: posts.length,
@@ -109,6 +119,30 @@ const Dashboard = () => {
             <CardContent>
               <div className="text-2xl font-bold">{card.value}</div>
               <p className="text-xs text-muted-foreground mt-1">{card.sub}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Traffic Sources */}
+      <h2 className="text-xl font-display tracking-wider mt-10 mb-4 flex items-center gap-2">
+        <BarChart3 className="h-5 w-5 text-primary" />
+        Traffic Sources
+      </h2>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+        {[
+          { label: "TikTok", count: trafficStats.tiktok, color: "text-pink-400" },
+          { label: "Instagram", count: trafficStats.instagram, color: "text-orange-400" },
+          { label: "Facebook", count: trafficStats.facebook, color: "text-blue-500" },
+          { label: "Other", count: trafficStats.other, color: "text-muted-foreground" },
+          { label: "Total Clicks", count: trafficStats.total, color: "text-primary" },
+        ].map((item) => (
+          <Card key={item.label} className="border-border/30">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">{item.label}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className={`text-2xl font-bold ${item.color}`}>{item.count}</div>
             </CardContent>
           </Card>
         ))}
