@@ -6,9 +6,9 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AethyxLogo from "@/components/AethyxLogo";
 import StarfieldBackground from "@/components/StarfieldBackground";
-import reRetreats1 from "@/assets/portfolio/re-retreats-1.jpg";
-import kokopelli1 from "@/assets/portfolio/kokopelli-1.jpg";
-import vibeshift1 from "@/assets/portfolio/vibeshift-1.jpg";
+import reRetreatsThumb from "@/assets/portfolio/re-retreats-thumb.png";
+import kokopelliThumb from "@/assets/portfolio/kokopelli-thumb.png";
+import vibeshiftThumb from "@/assets/portfolio/vibeshift-thumb.png";
 
 const services = [
   { icon: Globe, title: "Web Design", desc: "Custom websites that command attention and convert." },
@@ -17,9 +17,9 @@ const services = [
 ];
 
 const portfolioHighlights = [
-  { img: reRetreats1, title: "Rē Retreats", subtitle: "Women's Wellness Retreats", link: "/portfolio" },
-  { img: kokopelli1, title: "Kokopelli Kabin", subtitle: "Modern Mountain Retreat", link: "/portfolio" },
-  { img: vibeshift1, title: "Vibe Shift → Aethyx", subtitle: "Brand Evolution", link: "/portfolio" },
+  { img: reRetreatsThumb, title: "Rē Retreats", subtitle: "Women's Wellness Retreats", link: "https://re-retreats.com" },
+  { img: kokopelliThumb, title: "Kokopelli Kabin", subtitle: "Modern Mountain Retreat", link: "https://kokopellikabin.com" },
+  { img: vibeshiftThumb, title: "Vibe Shift → Aethyx", subtitle: "Brand Evolution", link: "https://vibe-shift.com" },
 ];
 
 const Home = () => {
@@ -79,9 +79,11 @@ const Home = () => {
           <h2 className="font-display text-3xl md:text-5xl text-center mb-16">Selected Work</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {portfolioHighlights.map((p) => (
-              <Link
+              <a
                 key={p.title}
-                to={p.link}
+                href={p.link}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="group rounded-2xl overflow-hidden border border-border/30 hover:border-primary/30 transition-all"
               >
                 <div className="aspect-video overflow-hidden">
@@ -95,7 +97,7 @@ const Home = () => {
                   <h3 className="font-display text-xl mb-1">{p.title}</h3>
                   <p className="text-muted-foreground text-sm">{p.subtitle}</p>
                 </div>
-              </Link>
+              </a>
             ))}
           </div>
         </div>
