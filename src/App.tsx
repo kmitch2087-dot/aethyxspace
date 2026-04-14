@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import AdminRoute from "@/components/AdminRoute";
+import ClientRoute from "@/components/ClientRoute";
 import Home from "./pages/Home";
 import Services from "./pages/Services";
 import Portfolio from "./pages/Portfolio";
@@ -25,6 +26,13 @@ import Inquiries from "./pages/admin/Inquiries";
 import Reviews from "./pages/admin/Reviews";
 import Agreements from "./pages/admin/Agreements";
 import Financials from "./pages/admin/Financials";
+import Clients from "./pages/admin/Clients";
+import PortalLayout from "./pages/portal/PortalLayout";
+import PortalOverview from "./pages/portal/PortalOverview";
+import PortalMessages from "./pages/portal/PortalMessages";
+import PortalDocuments from "./pages/portal/PortalDocuments";
+import PortalAgreements from "./pages/portal/PortalAgreements";
+import PortalPayments from "./pages/portal/PortalPayments";
 
 const queryClient = new QueryClient();
 
@@ -62,6 +70,21 @@ const App = () => (
               <Route path="reviews" element={<Reviews />} />
               <Route path="agreements" element={<Agreements />} />
               <Route path="financials" element={<Financials />} />
+              <Route path="clients" element={<Clients />} />
+            </Route>
+            <Route
+              path="/portal"
+              element={
+                <ClientRoute>
+                  <PortalLayout />
+                </ClientRoute>
+              }
+            >
+              <Route index element={<PortalOverview />} />
+              <Route path="messages" element={<PortalMessages />} />
+              <Route path="documents" element={<PortalDocuments />} />
+              <Route path="agreements" element={<PortalAgreements />} />
+              <Route path="payments" element={<PortalPayments />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

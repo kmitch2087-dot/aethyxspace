@@ -14,39 +14,33 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { NavLink } from "@/components/NavLink";
-import { useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
-  FileText,
   MessageSquare,
-  Star,
+  FolderOpen,
   FileSignature,
-  DollarSign,
-  Users,
+  CreditCard,
   LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const navItems = [
-  { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
-  { title: "Blog", url: "/admin/blog", icon: FileText },
-  { title: "Inquiries", url: "/admin/inquiries", icon: MessageSquare },
-  { title: "Reviews", url: "/admin/reviews", icon: Star },
-  { title: "Agreements", url: "/admin/agreements", icon: FileSignature },
-  { title: "Financials", url: "/admin/financials", icon: DollarSign },
-  { title: "Clients", url: "/admin/clients", icon: Users },
+  { title: "Overview", url: "/portal", icon: LayoutDashboard },
+  { title: "Messages", url: "/portal/messages", icon: MessageSquare },
+  { title: "Documents", url: "/portal/documents", icon: FolderOpen },
+  { title: "Agreements", url: "/portal/agreements", icon: FileSignature },
+  { title: "Payments", url: "/portal/payments", icon: CreditCard },
 ];
 
-function AdminSidebar() {
+function PortalSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
-  const location = useLocation();
   const { signOut } = useAuth();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
     await signOut();
-    navigate("/admin/login");
+    navigate("/");
   };
 
   return (
@@ -54,7 +48,7 @@ function AdminSidebar() {
       <SidebarContent className="flex flex-col h-full">
         <SidebarGroup>
           <SidebarGroupLabel className="font-display tracking-wider text-xs">
-            {!collapsed && "Admin Panel"}
+            {!collapsed && "Client Portal"}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -63,7 +57,7 @@ function AdminSidebar() {
                   <SidebarMenuButton asChild>
                     <NavLink
                       to={item.url}
-                      end={item.url === "/admin"}
+                      end={item.url === "/portal"}
                       className="hover:bg-muted/50"
                       activeClassName="bg-muted text-primary font-medium"
                     >
@@ -93,16 +87,16 @@ function AdminSidebar() {
   );
 }
 
-const AdminLayout = () => {
+const PortalLayout = () => {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
-        <AdminSidebar />
+        <PortalSidebar />
         <div className="flex-1 flex flex-col">
           <header className="h-12 flex items-center border-b border-border/30 px-4">
             <SidebarTrigger />
             <span className="ml-4 font-display text-sm tracking-wider text-muted-foreground">
-              Aethyx<span className="text-primary">.space</span> Admin
+              Aethyx<span className="text-primary">.space</span> Portal
             </span>
           </header>
           <main className="flex-1 p-6">
@@ -114,4 +108,4 @@ const AdminLayout = () => {
   );
 };
 
-export default AdminLayout;
+export default PortalLayout;
