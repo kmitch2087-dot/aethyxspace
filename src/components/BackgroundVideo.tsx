@@ -1,35 +1,11 @@
-import { useRef } from "react";
+import StarfieldBackground from "./StarfieldBackground";
 
-const BackgroundVideo = () => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-
-  const handleVideoLoaded = () => {
-    if (videoRef.current) {
-      videoRef.current.playbackRate = 0.6;
-    }
-  };
-
+const GlobalBackground = () => {
   return (
-    <div className="fixed inset-0 z-0">
-      <video
-        ref={videoRef}
-        src="/aethyx-intro.mov"
-        autoPlay
-        loop
-        muted
-        playsInline
-        onLoadedData={handleVideoLoaded}
-        className="w-full h-full object-cover"
-      />
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(to bottom, hsl(0 0% 4% / 0.4) 0%, hsl(0 0% 4% / 0.7) 50%, hsl(0 0% 4% / 0.92) 100%)",
-        }}
-      />
+    <div className="fixed inset-0 z-0 bg-[#0a0a14]">
+      <StarfieldBackground />
     </div>
   );
 };
 
-export default BackgroundVideo;
+export default GlobalBackground;

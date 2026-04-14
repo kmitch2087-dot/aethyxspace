@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
-import BackgroundVideo from "@/components/BackgroundVideo";
+import GlobalBackground from "@/components/BackgroundVideo";
 import AdminRoute from "@/components/AdminRoute";
 import ClientRoute from "@/components/ClientRoute";
 import Home from "./pages/Home";
@@ -44,7 +44,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <BackgroundVideo />
+          <GlobalBackground />
           <div className="relative z-10">
           <Routes>
             <Route path="/" element={<Home />} />
