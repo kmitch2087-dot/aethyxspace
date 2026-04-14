@@ -68,10 +68,10 @@ const Rebrand = () => {
       setIsLoading(false);
     }
   };
-
-
-
-
+  return (
+    <div className="min-h-screen text-foreground relative overflow-hidden">
+      {/* Main content */}
+      <div className="relative z-10 flex flex-col items-center px-6 pt-[55vh] md:pt-[60vh] pb-16">
       {/* Main content */}
       <div className="relative z-10 flex flex-col items-center px-6 pt-[55vh] md:pt-[60vh] pb-16">
 
