@@ -62,7 +62,7 @@ const AdminLogin = () => {
   }, [loading, isAdmin, submitting]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+    <div className="min-h-screen flex items-center justify-center bg-transparent px-4">
       <Card className="w-full max-w-md border-border/30">
         <CardHeader className="text-center">
           <CardTitle className="font-display text-2xl tracking-wider">

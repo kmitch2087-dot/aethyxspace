@@ -33,7 +33,7 @@ const Blog = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-transparent">
       <Navbar />
       <main className="pt-24 pb-16 px-6 max-w-5xl mx-auto">
         <h1 className="text-4xl md:text-5xl font-display tracking-wider mb-4">Blog</h1>

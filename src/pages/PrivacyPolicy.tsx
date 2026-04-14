@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 const PrivacyPolicy = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-transparent">
       <Header />
 
       <main className="relative z-10 pt-[calc(var(--fixed-banner-height)+32px)] pb-24 px-6 md:px-12 lg:px-24 xl:px-32">

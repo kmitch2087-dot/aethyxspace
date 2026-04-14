@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 
 const Seo = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-transparent">
       <Header />
 
       {/* Page Intro */}

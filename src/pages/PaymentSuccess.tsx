@@ -4,7 +4,7 @@ import { ArrowRight, CheckCircle } from "lucide-react";
 
 const PaymentSuccess = () => {
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
+    <div className="min-h-screen bg-transparent text-foreground flex flex-col">
       <div className="flex-1 flex items-center justify-center px-6 py-16">
         <div className="max-w-lg w-full text-center glass-card p-10 md:p-14">
           <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-8">

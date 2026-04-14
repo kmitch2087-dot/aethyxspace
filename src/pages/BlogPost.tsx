@@ -37,7 +37,7 @@ const BlogPost = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-transparent">
         <Navbar />
         <div className="flex justify-center items-center pt-40">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
@@ -48,7 +48,7 @@ const BlogPost = () => {
 
   if (!post) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-transparent">
         <Navbar />
         <main className="pt-24 pb-16 px-6 max-w-3xl mx-auto text-center">
           <h1 className="text-3xl font-display mb-4">Post not found</h1>
@@ -60,7 +60,7 @@ const BlogPost = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-transparent">
       <Navbar />
       <main className="pt-24 pb-16 px-6 max-w-3xl mx-auto">
         <Link

@@ -75,7 +75,7 @@ const Testimonials = () => {
   const [reviewPopupOpen, setReviewPopupOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-transparent">
       <Header />
       <main className="pt-[var(--fixed-banner-height,220px)]">
         <div className="container mx-auto px-4 py-12 md:py-16">
