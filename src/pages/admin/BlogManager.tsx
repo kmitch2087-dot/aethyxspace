@@ -130,7 +130,7 @@ const BlogManager = () => {
 
     const payload = {
       title: form.title.trim(),
-      slug: form.slug.trim(),
+      slug: form.slug.trim().replace(/^\/+/, ""),
       content: form.content,
       excerpt: form.excerpt.trim() || null,
       cover_image_url: form.cover_image_url.trim() || null,
