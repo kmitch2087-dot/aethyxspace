@@ -4,7 +4,7 @@ import { ArrowRight, Globe, Palette, Layers } from "lucide-react";
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import StarfieldBackground from "@/components/StarfieldBackground";
+
 import TrafficSourcePopup from "@/components/TrafficSourcePopup";
 import { supabase } from "@/integrations/supabase/client";
 import reRetreatsThumb from "@/assets/portfolio/re-retreats-thumb.png";
