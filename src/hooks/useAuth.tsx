@@ -19,10 +19,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const adminCheckRef = useRef<string | null>(null);
+  const adminResultRef = useRef(false);
 
   const checkAdmin = useCallback(async (userId: string): Promise<boolean> => {
-    // Deduplicate: skip if we're already checking this user
-    if (adminCheckRef.current === userId) return isAdmin;
+    // If we already resolved this user, return cached result
+    if (adminCheckRef.current === userId) return adminResultRef.current;
     adminCheckRef.current = userId;
 
     try {
@@ -35,10 +36,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       if (adminCheckRef.current !== userId) return false; // stale
       const result = !error && !!data;
+      adminResultRef.current = result;
       setIsAdmin(result);
       return result;
     } catch {
-      if (adminCheckRef.current === userId) setIsAdmin(false);
+      if (adminCheckRef.current === userId) {
+        adminResultRef.current = false;
+        setIsAdmin(false);
+      }
       return false;
     }
   }, []);
