@@ -98,6 +98,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signOut = useCallback(async () => {
     adminCheckRef.current = null;
+    adminResultRef.current = false;
     setIsAdmin(false);
     await supabase.auth.signOut();
   }, []);
