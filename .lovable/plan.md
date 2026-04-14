@@ -1,56 +1,74 @@
 
-Goal
-- Fix the admin sign-in loop first, then audit the admin buttons/forms so actions reliably submit, persist, and show clear feedback.
 
-What I found
-- Password login is succeeding in the backend repeatedly.
-- Your admin user and admin role both exist in the database.
-- The likely failure is frontend auth state timing: `useAuth` sets the user after login, but the admin-role lookup can run before authenticated queries are fully ready, resolve as non-admin, and never retry. That leaves you on `/admin/login` while the button briefly switches to “Please wait...” and back.
+## Plan: Traffic Tracking, Client Portal, and Nav Updates
 
-Implementation plan
-1. Rebuild auth readiness flow in `src/hooks/useAuth.tsx`
-- Separate session hydration, role lookup, and final auth readiness.
-- Restore session cleanly, then handle later auth state changes.
-- Only run the admin check after a confirmed session is available.
-- Re-run the admin check when the session changes, not just when `user.id` changes.
-- Reset auth/admin state cleanly on sign-out.
+This plan batches all the requested features into 3 focused implementation messages to minimize credits.
 
-2. Make admin-role detection robust
-- Stop relying on one immediate `user_roles` read during the login transition.
-- Use a more reliable admin check flow so the role decision is not lost during token initialization.
-- Add an explicit “signed in but not authorized” path so this never looks like a stuck login again.
+---
 
-3. Harden `AdminLogin.tsx`
-- Keep submit loading separate from auth initialization/loading.
-- After successful password login, wait for auth readiness instead of dropping straight back to idle.
-- Show clear messages for bad credentials, missing admin access, and unexpected auth failures.
-- Remove or disable the signup toggle if public signup is no longer meant to be used.
+### Message 1: Database Schema + Traffic Tracking + Nav Updates
 
-4. Audit the protected admin flow
-- Verify `AdminRoute` does not bounce users back to login while auth is still resolving.
-- Only redirect to `/admin` after admin access is confirmed.
-- Confirm logout fully clears local admin state.
+**Database migrations (all in one):**
+- Create `traffic_clicks` table: `id`, `source` (enum: tiktok, instagram, facebook, other), `other_details` (text, nullable), `created_at`
+- Create `client_profiles` table: `id`, `user_id` (ref auth.users), `full_name`, `phone`, `business_name`, `billing_address`, `billing_city`, `billing_state`, `billing_zip`, `created_at`, `updated_at`
+- Create `client_messages` table: `id`, `user_id`, `message`, `created_at`
+- Create `client_documents` table: `id`, `user_id`, `title`, `file_url`, `uploaded_by` (admin or client), `created_at`
+- Add RLS: `traffic_clicks` allows anonymous inserts; client tables are scoped to own user_id + admin read/write
+- Create storage bucket `client-documents`
 
-5. Fix the blog create/update flow after login is stable
-- Re-test create/edit/publish/unpublish/delete in `BlogManager`.
-- Add any missing validation, disabled states, error surfacing, and success toasts.
-- Make sure form values hold while saving and that saved content persists after refresh.
-- Verify cover image upload and post save sequencing works with the authenticated admin session.
+**Home.tsx changes:**
+- Add 4 buttons below "Woman Owned..." line: TikTok, Instagram, Facebook, Other
+- Each button inserts a row into `traffic_clicks`, then navigates to `/contact` (consultation booking)
+- "Other" button shows a small dialog/popup asking where they found you, saves the text in `other_details`, then navigates to `/contact`
 
-6. End-to-end QA pass for the key buttons/forms
-- Login
-- Logout
-- Create/update/publish blog post
-- Inquiries actions
-- Reviews approve/reject
-- Agreements CRUD
-- Financials CRUD
+**Navbar.tsx changes:**
+- Add "Emergency Contact" link (calls `tel:+14015891023`)
+- Add "Client Login" button that opens a dialog with login/signup form
 
-Technical details
-- Files most likely to change: `src/hooks/useAuth.tsx`, `src/pages/admin/AdminLogin.tsx`, `src/components/AdminRoute.tsx`, and `src/pages/admin/BlogManager.tsx`.
-- If needed, I’ll also make a small backend-side role-check adjustment so admin detection is reliable and secure during session startup.
-- This should be a focused state-management and form-hardening pass, not a redesign.
+**Dashboard.tsx changes:**
+- Add a "Traffic Sources" card showing counts by source from `traffic_clicks`
 
-Expected result
-- Clicking “Sign In” should complete once, route into the admin dashboard, and stay logged in.
-- Admin actions should submit once, persist correctly, and show clear success/error states instead of silently failing.
+---
+
+### Message 2: Client Auth + Portal Pages
+
+**Client login/signup dialog:**
+- Login tab: email + password sign-in
+- Signup tab: email, password, full name, phone, business name, billing address fields
+- On signup, insert into `client_profiles`
+- On login success, redirect to `/portal`
+
+**Client portal pages (new):**
+- `/portal` — `ClientPortal.tsx` layout with sidebar tabs: Overview, Messages, Documents, Agreements, Payments
+- **Overview**: Shows project status placeholder, welcome message
+- **Messages**: Text field to submit notes/messages (saves to `client_messages`), shows history
+- **Documents**: List of uploaded documents from `client_documents` (admin uploads for them)
+- **Agreements**: Placeholder showing "DocuSign integration coming soon" with list of agreement records
+- **Payments**: Placeholder for Stripe invoice links
+
+**App.tsx**: Add `/portal` routes wrapped in a `ClientRoute` (authenticated, non-admin)
+
+---
+
+### Message 3: Admin-Side Client Management + Polish
+
+**Admin dashboard updates:**
+- Add traffic source counter widget with breakdown (TikTok / IG / FB / Other)
+- Add client list view so admin can see registered clients
+- Add ability for admin to upload documents to a client's `client_documents`
+
+**Wire up remaining pieces:**
+- Ensure client portal only shows data for the logged-in user
+- Add sign-out button to portal
+- Test that traffic buttons → consultation flow works end to end
+
+---
+
+### Technical Details
+
+- **Files created**: `src/pages/portal/ClientPortal.tsx`, `src/pages/portal/ClientMessages.tsx`, `src/pages/portal/ClientDocuments.tsx`, `src/pages/portal/ClientAgreements.tsx`, `src/pages/portal/ClientPayments.tsx`, `src/components/ClientLoginDialog.tsx`, `src/components/ClientRoute.tsx`, `src/components/TrafficSourcePopup.tsx`
+- **Files modified**: `src/pages/Home.tsx`, `src/components/Navbar.tsx`, `src/App.tsx`, `src/pages/admin/Dashboard.tsx`
+- **Database**: 3 new tables + 1 storage bucket + RLS policies, all in one migration
+- **Auth**: Client accounts use standard email/password signup (separate from admin). The existing `profiles` table trigger auto-creates a profile row; `client_profiles` stores extended billing info.
+- **No DocuSign or Stripe invoice integration yet** — those tabs will be placeholders as requested ("we will build this out later on")
+
