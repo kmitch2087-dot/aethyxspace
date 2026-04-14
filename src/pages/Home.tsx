@@ -5,6 +5,7 @@ import { ArrowRight, Globe, Palette, Layers } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AethyxLogo from "@/components/AethyxLogo";
+import StarfieldBackground from "@/components/StarfieldBackground";
 import reRetreats1 from "@/assets/portfolio/re-retreats-1.jpg";
 import kokopelli1 from "@/assets/portfolio/kokopelli-1.jpg";
 import vibeshift1 from "@/assets/portfolio/vibeshift-1.jpg";
@@ -27,13 +28,14 @@ const Home = () => {
       <Navbar />
 
       {/* Hero */}
-      <section className="relative min-h-screen flex items-center justify-center bg-white">
+      <section className="relative min-h-screen flex items-center justify-center bg-[#0a0a14] overflow-hidden">
+        <StarfieldBackground />
         <div className="relative z-10 text-center px-6 pt-20">
           <div className="rounded-2xl px-8 py-10 max-w-3xl mx-auto">
-          <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold tracking-wide text-primary mb-6">
+          <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold tracking-wide text-white mb-6">
             Elevate & Evolve Unapologetically
           </h1>
-          <p className="text-lg md:text-xl text-foreground/70 max-w-2xl mx-auto mb-10">
+          <p className="text-lg md:text-xl text-white/60 max-w-2xl mx-auto mb-10">
             Premium web design & digital experiences for ambitious brands.
           </p>
           <Link
@@ -42,7 +44,7 @@ const Home = () => {
           >
             Get Started <ArrowRight className="h-4 w-4" />
           </Link>
-          <p className="text-foreground/50 text-sm mt-6 tracking-widest uppercase">
+          <p className="text-white/40 text-sm mt-6 tracking-widest uppercase">
             RI-based • Serving USA
           </p>
           </div>
