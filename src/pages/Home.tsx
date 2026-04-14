@@ -45,7 +45,7 @@ const Home = () => {
             Get Started <ArrowRight className="h-4 w-4" />
           </Link>
           <p className="text-white/40 text-sm mt-6 tracking-widest uppercase">
-            RI-based • Serving USA
+            Woman Owned • RI-based • Serving The Entire USA
           </p>
           </div>
         </div>
