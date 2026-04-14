@@ -98,6 +98,96 @@ export type Database = {
         }
         Relationships: []
       }
+      client_documents: {
+        Row: {
+          created_at: string
+          file_url: string
+          id: string
+          title: string
+          uploaded_by: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          file_url: string
+          id?: string
+          title: string
+          uploaded_by?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          file_url?: string
+          id?: string
+          title?: string
+          uploaded_by?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      client_messages: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      client_profiles: {
+        Row: {
+          billing_address: string | null
+          billing_city: string | null
+          billing_state: string | null
+          billing_zip: string | null
+          business_name: string | null
+          created_at: string
+          full_name: string
+          id: string
+          phone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          billing_address?: string | null
+          billing_city?: string | null
+          billing_state?: string | null
+          billing_zip?: string | null
+          business_name?: string | null
+          created_at?: string
+          full_name: string
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          billing_address?: string | null
+          billing_city?: string | null
+          billing_state?: string | null
+          billing_zip?: string | null
+          business_name?: string | null
+          created_at?: string
+          full_name?: string
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       financial_records: {
         Row: {
           amount: number
@@ -200,6 +290,27 @@ export type Database = {
         }
         Relationships: []
       }
+      traffic_clicks: {
+        Row: {
+          created_at: string
+          id: string
+          other_details: string | null
+          source: Database["public"]["Enums"]["traffic_source"]
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          other_details?: string | null
+          source: Database["public"]["Enums"]["traffic_source"]
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          other_details?: string | null
+          source?: Database["public"]["Enums"]["traffic_source"]
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -260,6 +371,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      traffic_source: "tiktok" | "instagram" | "facebook" | "other"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -388,6 +500,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      traffic_source: ["tiktok", "instagram", "facebook", "other"],
     },
   },
 } as const
