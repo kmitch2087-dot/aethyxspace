@@ -69,29 +69,8 @@ const Rebrand = () => {
     }
   };
 
-  const videoRef = useRef<HTMLVideoElement>(null);
 
-  const handleVideoLoaded = () => {
-    if (videoRef.current) {
-      videoRef.current.playbackRate = 0.6;
-    }
-  };
 
-  return (
-    <div className="min-h-screen text-foreground relative overflow-hidden bg-background">
-      {/* Video as full-width background hero */}
-      <div className="fixed inset-0 z-0">
-        <video
-          ref={videoRef}
-          src="/aethyx-intro.mov"
-          autoPlay
-          muted
-          playsInline
-          onLoadedData={handleVideoLoaded}
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 30%, hsl(0 0% 4%) 85%)" }} />
-      </div>
 
       {/* Main content */}
       <div className="relative z-10 flex flex-col items-center px-6 pt-[55vh] md:pt-[60vh] pb-16">
