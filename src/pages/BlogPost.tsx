@@ -26,7 +26,7 @@ const BlogPost = () => {
       const { data } = await supabase
         .from("blog_posts")
         .select("*")
-        .eq("slug", slug)
+        .or(`slug.eq.${slug},slug.eq./${slug}`)
         .eq("published", true)
         .maybeSingle();
       setPost(data);
