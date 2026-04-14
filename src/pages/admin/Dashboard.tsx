@@ -112,49 +112,131 @@ const Dashboard = () => {
     },
   ];
 
+  const handleSaveFacebook = async () => {
+    setSavingFb(true);
+    try {
+      localStorage.setItem("fb_page_id", fbPageId);
+      localStorage.setItem("fb_access_token", fbAccessToken);
+      toast({ title: "Saved", description: "Facebook credentials saved locally. They'll be configured as secrets when you're ready." });
+    } finally {
+      setSavingFb(false);
+    }
+  };
+
   return (
     <div>
       <h1 className="text-2xl font-display tracking-wider mb-6">Dashboard</h1>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-        {cards.map((card) => (
-          <Card key={card.title} className="border-border/30">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                {card.title}
-              </CardTitle>
-              <card.icon className={`h-4 w-4 ${card.color}`} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{card.value}</div>
-              <p className="text-xs text-muted-foreground mt-1">{card.sub}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
 
-      {/* Traffic Sources */}
-      <h2 className="text-xl font-display tracking-wider mt-10 mb-4 flex items-center gap-2">
-        <BarChart3 className="h-5 w-5 text-primary" />
-        Traffic Sources
-      </h2>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-        {[
-          { label: "TikTok", count: trafficStats.tiktok, color: "text-pink-400" },
-          { label: "Instagram", count: trafficStats.instagram, color: "text-orange-400" },
-          { label: "Facebook", count: trafficStats.facebook, color: "text-blue-500" },
-          { label: "Other", count: trafficStats.other, color: "text-muted-foreground" },
-          { label: "Total Clicks", count: trafficStats.total, color: "text-primary" },
-        ].map((item) => (
-          <Card key={item.label} className="border-border/30">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">{item.label}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className={`text-2xl font-bold ${item.color}`}>{item.count}</div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <Tabs defaultValue="overview" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="social" className="flex items-center gap-1.5">
+            <Share2 className="h-3.5 w-3.5" /> Social / Sharing
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Overview Tab */}
+        <TabsContent value="overview">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+            {cards.map((card) => (
+              <Card key={card.title} className="border-border/30">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
+                    {card.title}
+                  </CardTitle>
+                  <card.icon className={`h-4 w-4 ${card.color}`} />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{card.value}</div>
+                  <p className="text-xs text-muted-foreground mt-1">{card.sub}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Traffic Sources */}
+          <h2 className="text-xl font-display tracking-wider mt-10 mb-4 flex items-center gap-2">
+            <BarChart3 className="h-5 w-5 text-primary" />
+            Traffic Sources
+          </h2>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+            {[
+              { label: "TikTok", count: trafficStats.tiktok, color: "text-pink-400" },
+              { label: "Instagram", count: trafficStats.instagram, color: "text-orange-400" },
+              { label: "Facebook", count: trafficStats.facebook, color: "text-blue-500" },
+              { label: "Other", count: trafficStats.other, color: "text-muted-foreground" },
+              { label: "Total Clicks", count: trafficStats.total, color: "text-primary" },
+            ].map((item) => (
+              <Card key={item.label} className="border-border/30">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">{item.label}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className={`text-2xl font-bold ${item.color}`}>{item.count}</div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+
+        {/* Social / Sharing Tab */}
+        <TabsContent value="social">
+          <div className="grid gap-6 md:grid-cols-2">
+            {/* Facebook */}
+            <Card className="border-border/30">
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Facebook className="h-5 w-5 text-blue-500" />
+                  <CardTitle className="text-lg">Facebook Business Page</CardTitle>
+                </div>
+                <CardDescription>
+                  Auto-post published blog articles to your Facebook page. Enter your Page ID and long-lived Page Access Token below.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="fb-page-id">Page ID</Label>
+                  <Input
+                    id="fb-page-id"
+                    placeholder="e.g. 123456789012345"
+                    value={fbPageId}
+                    onChange={(e) => setFbPageId(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="fb-token">Page Access Token</Label>
+                  <Input
+                    id="fb-token"
+                    type="password"
+                    placeholder="Paste your long-lived token here"
+                    value={fbAccessToken}
+                    onChange={(e) => setFbAccessToken(e.target.value)}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Get this from Meta Business Suite → Graph API Explorer → generate a long-lived token with <code>pages_manage_posts</code> permission.
+                  </p>
+                </div>
+                <Button onClick={handleSaveFacebook} disabled={savingFb} className="gap-2">
+                  <Save className="h-4 w-4" /> Save Credentials
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Placeholder for Instagram / future platforms */}
+            <Card className="border-border/30 opacity-60">
+              <CardHeader>
+                <CardTitle className="text-lg">Instagram (Coming Soon)</CardTitle>
+                <CardDescription>
+                  Auto-share blog posts as Instagram feed posts. Requires a connected Facebook Business page first.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground italic">This integration will be available once your Facebook page is connected.</p>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
