@@ -6,9 +6,9 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AethyxLogo from "@/components/AethyxLogo";
 import StarfieldBackground from "@/components/StarfieldBackground";
-import reRetreats1 from "@/assets/portfolio/re-retreats-1.jpg";
-import kokopelli1 from "@/assets/portfolio/kokopelli-1.jpg";
-import vibeshift1 from "@/assets/portfolio/vibeshift-1.jpg";
+import reRetreatsThumb from "@/assets/portfolio/re-retreats-thumb.png";
+import kokopelliThumb from "@/assets/portfolio/kokopelli-thumb.png";
+import vibeshiftThumb from "@/assets/portfolio/vibeshift-thumb.png";
 
 const services = [
   { icon: Globe, title: "Web Design", desc: "Custom websites that command attention and convert." },
@@ -17,9 +17,9 @@ const services = [
 ];
 
 const portfolioHighlights = [
-  { img: reRetreats1, title: "Rē Retreats", subtitle: "Women's Wellness Retreats", link: "/portfolio" },
-  { img: kokopelli1, title: "Kokopelli Kabin", subtitle: "Modern Mountain Retreat", link: "/portfolio" },
-  { img: vibeshift1, title: "Vibe Shift → Aethyx", subtitle: "Brand Evolution", link: "/portfolio" },
+  { img: reRetreatsThumb, title: "Rē Retreats", subtitle: "Women's Wellness Retreats", link: "https://re-retreats.com" },
+  { img: kokopelliThumb, title: "Kokopelli Kabin", subtitle: "Modern Mountain Retreat", link: "https://kokopellikabin.com" },
+  { img: vibeshiftThumb, title: "Vibe Shift → Aethyx", subtitle: "Brand Evolution", link: "https://vibe-shift.com" },
 ];
 
 const Home = () => {
