@@ -1,11 +1,12 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Globe, Palette, Layers } from "lucide-react";
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import AethyxLogo from "@/components/AethyxLogo";
 import StarfieldBackground from "@/components/StarfieldBackground";
+import TrafficSourcePopup from "@/components/TrafficSourcePopup";
+import { supabase } from "@/integrations/supabase/client";
 import reRetreatsThumb from "@/assets/portfolio/re-retreats-thumb.png";
 import kokopelliThumb from "@/assets/portfolio/kokopelli-thumb.png";
 import vibeshiftThumb from "@/assets/portfolio/vibeshift-thumb.png";
@@ -22,7 +23,25 @@ const portfolioHighlights = [
   { img: vibeshiftThumb, title: "Vibe Shift → Aethyx", subtitle: "Brand Evolution", link: "https://vibe-shift.com" },
 ];
 
+const trafficButtons = [
+  { label: "TikTok", source: "tiktok" as const },
+  { label: "Instagram", source: "instagram" as const },
+  { label: "Facebook", source: "facebook" as const },
+  { label: "Other", source: "other" as const },
+];
+
 const Home = () => {
+  const navigate = useNavigate();
+  const [otherOpen, setOtherOpen] = useState(false);
+
+  const handleTrafficClick = async (source: "tiktok" | "instagram" | "facebook" | "other", otherDetails?: string) => {
+    await supabase.from("traffic_clicks").insert({
+      source,
+      other_details: otherDetails || null,
+    } as any);
+    navigate("/contact");
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
@@ -32,24 +51,53 @@ const Home = () => {
         <StarfieldBackground />
         <div className="relative z-10 text-center px-6 pt-20">
           <div className="rounded-2xl px-8 py-10 max-w-3xl mx-auto">
-          <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold tracking-wide text-white mb-6">
-            Elevate & Evolve Unapologetically
-          </h1>
-          <p className="text-lg md:text-xl text-white/60 max-w-2xl mx-auto mb-10">
-            Premium web design & digital experiences for ambitious brands.
-          </p>
-          <Link
-            to="/contact"
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-primary-foreground font-semibold tracking-wide uppercase text-sm hover:bg-primary/90 transition-all hover:-translate-y-0.5"
-          >
-            Get Started <ArrowRight className="h-4 w-4" />
-          </Link>
-          <p className="text-white/40 text-sm mt-6 tracking-widest uppercase">
-            Woman Owned • RI-based • Serving The Entire USA
-          </p>
+            <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold tracking-wide text-white mb-6">
+              Elevate & Evolve Unapologetically
+            </h1>
+            <p className="text-lg md:text-xl text-white/60 max-w-2xl mx-auto mb-10">
+              Premium web design & digital experiences for ambitious brands.
+            </p>
+            <Link
+              to="/contact"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-primary-foreground font-semibold tracking-wide uppercase text-sm hover:bg-primary/90 transition-all hover:-translate-y-0.5"
+            >
+              Get Started <ArrowRight className="h-4 w-4" />
+            </Link>
+            <p className="text-white/40 text-sm mt-6 tracking-widest uppercase">
+              Woman Owned • RI-based • Serving The Entire USA
+            </p>
+
+            {/* Traffic source buttons */}
+            <p className="text-white/30 text-xs mt-6 tracking-wider uppercase">How did you find us?</p>
+            <div className="flex flex-wrap justify-center gap-3 mt-3">
+              {trafficButtons.map((btn) => (
+                <button
+                  key={btn.source}
+                  onClick={() => {
+                    if (btn.source === "other") {
+                      setOtherOpen(true);
+                    } else {
+                      handleTrafficClick(btn.source);
+                    }
+                  }}
+                  className="px-5 py-2 rounded-full border border-white/20 text-white/60 text-xs tracking-widest uppercase hover:border-primary/50 hover:text-primary transition-all"
+                >
+                  {btn.label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </section>
+
+      <TrafficSourcePopup
+        open={otherOpen}
+        onClose={() => setOtherOpen(false)}
+        onSubmit={(details) => {
+          setOtherOpen(false);
+          handleTrafficClick("other", details);
+        }}
+      />
 
       {/* Services Teaser */}
       <section className="py-24 px-6">
