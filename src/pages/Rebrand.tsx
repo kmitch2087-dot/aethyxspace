@@ -72,8 +72,6 @@ const Rebrand = () => {
     <div className="min-h-screen text-foreground relative overflow-hidden">
       {/* Main content */}
       <div className="relative z-10 flex flex-col items-center px-6 pt-[55vh] md:pt-[60vh] pb-16">
-      {/* Main content */}
-      <div className="relative z-10 flex flex-col items-center px-6 pt-[55vh] md:pt-[60vh] pb-16">
 
         {/* Tagline */}
         <p className="font-display text-3xl md:text-4xl lg:text-5xl font-bold tracking-[0.15em] uppercase text-primary mb-8 text-center glow-teal">
