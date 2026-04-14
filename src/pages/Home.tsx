@@ -79,9 +79,11 @@ const Home = () => {
           <h2 className="font-display text-3xl md:text-5xl text-center mb-16">Selected Work</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {portfolioHighlights.map((p) => (
-              <Link
+              <a
                 key={p.title}
-                to={p.link}
+                href={p.link}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="group rounded-2xl overflow-hidden border border-border/30 hover:border-primary/30 transition-all"
               >
                 <div className="aspect-video overflow-hidden">
@@ -95,7 +97,7 @@ const Home = () => {
                   <h3 className="font-display text-xl mb-1">{p.title}</h3>
                   <p className="text-muted-foreground text-sm">{p.subtitle}</p>
                 </div>
-              </Link>
+              </a>
             ))}
           </div>
         </div>
