@@ -55,7 +55,7 @@ const Home = () => {
           <div className="px-2 py-10 max-w-7xl mx-auto">
             {/* Logo with gold orbs backdrop blending into background */}
             <div className="relative mx-auto mb-6 -mx-2">
-              <div className="relative overflow-visible" style={{ padding: '10rem 0 14rem', margin: '0 -6rem' }}>
+              <div className="relative overflow-visible" style={{ padding: '16rem 0 14rem', margin: '-6rem -6rem 0' }}>
                 <div className="absolute inset-0 z-0" style={{
                   background: 'radial-gradient(ellipse 100% 90% at center 40%, #1a1812 0%, rgba(26,24,18,0.6) 15%, rgba(42,37,24,0.25) 35%, rgba(42,37,24,0.08) 55%, rgba(42,37,24,0.02) 70%, transparent 85%)',
                 }}>
