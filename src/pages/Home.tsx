@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Globe, Palette, Layers } from "lucide-react";
+import StarfieldBackground from "@/components/StarfieldBackground";
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -48,10 +49,15 @@ const Home = () => {
     <div className="min-h-screen bg-transparent text-foreground">
       <Navbar />
 
-      {/* Hero */}
+      {/* Hero with starfield backdrop */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Starfield container behind hero */}
+        <div className="absolute inset-0 bg-[#0a0a14] z-0">
+          <StarfieldBackground />
+        </div>
+
         <div className="relative z-10 text-center w-full px-2 pt-20">
-          <div className="rounded-2xl px-2 py-10 max-w-7xl mx-auto">
+          <div className="px-2 py-10 max-w-7xl mx-auto">
            <img src={aethyxCalligraphy} alt="Aethyx" className="mx-auto mb-6 w-full" />
             
             <p className="font-display text-lg md:text-xl lg:text-2xl tracking-widest uppercase text-white/80 mb-6">
