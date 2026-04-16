@@ -7,7 +7,7 @@ import Footer from "@/components/Footer";
 
 import TrafficSourcePopup from "@/components/TrafficSourcePopup";
 import { supabase } from "@/integrations/supabase/client";
-import aethyxCalligraphy from "@/assets/aethyx-calligraphy.png";
+import aethyxCalligraphy from "@/assets/aethyx-calligraphy-updated.png";
 import elevateEvolve from "@/assets/elevate-evolve.png";
 import reRetreatsThumb from "@/assets/portfolio/re-retreats-thumb.png";
 import kokopelliThumb from "@/assets/portfolio/kokopelli-thumb.png";
