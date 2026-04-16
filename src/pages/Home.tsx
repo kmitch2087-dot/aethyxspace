@@ -50,9 +50,9 @@ const Home = () => {
 
       {/* Hero */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        <div className="relative z-10 text-center px-6 pt-20">
-          <div className="rounded-2xl px-8 py-10 max-w-3xl mx-auto">
-           <img src={aethyxCalligraphy} alt="Aethyx" className="mx-auto mb-6 w-full max-w-[95vw]" />
+        <div className="relative z-10 text-center w-full px-2 pt-20">
+          <div className="rounded-2xl px-2 py-10 max-w-7xl mx-auto">
+           <img src={aethyxCalligraphy} alt="Aethyx" className="mx-auto mb-6 w-full" />
             
             <p className="font-display text-lg md:text-xl lg:text-2xl tracking-widest uppercase text-white/80 mb-6">
               Unapologetically
