@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Globe, Palette, Layers } from "lucide-react";
+import StarfieldBackground from "@/components/StarfieldBackground";
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -48,10 +49,15 @@ const Home = () => {
     <div className="min-h-screen bg-transparent text-foreground">
       <Navbar />
 
-      {/* Hero */}
+      {/* Hero with starfield backdrop */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Starfield container behind hero */}
+        <div className="absolute inset-0 bg-[#0a0a14] z-0">
+          <StarfieldBackground />
+        </div>
+
         <div className="relative z-10 text-center w-full px-2 pt-20">
-          <div className="rounded-2xl px-2 py-10 max-w-7xl mx-auto">
+          <div className="px-2 py-10 max-w-7xl mx-auto">
            <img src={aethyxCalligraphy} alt="Aethyx" className="mx-auto mb-6 w-full" />
             
             <p className="font-display text-lg md:text-xl lg:text-2xl tracking-widest uppercase text-white/80 mb-6">
@@ -105,19 +111,19 @@ const Home = () => {
       {/* Services Teaser */}
       <section className="py-24 px-6">
         <div className="max-w-6xl mx-auto">
-          <h2 className="font-display text-3xl md:text-5xl text-center mb-16">What We Build</h2>
+          <h2 className="font-display text-3xl md:text-5xl text-center mb-16 text-[#1a1a2e]">What We Build</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {services.map((s) => (
               <Link
                 key={s.title}
                 to="/services"
-                className="glass-card p-8 text-center group hover:border-primary/30 transition-all"
+                className="rounded-2xl border border-[#d1d5e0] bg-white/60 backdrop-blur-sm p-8 text-center group hover:border-primary/40 hover:shadow-lg transition-all"
               >
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
                   <s.icon className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="font-display text-2xl mb-3">{s.title}</h3>
-                <p className="text-muted-foreground text-sm">{s.desc}</p>
+                <h3 className="font-display text-2xl mb-3 text-[#1a1a2e]">{s.title}</h3>
+                <p className="text-[#5a5f72] text-sm">{s.desc}</p>
               </Link>
             ))}
           </div>
@@ -125,9 +131,9 @@ const Home = () => {
       </section>
 
       {/* Portfolio Highlights */}
-      <section className="py-24 px-6 border-t border-border/20">
+      <section className="py-24 px-6 border-t border-[#d1d5e0]/50">
         <div className="max-w-6xl mx-auto">
-          <h2 className="font-display text-3xl md:text-5xl text-center mb-16">Selected Work</h2>
+          <h2 className="font-display text-3xl md:text-5xl text-center mb-16 text-[#1a1a2e]">Selected Work</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {portfolioHighlights.map((p) => (
               <a
@@ -135,7 +141,7 @@ const Home = () => {
                 href={p.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group rounded-2xl overflow-hidden border border-border/30 hover:border-primary/30 transition-all"
+                className="group rounded-2xl overflow-hidden border border-[#d1d5e0] bg-white/60 hover:border-primary/40 hover:shadow-lg transition-all"
               >
                 <div className="aspect-video overflow-hidden">
                   <img
@@ -145,8 +151,8 @@ const Home = () => {
                   />
                 </div>
                 <div className="p-6">
-                  <h3 className="font-display text-xl mb-1">{p.title}</h3>
-                  <p className="text-muted-foreground text-sm">{p.subtitle}</p>
+                  <h3 className="font-display text-xl mb-1 text-[#1a1a2e]">{p.title}</h3>
+                  <p className="text-[#5a5f72] text-sm">{p.subtitle}</p>
                 </div>
               </a>
             ))}
@@ -155,9 +161,9 @@ const Home = () => {
       </section>
 
       {/* CTA */}
-      <section className="py-24 px-6 border-t border-border/20 text-center">
-        <h2 className="font-display text-3xl md:text-5xl mb-6">Ready to Shift?</h2>
-        <p className="text-muted-foreground text-lg max-w-xl mx-auto mb-10">
+      <section className="py-24 px-6 border-t border-[#d1d5e0]/50 text-center">
+        <h2 className="font-display text-3xl md:text-5xl mb-6 text-[#1a1a2e]">Ready to Shift?</h2>
+        <p className="text-[#5a5f72] text-lg max-w-xl mx-auto mb-10">
           Book a consultation and let's build something that actually represents you.
         </p>
         <Link
