@@ -55,10 +55,10 @@ const Home = () => {
           <div className="px-2 py-10 max-w-7xl mx-auto">
             {/* Logo with starfield backdrop blending into gold */}
             <div className="relative mx-auto mb-6">
-              <div className="relative rounded-2xl overflow-visible">
-                <div className="absolute inset-0 bg-[#0a0a14] z-0 rounded-2xl" style={{
-                  maskImage: 'radial-gradient(ellipse 80% 70% at center, black 40%, transparent 100%)',
-                  WebkitMaskImage: 'radial-gradient(ellipse 80% 70% at center, black 40%, transparent 100%)',
+              <div className="relative overflow-visible" style={{ padding: '4rem 4rem' }}>
+                <div className="absolute inset-0 bg-[#0a0a14] z-0" style={{
+                  maskImage: 'radial-gradient(ellipse 60% 50% at center, black 10%, rgba(0,0,0,0.3) 50%, transparent 80%)',
+                  WebkitMaskImage: 'radial-gradient(ellipse 60% 50% at center, black 10%, rgba(0,0,0,0.3) 50%, transparent 80%)',
                 }}>
                   <StarfieldBackground />
                 </div>
