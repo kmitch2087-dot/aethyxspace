@@ -57,8 +57,8 @@ const Home = () => {
             <div className="relative mx-auto mb-6">
               <div className="relative overflow-visible" style={{ padding: '4rem 4rem' }}>
                 <div className="absolute inset-0 bg-[#0a0a14] z-0" style={{
-                  maskImage: 'radial-gradient(ellipse 60% 50% at center, black 10%, rgba(0,0,0,0.3) 50%, transparent 80%)',
-                  WebkitMaskImage: 'radial-gradient(ellipse 60% 50% at center, black 10%, rgba(0,0,0,0.3) 50%, transparent 80%)',
+                  maskImage: 'radial-gradient(ellipse 70% 60% at center, black 25%, rgba(0,0,0,0.3) 55%, transparent 85%)',
+                  WebkitMaskImage: 'radial-gradient(ellipse 70% 60% at center, black 25%, rgba(0,0,0,0.3) 55%, transparent 85%)',
                 }}>
                   <StarfieldBackground />
                 </div>
