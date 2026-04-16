@@ -51,7 +51,7 @@ const Home = () => {
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <div className="relative z-10 text-center px-6 pt-20">
           <div className="rounded-2xl px-8 py-10 max-w-3xl mx-auto">
-           <img src={aethyxCalligraphy} alt="Aethyx" className="mx-auto mb-8 w-[280px] md:w-[420px] lg:w-[520px]" />
+           <img src={aethyxCalligraphy} alt="Aethyx" className="mx-auto mb-8 w-[360px] md:w-[540px] lg:w-[680px]" />
             <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold tracking-wide text-white mb-6">
               Elevate & Evolve Unapologetically
             </h1>
