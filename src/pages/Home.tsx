@@ -52,9 +52,10 @@ const Home = () => {
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <div className="relative z-10 text-center px-6 pt-20">
           <div className="rounded-2xl px-8 py-10 max-w-3xl mx-auto">
-           <img src={aethyxCalligraphy} alt="Aethyx" className="mx-auto mb-8 w-[360px] md:w-[540px] lg:w-[680px]" />
-            <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold tracking-wide text-white mb-6">
-              Elevate & Evolve Unapologetically
+           <img src={aethyxCalligraphy} alt="Aethyx" className="mx-auto mb-6 w-[440px] md:w-[640px] lg:w-[800px]" />
+            <img src={elevateEvolve} alt="Elevate & Evolve" className="mx-auto mb-2 w-[260px] md:w-[380px] lg:w-[460px]" />
+            <p className="font-display text-lg md:text-xl lg:text-2xl tracking-widest uppercase text-white/80 mb-6">
+              Unapologetically
             </h1>
             <p className="text-lg md:text-xl text-white/60 max-w-2xl mx-auto mb-10">
               Premium web design & digital experiences for ambitious brands.
