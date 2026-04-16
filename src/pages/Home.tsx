@@ -53,12 +53,17 @@ const Home = () => {
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <div className="relative z-10 text-center w-full px-2 pt-20">
           <div className="px-2 py-10 max-w-7xl mx-auto">
-            {/* Logo with starfield backdrop */}
-            <div className="relative rounded-2xl overflow-hidden mx-auto mb-6">
-              <div className="absolute inset-0 bg-[#0a0a14] z-0">
-                <StarfieldBackground />
+            {/* Logo with starfield backdrop blending into gold */}
+            <div className="relative mx-auto mb-6">
+              <div className="relative rounded-2xl overflow-visible">
+                <div className="absolute inset-0 bg-[#0a0a14] z-0 rounded-2xl" style={{
+                  maskImage: 'radial-gradient(ellipse 80% 70% at center, black 40%, transparent 100%)',
+                  WebkitMaskImage: 'radial-gradient(ellipse 80% 70% at center, black 40%, transparent 100%)',
+                }}>
+                  <StarfieldBackground />
+                </div>
+                <img src={aethyxCalligraphy} alt="Aethyx" className="relative z-10 w-full" />
               </div>
-              <img src={aethyxCalligraphy} alt="Aethyx" className="relative z-10 w-full" />
             </div>
             
             <p className="font-display text-lg md:text-xl lg:text-2xl tracking-widest uppercase text-[#1a1a2e]/70 mb-6">
