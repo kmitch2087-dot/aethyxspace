@@ -1,10 +1,6 @@
-import StarfieldBackground from "./StarfieldBackground";
-
 const GlobalBackground = () => {
   return (
-    <div className="fixed inset-0 z-0 bg-[#0a0a14]">
-      <StarfieldBackground />
-    </div>
+    <div className="fixed inset-0 z-0 bg-gradient-to-br from-[#f8f9fc] via-[#eef1f8] to-[#e4e8f2]" />
   );
 };
 
