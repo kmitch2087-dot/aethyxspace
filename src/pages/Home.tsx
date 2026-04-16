@@ -66,24 +66,24 @@ const Home = () => {
               </div>
             </div>
             
-            <p className="font-display text-lg md:text-xl lg:text-2xl tracking-widest uppercase text-[#1a1a2e]/70 mb-6">
+            <p className="font-display text-lg md:text-xl lg:text-2xl tracking-widest uppercase text-[#3a2a10]/80 mb-6">
               Unapologetically
             </p>
-            <p className="text-lg md:text-xl text-[#5a5f72] max-w-2xl mx-auto mb-10">
+            <p className="text-lg md:text-xl text-[#4a3a1a]/70 max-w-2xl mx-auto mb-10">
               Premium web design & digital experiences for ambitious brands.
             </p>
             <Link
               to="/contact"
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-primary-foreground font-semibold tracking-wide uppercase text-sm hover:bg-primary/90 transition-all hover:-translate-y-0.5"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-[#1a1a2e] text-white font-semibold tracking-wide uppercase text-sm hover:bg-[#1a1a2e]/90 transition-all hover:-translate-y-0.5"
             >
               Get Started <ArrowRight className="h-4 w-4" />
             </Link>
-            <p className="text-[#5a5f72]/60 text-sm mt-6 tracking-widest uppercase">
+            <p className="text-[#4a3a1a]/50 text-sm mt-6 tracking-widest uppercase">
               Woman Owned • RI-based • Serving The Entire USA
             </p>
 
             {/* Traffic source buttons */}
-            <p className="text-[#5a5f72]/40 text-xs mt-6 tracking-wider uppercase">How did you find us?</p>
+            <p className="text-[#4a3a1a]/40 text-xs mt-6 tracking-wider uppercase">How did you find us?</p>
             <div className="flex flex-wrap justify-center gap-3 mt-3">
               {trafficButtons.map((btn) => (
                 <button
@@ -95,7 +95,7 @@ const Home = () => {
                       handleTrafficClick(btn.source);
                     }
                   }}
-                  className="px-5 py-2 rounded-full border border-[#d1d5e0] text-[#5a5f72] text-xs tracking-widest uppercase hover:border-primary/50 hover:text-primary transition-all"
+                  className="px-5 py-2 rounded-full border border-[#4a3a1a]/30 text-[#4a3a1a]/60 text-xs tracking-widest uppercase hover:border-[#1a1a2e]/50 hover:text-[#1a1a2e] transition-all"
                 >
                   {btn.label}
                 </button>
