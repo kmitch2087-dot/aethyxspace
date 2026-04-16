@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Phone, User } from "lucide-react";
 import ClientLoginDialog from "@/components/ClientLoginDialog";
+import navLogo from "@/assets/aethyx-calligraphy-updated.png";
 
 const links = [
   { to: "/", label: "Home" },
@@ -22,9 +23,7 @@ const Navbar = () => {
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/30 backdrop-blur-xl bg-background/70">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
           <Link to="/" className="flex items-center gap-1">
-            <span className="font-display text-xl tracking-wider text-foreground">
-              Aethyx<span className="text-primary">.space</span>
-            </span>
+            <img src={navLogo} alt="Aethyx" className="h-8" />
           </Link>
 
           {/* Desktop */}
