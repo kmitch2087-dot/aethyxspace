@@ -56,7 +56,7 @@ const Home = () => {
             <img src={elevateEvolve} alt="Elevate & Evolve" className="mx-auto mb-2 w-[260px] md:w-[380px] lg:w-[460px]" />
             <p className="font-display text-lg md:text-xl lg:text-2xl tracking-widest uppercase text-white/80 mb-6">
               Unapologetically
-            </h1>
+            </p>
             <p className="text-lg md:text-xl text-white/60 max-w-2xl mx-auto mb-10">
               Premium web design & digital experiences for ambitious brands.
             </p>
