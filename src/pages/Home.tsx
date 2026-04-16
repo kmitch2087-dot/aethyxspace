@@ -55,13 +55,13 @@ const Home = () => {
           <div className="px-2 py-10 max-w-7xl mx-auto">
             {/* Logo with gold orbs backdrop blending into background */}
             <div className="relative mx-auto mb-6 -mx-2">
-              <div className="relative overflow-visible" style={{ padding: '8rem 0', margin: '0 -3rem' }}>
+              <div className="relative overflow-visible" style={{ padding: '10rem 0 14rem', margin: '0 -6rem' }}>
                 <div className="absolute inset-0 z-0" style={{
-                  background: 'radial-gradient(ellipse 90% 80% at center, #1a1812 0%, rgba(26,24,18,0.7) 20%, rgba(42,37,24,0.3) 45%, rgba(42,37,24,0.1) 65%, transparent 90%)',
+                  background: 'radial-gradient(ellipse 100% 90% at center 40%, #1a1812 0%, rgba(26,24,18,0.6) 15%, rgba(42,37,24,0.25) 35%, rgba(42,37,24,0.08) 55%, rgba(42,37,24,0.02) 70%, transparent 85%)',
                 }}>
                   <GoldOrbsBackground />
                 </div>
-                <img src={aethyxCalligraphy} alt="Aethyx" className="relative z-10 w-full px-8" />
+                <img src={aethyxCalligraphy} alt="Aethyx" className="relative z-10 w-full px-16" />
               </div>
             </div>
             
