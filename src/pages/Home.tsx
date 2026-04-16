@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Globe, Palette, Layers } from "lucide-react";
-import StarfieldBackground from "@/components/StarfieldBackground";
+import GoldOrbsBackground from "@/components/GoldOrbsBackground";
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -53,15 +53,19 @@ const Home = () => {
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <div className="relative z-10 text-center w-full px-2 pt-20">
           <div className="px-2 py-10 max-w-7xl mx-auto">
-            {/* Logo with starfield backdrop blending into gold */}
+            {/* Logo with gold orbs backdrop blending into background */}
             <div className="relative mx-auto mb-6">
-              <div className="relative overflow-visible" style={{ padding: '4rem 4rem' }}>
-                <div className="absolute inset-0 bg-[#0a0a14] z-0" style={{
-                  maskImage: 'radial-gradient(ellipse 70% 60% at center, black 25%, rgba(0,0,0,0.3) 55%, transparent 85%)',
-                  WebkitMaskImage: 'radial-gradient(ellipse 70% 60% at center, black 25%, rgba(0,0,0,0.3) 55%, transparent 85%)',
+              <div className="relative overflow-visible" style={{ padding: '5rem 5rem' }}>
+                <div className="absolute inset-0 z-0" style={{
+                  background: 'radial-gradient(ellipse 70% 60% at center, #1a1812 0%, #2a2518 30%, rgba(42,37,24,0.4) 55%, transparent 80%)',
                 }}>
-                  <StarfieldBackground />
+                  <GoldOrbsBackground />
                 </div>
+                <div className="absolute inset-0 z-[1] pointer-events-none" style={{
+                  maskImage: 'radial-gradient(ellipse 75% 65% at center, transparent 30%, black 80%)',
+                  WebkitMaskImage: 'radial-gradient(ellipse 75% 65% at center, transparent 30%, black 80%)',
+                  background: 'inherit',
+                }} />
                 <img src={aethyxCalligraphy} alt="Aethyx" className="relative z-10 w-full" />
               </div>
             </div>
