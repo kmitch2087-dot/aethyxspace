@@ -7,6 +7,7 @@ interface AuthContextType {
   session: Session | null;
   isAdmin: boolean;
   loading: boolean;
+  adminChecked: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
@@ -18,6 +19,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [adminChecked, setAdminChecked] = useState(false);
   const adminCheckRef = useRef<string | null>(null);
   const adminResultRef = useRef(false);
 
@@ -38,11 +40,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const result = !error && !!data;
       adminResultRef.current = result;
       setIsAdmin(result);
+      setAdminChecked(true);
       return result;
     } catch {
       if (adminCheckRef.current === userId) {
         adminResultRef.current = false;
         setIsAdmin(false);
+        setAdminChecked(true);
       }
       return false;
     }
@@ -62,6 +66,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } else {
         adminCheckRef.current = null;
         setIsAdmin(false);
+        setAdminChecked(true);
       }
 
       if (mounted) setLoading(false);
@@ -100,11 +105,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     adminCheckRef.current = null;
     adminResultRef.current = false;
     setIsAdmin(false);
+    setAdminChecked(false);
     await supabase.auth.signOut();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, session, isAdmin, loading, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, session, isAdmin, loading, adminChecked, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );
