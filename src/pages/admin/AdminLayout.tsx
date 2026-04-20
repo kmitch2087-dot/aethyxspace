@@ -98,14 +98,14 @@ const AdminLayout = () => {
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-transparent">
         <AdminSidebar />
-        <div className="flex-1 flex flex-col">
-          <header className="h-12 flex items-center border-b border-border/30 px-4">
-            <SidebarTrigger />
-            <span className="ml-4 font-display text-sm tracking-wider text-muted-foreground">
+        <div className="flex-1 flex flex-col bg-white text-black">
+          <header className="h-12 flex items-center border-b border-black/10 px-4 bg-white">
+            <SidebarTrigger className="text-black hover:bg-black/5" />
+            <span className="ml-4 font-display text-sm tracking-wider text-black/60">
               Aethyx<span className="text-primary">.space</span> Admin
             </span>
           </header>
-          <main className="flex-1 p-6">
+          <main className="flex-1 p-6 bg-white text-black [&_*]:!border-black/10">
             <Outlet />
           </main>
         </div>
