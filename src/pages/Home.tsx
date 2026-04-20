@@ -50,56 +50,68 @@ const Home = () => {
       <Navbar />
 
       {/* Hero */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        <div className="relative z-10 text-center w-full px-2 pt-20">
-          <div className="px-2 py-10 max-w-7xl mx-auto">
-            {/* Logo with gold orbs backdrop blending into background */}
-            <div className="relative mx-auto mb-6">
-              <div className="relative overflow-visible" style={{ padding: '16rem 0 14rem', margin: '-6rem calc(50% - 50vw) 0', width: '100vw', marginLeft: 'calc(50% - 50vw)', marginRight: 'calc(50% - 50vw)' }}>
-                <div className="absolute inset-0 z-0" style={{
-                  background: 'radial-gradient(ellipse 70% 90% at center 40%, #1a1812 0%, rgba(26,24,18,0.6) 15%, rgba(42,37,24,0.25) 35%, rgba(42,37,24,0.08) 55%, rgba(42,37,24,0.02) 70%, transparent 85%)',
-                }}>
-                  <GoldOrbsBackground />
-                </div>
-                <img src={aethyxCalligraphy} alt="Aethyx" className="relative z-10 w-full max-w-7xl mx-auto px-16" />
-              </div>
-            </div>
-            
-            <p className="font-display text-lg md:text-xl lg:text-2xl tracking-widest uppercase text-[#3a2a10]/80 mb-6">
-              Unapologetically
-            </p>
-            <p className="text-lg md:text-xl text-[#4a3a1a]/70 max-w-2xl mx-auto mb-10">
-              Premium web design & digital experiences for ambitious brands.
-            </p>
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-32 pb-24 px-6">
+        {/* Ghost wordmark */}
+        <div
+          aria-hidden
+          className="pointer-events-none select-none absolute inset-0 flex items-center justify-center"
+        >
+          <span className="font-display font-black tracking-tight text-outline opacity-[0.07] text-[28vw] leading-none whitespace-nowrap">
+            AETHYX
+          </span>
+        </div>
+
+        <div className="relative z-10 text-center w-full max-w-5xl mx-auto">
+          <p className="text-primary text-xs md:text-sm tracking-[0.4em] uppercase mb-8">
+            Ready to Shift?
+          </p>
+
+          <h1 className="font-display font-black tracking-tight leading-[1.02] text-5xl md:text-7xl lg:text-[6.5rem] mb-8">
+            <span className="block text-foreground">Build something</span>
+            <span className="block text-outline">they can't ignore.</span>
+          </h1>
+
+          <p className="text-foreground/70 text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed">
+            Book a consultation and let's build a digital presence that actually represents you.
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-14">
             <Link
               to="/contact"
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-[#1a1a2e] text-white font-semibold tracking-wide uppercase text-sm hover:bg-[#1a1a2e]/90 transition-all hover:-translate-y-0.5"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-primary-foreground font-semibold tracking-[0.2em] uppercase text-sm hover:bg-primary/90 transition-all hover:-translate-y-0.5"
             >
-              Get Started <ArrowRight className="h-4 w-4" />
+              Book a Consultation <ArrowRight className="h-4 w-4" />
             </Link>
-            <p className="text-[#4a3a1a]/50 text-sm mt-6 tracking-widest uppercase">
-              Woman Owned • RI-based • Serving The Entire USA
-            </p>
+            <Link
+              to="/services"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-full border border-foreground/30 text-foreground font-semibold tracking-[0.2em] uppercase text-sm hover:border-foreground/60 transition-all"
+            >
+              View Services
+            </Link>
+          </div>
 
-            {/* Traffic source buttons */}
-            <p className="text-[#4a3a1a]/40 text-xs mt-6 tracking-wider uppercase">How did you find us?</p>
-            <div className="flex flex-wrap justify-center gap-3 mt-3">
-              {trafficButtons.map((btn) => (
-                <button
-                  key={btn.source}
-                  onClick={() => {
-                    if (btn.source === "other") {
-                      setOtherOpen(true);
-                    } else {
-                      handleTrafficClick(btn.source);
-                    }
-                  }}
-                  className="px-5 py-2 rounded-full border border-[#4a3a1a]/30 text-[#4a3a1a]/60 text-xs tracking-widest uppercase hover:border-[#1a1a2e]/50 hover:text-[#1a1a2e] transition-all"
-                >
-                  {btn.label}
-                </button>
-              ))}
-            </div>
+          <p className="text-foreground/40 text-xs tracking-[0.3em] uppercase">
+            Woman Owned • RI-based • Serving The Entire USA
+          </p>
+
+          {/* Traffic source buttons */}
+          <p className="text-foreground/40 text-xs mt-10 tracking-[0.25em] uppercase">How did you find us?</p>
+          <div className="flex flex-wrap justify-center gap-3 mt-4">
+            {trafficButtons.map((btn) => (
+              <button
+                key={btn.source}
+                onClick={() => {
+                  if (btn.source === "other") {
+                    setOtherOpen(true);
+                  } else {
+                    handleTrafficClick(btn.source);
+                  }
+                }}
+                className="px-5 py-2 rounded-full border border-foreground/20 text-foreground/60 text-xs tracking-[0.25em] uppercase hover:border-primary/60 hover:text-primary transition-all"
+              >
+                {btn.label}
+              </button>
+            ))}
           </div>
         </div>
       </section>

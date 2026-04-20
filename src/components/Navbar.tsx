@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Phone, User } from "lucide-react";
 import ClientLoginDialog from "@/components/ClientLoginDialog";
+import ServicesTicker from "@/components/ServicesTicker";
 import navLogo from "@/assets/aethyx-calligraphy-updated.png";
 
 const links = [
@@ -100,6 +101,7 @@ const Navbar = () => {
             </button>
           </div>
         )}
+        <ServicesTicker />
       </nav>
 
       <ClientLoginDialog open={loginOpen} onClose={() => setLoginOpen(false)} />

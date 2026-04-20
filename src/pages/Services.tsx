@@ -105,20 +105,21 @@ const Services = () => (
     </section>
 
     {/* 2. POSITIONING */}
-    <section className="py-20 px-6 border-t border-border/20">
-      <div className="max-w-3xl mx-auto">
-        <h2 className="font-display text-3xl md:text-4xl mb-8">
-          Most businesses don't need just a website — they need a <span className="text-primary">system</span>.
+    <section className="py-24 md:py-32 px-6 border-t border-border/20">
+      <div className="max-w-5xl mx-auto">
+        <h2 className="font-display text-3xl md:text-5xl lg:text-6xl leading-[1.15] mb-10 tracking-tight">
+          Most agencies give you a website.
+          <br />
+          We give you a <span className="text-primary">digital infrastructure</span> —
+          <br />
+          built around <span style={{ color: "hsl(43 60% 65%)" }}>how your business actually operates.</span>
         </h2>
-        <p className="text-muted-foreground text-lg leading-relaxed mb-6">
-          We build connected digital infrastructures that combine brand strategy, website development, user experience, automation, marketing systems, and long-term scalability — all under one roof.
-        </p>
-        <p className="text-muted-foreground text-lg leading-relaxed mb-6">
-          This is not template-based work. Every system is custom-built around how your business operates and grows.
-        </p>
-        <p className="text-foreground/60 text-sm italic">
-          Our work often replaces the need for multiple agencies by combining strategy, design, development, and systems into one cohesive build.
-        </p>
+        <div className="flex items-start gap-3 mt-12 max-w-2xl">
+          <span className="block w-[3px] self-stretch bg-primary/70 rounded-full" />
+          <p className="text-foreground/70 text-xs md:text-sm tracking-[0.25em] uppercase leading-relaxed">
+            No templates. No fluff. No agencies pretending a SaaS dashboard is strategy.
+          </p>
+        </div>
       </div>
     </section>
 
