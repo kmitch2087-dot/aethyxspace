@@ -68,6 +68,10 @@ const Home = () => {
             <span className="block text-outline">they can't ignore.</span>
           </h1>
 
+          <p className="text-primary/90 font-display text-base md:text-lg tracking-[0.3em] uppercase mb-6">
+            Built to stand out, designed to perform.
+          </p>
+
           <p className="text-foreground/70 text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed">
             Book a consultation & let's build a digital presence that actually represents you.
           </p>
