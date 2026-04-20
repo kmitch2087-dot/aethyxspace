@@ -11,26 +11,26 @@ const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const { signIn, user, isAdmin, loading } = useAuth();
+  const { signIn, user, isAdmin, loading, adminChecked } = useAuth();
   const navigate = useNavigate();
 
   // Redirect once auth has resolved and user is admin
   useEffect(() => {
-    if (!loading && user && isAdmin) {
+    if (!loading && adminChecked && user && isAdmin) {
       navigate("/admin", { replace: true });
     }
-  }, [loading, user, isAdmin, navigate]);
+  }, [loading, adminChecked, user, isAdmin, navigate]);
 
-  // Show message if signed in but not admin
+  // Show message ONLY after admin check has truly completed
   useEffect(() => {
-    if (!loading && user && !isAdmin && !submitting) {
+    if (!loading && adminChecked && user && !isAdmin && !submitting) {
       toast({
         title: "Access denied",
         description: "Your account does not have admin privileges.",
         variant: "destructive",
       });
     }
-  }, [loading, user, isAdmin, submitting]);
+  }, [loading, adminChecked, user, isAdmin, submitting]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +44,6 @@ const AdminLogin = () => {
         setSubmitting(false);
       }
       // On success, don't reset submitting — let the redirect useEffect handle it
-      // This prevents the button from flickering back to "Sign In"
     } catch {
       toast({ title: "Login failed", description: "An unexpected error occurred.", variant: "destructive" });
       setSubmitting(false);
@@ -53,13 +52,10 @@ const AdminLogin = () => {
 
   // Reset submitting state once auth fully resolves after login
   useEffect(() => {
-    if (!loading && submitting) {
-      // Auth resolved — if we're not redirecting (not admin), reset
-      if (!isAdmin) {
-        setSubmitting(false);
-      }
+    if (!loading && adminChecked && submitting && !isAdmin) {
+      setSubmitting(false);
     }
-  }, [loading, isAdmin, submitting]);
+  }, [loading, adminChecked, isAdmin, submitting]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-transparent px-4">
