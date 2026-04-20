@@ -22,7 +22,7 @@ const Membership = () => {
               Site Maintenance Membership
             </h1>
             <p className="text-lg text-foreground leading-relaxed max-w-2xl mx-auto font-sans font-medium md:text-2xl">
-              Keep your website running smoothly with ongoing care, updates, and priority support.
+              Keep your website running smoothly with ongoing care, updates, & priority support.
             </p>
           </div>
         </div>
@@ -39,7 +39,7 @@ const Membership = () => {
               </div>
               
               <p className="text-foreground text-lg md:text-xl leading-relaxed font-medium mb-8">
-                Everything you need to keep your site secure, updated, and performing at its best.
+                Everything you need to keep your site secure, updated, & performing at its best.
               </p>
               
               <Button size="lg" onClick={() => setWaitingListOpen(true)} className="w-full text-base px-8 py-6 rounded-full bg-sage hover:bg-sage/90 text-white shadow-warm transition-all duration-300 hover:shadow-warm-lg hover:-translate-y-0.5">
@@ -67,12 +67,12 @@ const Membership = () => {
               {[{
               icon: RefreshCw,
               title: "Regular Updates",
-              desc: "Software updates, security patches, and plugin maintenance to keep everything current.",
+              desc: "Software updates, security patches, & plugin maintenance to keep everything current.",
               color: "sage"
             }, {
               icon: Shield,
               title: "Security Monitoring",
-              desc: "Ongoing security checks and backups to protect your site and your visitors.",
+              desc: "Ongoing security checks & backups to protect your site & your visitors.",
               color: "ocean"
             }, {
               icon: Zap,
@@ -82,7 +82,7 @@ const Membership = () => {
             }, {
               icon: CheckCircle2,
               title: "Content Updates",
-              desc: "Small text and image updates included each month to keep your site fresh.",
+              desc: "Small text & image updates included each month to keep your site fresh.",
               color: "ocean"
             }].map((item, i) => <div key={i} className="card-elevated rounded-3xl p-5 md:p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-warm-lg">
                   <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 shadow-soft ${item.color === 'sage' ? 'bg-gradient-to-br from-sage-light to-sage-muted' : 'bg-gradient-to-br from-ocean-light to-ocean-muted'}`}>

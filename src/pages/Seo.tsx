@@ -63,7 +63,7 @@ const Seo = () => {
                   <div>
                     <h3 className="font-semibold text-lg text-foreground mb-2">Trust & Credibility</h3>
                     <p className="text-foreground font-medium leading-relaxed">
-                      Websites that appear in search results are often perceived as more trustworthy and established.
+                      Websites that appear in search results are often perceived as more trustworthy & established.
                     </p>
                   </div>
                 </div>

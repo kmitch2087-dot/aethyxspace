@@ -119,8 +119,8 @@ const ServiceSelectionPopup = ({ open, onOpenChange, serviceName }: ServiceSelec
                     <span className="px-3 py-1 bg-sage text-white text-sm font-semibold rounded-full">$50</span>
                   </div>
                   <p className="text-muted-foreground mb-4 leading-relaxed">
-                    Get a detailed report and personalized overview of your current online presence and website versatility. 
-                    This analysis will help us determine the perfect package for your specific goals and needs.
+                    Get a detailed report & personalized overview of your current online presence & website versatility. 
+                    This analysis will help us determine the perfect package for your specific goals & needs.
                   </p>
                   <ul className="space-y-2 mb-4">
                     <li className="flex items-center gap-2 text-sm text-foreground">
@@ -171,7 +171,7 @@ const ServiceSelectionPopup = ({ open, onOpenChange, serviceName }: ServiceSelec
                     <span className="px-3 py-1 bg-ocean/10 text-ocean text-sm font-semibold rounded-full">Free</span>
                   </div>
                   <p className="text-muted-foreground mb-4 leading-relaxed">
-                    Just want to explore your options? Fill out our quick intake form and schedule a 15-minute call 
+                    Just want to explore your options? Fill out our quick intake form & schedule a 15-minute call 
                     or discuss possibilities over email. No commitment required.
                   </p>
                   <Button 
@@ -258,7 +258,7 @@ const ServiceSelectionPopup = ({ open, onOpenChange, serviceName }: ServiceSelec
               </form>
 
               <p className="text-center text-xs text-muted-foreground mt-4 font-light">
-                Secure payment powered by Stripe. After payment, you'll receive a receipt and be redirected to submit your intake form.
+                Secure payment powered by Stripe. After payment, you'll receive a receipt & be redirected to submit your intake form.
               </p>
             </div>
           </div>

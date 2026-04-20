@@ -167,7 +167,7 @@ const ReviewSubmissionPopup = ({ open, onOpenChange }: ReviewSubmissionPopupProp
               Thank You!
             </DialogTitle>
             <DialogDescription className="text-base text-muted-foreground mb-6">
-              Your review has been submitted and is pending approval. We appreciate you taking the time to share your experience!
+              Your review has been submitted & is pending approval. We appreciate you taking the time to share your experience!
             </DialogDescription>
             <Button
               onClick={() => handleClose(false)}
@@ -244,7 +244,7 @@ const ReviewSubmissionPopup = ({ open, onOpenChange }: ReviewSubmissionPopupProp
             />
           </div>
 
-          {/* City and State */}
+          {/* City & State */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="city" className="text-sm font-medium text-foreground">

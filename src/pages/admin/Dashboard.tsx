@@ -190,7 +190,7 @@ const Dashboard = () => {
                   <CardTitle className="text-lg">Facebook Business Page</CardTitle>
                 </div>
                 <CardDescription>
-                  Auto-post published blog articles to your Facebook page. Enter your Page ID and long-lived Page Access Token below.
+                  Auto-post published blog articles to your Facebook page. Enter your Page ID & long-lived Page Access Token below.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">

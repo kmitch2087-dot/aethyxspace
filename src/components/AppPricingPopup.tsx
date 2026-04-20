@@ -45,7 +45,7 @@ const AppPricingPopup = ({ open, onOpenChange, onSelectOption }: AppPricingPopup
               Native App (Apple & Google Play Store)
             </h3>
             <p className="text-sm text-muted-foreground mb-4">
-              A fully downloadable app for iOS and Android devices, available in the app stores.
+              A fully downloadable app for iOS & Android devices, available in the app stores.
             </p>
             <div className="grid md:grid-cols-2 gap-4">
               <Button
@@ -100,7 +100,7 @@ const AppPricingPopup = ({ open, onOpenChange, onSelectOption }: AppPricingPopup
 
           <div className="bg-sage-light/50 rounded-xl p-4 mt-6">
             <p className="text-sm text-foreground text-center">
-              <strong>Not sure which to choose?</strong> Native apps are best for complex functionality and app store presence. PWAs are perfect for simple, fast access without the app store overhead.
+              <strong>Not sure which to choose?</strong> Native apps are best for complex functionality & app store presence. PWAs are perfect for simple, fast access without the app store overhead.
             </p>
           </div>
         </div>

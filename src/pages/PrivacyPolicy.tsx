@@ -15,7 +15,7 @@ const PrivacyPolicy = () => {
 
           <div className="space-y-8 text-base text-muted-foreground leading-relaxed">
             <p>
-              Vibe Shift Studio respects your privacy and is committed to protecting any personal information you provide through this website, social media, or business forms.
+              Vibe Shift Studio respects your privacy & is committed to protecting any personal information you provide through this website, social media, or business forms.
             </p>
 
             <section>
@@ -25,7 +25,7 @@ const PrivacyPolicy = () => {
                 <li>Name, email address, phone number, or social media handle</li>
                 <li>Business details submitted through contact or intake forms</li>
                 <li>Messages, project requests, or educational inquiries</li>
-                <li>Basic website analytics such as device type, browser, and page visits</li>
+                <li>Basic website analytics such as device type, browser, & page visits</li>
               </ul>
             </section>
 
@@ -35,7 +35,7 @@ const PrivacyPolicy = () => {
               <ul className="list-disc pl-6 space-y-1">
                 <li>Respond to inquiries or provide web design, branding, or educational services</li>
                 <li>Deliver resources, updates, or service communications</li>
-                <li>Improve website performance and marketing strategy</li>
+                <li>Improve website performance & marketing strategy</li>
                 <li>Process bookings or service requests</li>
               </ul>
             </section>
@@ -43,7 +43,7 @@ const PrivacyPolicy = () => {
             <section>
               <h2 className="text-xl font-semibold text-foreground mb-3">3. Education & Results Disclaimer</h2>
               <p>
-                Some services include coaching or education related to branding, web design, marketing, or digital revenue ecosystems. Information provided is educational in nature and does not guarantee specific business results, income, or platform approval.
+                Some services include coaching or education related to branding, web design, marketing, or digital revenue ecosystems. Information provided is educational in nature & does not guarantee specific business results, income, or platform approval.
               </p>
             </section>
 

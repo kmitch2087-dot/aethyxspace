@@ -95,7 +95,7 @@ const Financials = () => {
 
   const handleSave = async () => {
     if (!form.client_name.trim() || !form.amount) {
-      toast({ title: "Client name and amount are required", variant: "destructive" });
+      toast({ title: "Client name & amount are required", variant: "destructive" });
       return;
     }
     const payload = {

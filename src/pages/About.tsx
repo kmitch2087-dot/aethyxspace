@@ -46,7 +46,7 @@ const About = () => (
 
         <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
           <p>
-            Every project gets the same energy: deep attention to brand, obsessive detail on the user experience, and a final product that makes people stop and say,
+            Every project gets the same energy: deep attention to brand, obsessive detail on the user experience, & a final product that makes people stop & say,
             <br />
             <span className="text-primary italic">"Who built this?"</span>
           </p>
@@ -65,7 +65,7 @@ const About = () => (
             </div>
             <h3 className="font-display text-2xl mb-3">Our Team</h3>
             <p className="text-muted-foreground text-sm leading-relaxed">
-              A lean, focused creative studio led by Kristin Mitchell. We bring deep expertise in web design, branding, and digital strategy — partnering closely with every client to deliver work that's unmistakably theirs.
+              A lean, focused creative studio led by Kristin Mitchell. We bring deep expertise in web design, branding, & digital strategy — partnering closely with every client to deliver work that's unmistakably theirs.
             </p>
           </div>
 
@@ -75,7 +75,7 @@ const About = () => (
             </div>
             <h3 className="font-display text-2xl mb-3">Our Values</h3>
             <p className="text-muted-foreground text-sm leading-relaxed">
-              Bold over safe. Clarity over complexity. Craft over shortcuts. We believe every business deserves a digital presence that commands respect — and we don't stop until it does.
+              Bold over safe. Clarity over complexity. Craft over shortcuts. We believe every business deserves a digital presence that commands respect — & we don't stop until it does.
             </p>
           </div>
         </div>

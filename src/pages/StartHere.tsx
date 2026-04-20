@@ -23,7 +23,7 @@ const StartHere = () => {
               You don't need to have everything figured out before reaching out.
             </p>
             <p className="text-lg md:text-xl text-muted-foreground leading-relaxed font-light mt-4">
-              This process is designed to be simple, clear, and low-pressure. Answer a few questions, and I'll take it from there.
+              This process is designed to be simple, clear, & low-pressure. Answer a few questions, & I'll take it from there.
             </p>
           </div>
         </div>
@@ -41,7 +41,7 @@ const StartHere = () => {
               What happens next
             </h2>
             <p className="text-muted-foreground text-lg md:text-xl leading-relaxed font-light mb-10">
-              Once you submit the form, I'll review your responses and follow up with next steps.
+              Once you submit the form, I'll review your responses & follow up with next steps.
               You'll never be pushed into something you don't need — this is about building the right thing, at the right pace.
             </p>
             
@@ -77,7 +77,7 @@ const StartHere = () => {
                 Choose Your Path
               </h2>
               <p className="text-muted-foreground text-lg leading-relaxed font-light max-w-2xl mx-auto">
-                Fill out the intake form to share your needs, or book a paid consultation for a comprehensive review and action plan.
+                Fill out the intake form to share your needs, or book a paid consultation for a comprehensive review & action plan.
               </p>
             </div>
 
@@ -92,7 +92,7 @@ const StartHere = () => {
                     Client Intake Form
                   </h3>
                   <p className="text-muted-foreground font-light leading-relaxed">
-                    Share a bit about your business and what you're looking for. I'll review your responses and reach out with next steps.
+                    Share a bit about your business & what you're looking for. I'll review your responses & reach out with next steps.
                   </p>
                 </div>
                 

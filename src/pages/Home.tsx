@@ -12,8 +12,8 @@ import kokopelliThumb from "@/assets/portfolio/kokopelli-thumb.png";
 import vibeshiftThumb from "@/assets/portfolio/vibeshift-thumb.png";
 
 const services = [
-  { icon: Globe, title: "Web Design", desc: "Custom websites that command attention and convert." },
-  { icon: Palette, title: "Branding & Identity", desc: "Logos, assets, and identity systems built to last." },
+  { icon: Globe, title: "Web Design", desc: "Custom websites that command attention & convert." },
+  { icon: Palette, title: "Branding & Identity", desc: "Logos, assets, & identity systems built to last." },
   { icon: Layers, title: "Digital Experiences", desc: "E-commerce, dashboards, booking — everything you need." },
 ];
 
@@ -69,7 +69,7 @@ const Home = () => {
           </h1>
 
           <p className="text-foreground/70 text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed">
-            Book a consultation and let's build a digital presence that actually represents you.
+            Book a consultation & let's build a digital presence that actually represents you.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-14">
@@ -181,7 +181,7 @@ const Home = () => {
         <p className="text-primary text-xs tracking-[0.4em] uppercase mb-4">Ready to Shift?</p>
         <h2 className="font-display text-3xl md:text-5xl mb-6 tracking-tight">Let's build something they can't ignore.</h2>
         <p className="text-muted-foreground text-lg max-w-xl mx-auto mb-10">
-          Book a consultation and let's build a digital presence that actually represents you.
+          Book a consultation & let's build a digital presence that actually represents you.
         </p>
         <Link
           to="/contact"

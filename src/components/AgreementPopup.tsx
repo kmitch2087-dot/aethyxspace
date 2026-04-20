@@ -57,12 +57,12 @@ const AgreementPopup = ({
             Service Agreement Required
           </DialogTitle>
           <DialogDescription className="text-base text-muted-foreground mt-2">
-            Before proceeding to payment for <span className="font-semibold text-foreground">{serviceName}</span>, please review and sign the service agreement.
+            Before proceeding to payment for <span className="font-semibold text-foreground">{serviceName}</span>, please review & sign the service agreement.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Step 1: Open and Complete Form */}
+          {/* Step 1: Open & Complete Form */}
           <div className="bg-sage-light/30 rounded-xl p-4">
             <div className="flex items-start gap-3 mb-3">
               <div className="w-6 h-6 rounded-full bg-sage text-white flex items-center justify-center text-sm font-bold flex-shrink-0">
@@ -71,7 +71,7 @@ const AgreementPopup = ({
               <div>
                 <h3 className="font-semibold text-foreground">Review & Sign Agreement</h3>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Click the button below to open the service agreement form in a new tab. Please complete and submit the form.
+                  Click the button below to open the service agreement form in a new tab. Please complete & submit the form.
                 </p>
               </div>
             </div>
@@ -121,7 +121,7 @@ const AgreementPopup = ({
                   !formOpened ? "text-muted-foreground/50" : "text-foreground"
                 }`}
               >
-                I have read, understood, and submitted the service agreement form
+                I have read, understood, & submitted the service agreement form
               </label>
             </div>
           </div>

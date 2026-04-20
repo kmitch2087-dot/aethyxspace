@@ -20,11 +20,11 @@ const coreServices = [
     title: "Website & Platform Development",
     items: [
       "Custom website design & development",
-      "Booking and scheduling systems",
-      "E-commerce and digital product systems",
-      "Membership and user portal builds",
+      "Booking & scheduling systems",
+      "E-commerce & digital product systems",
+      "Membership & user portal builds",
       "Multi-role platforms (admin, client, provider dashboards)",
-      "App planning and platform architecture",
+      "App planning & platform architecture",
     ],
   },
   {
@@ -35,7 +35,7 @@ const coreServices = [
       "Client onboarding systems",
       "Internal business systems",
       "Data flow structuring",
-      "Integration of tools and platforms",
+      "Integration of tools & platforms",
       "Operational efficiency design",
     ],
   },
@@ -53,10 +53,10 @@ const coreServices = [
 ];
 
 const processSteps = [
-  { step: "01", title: "Discovery & Strategy", desc: "We learn your business, your audience, and your goals to define the right digital infrastructure." },
-  { step: "02", title: "System Architecture & Planning", desc: "We map out the full ecosystem — features, integrations, user flows, and long-term scalability." },
+  { step: "01", title: "Discovery & Strategy", desc: "We learn your business, your audience, & your goals to define the right digital infrastructure." },
+  { step: "02", title: "System Architecture & Planning", desc: "We map out the full ecosystem — features, integrations, user flows, & long-term scalability." },
   { step: "03", title: "Design & Development", desc: "Every element is custom-built with precision, from brand visuals to backend functionality." },
-  { step: "04", title: "Launch & Ongoing Support", desc: "We launch your platform and provide continued protection, optimization, and strategic guidance." },
+  { step: "04", title: "Launch & Ongoing Support", desc: "We launch your platform & provide continued protection, optimization, & strategic guidance." },
 ];
 
 const quickServices = Object.values(QUICK_SERVICES);
@@ -85,7 +85,7 @@ const Services = () => (
           We Don't Just Build Websites — We Build Digital Ecosystems
         </h1>
         <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
-          We design, develop, and maintain fully integrated digital platforms that support your business growth, operations, and customer experience.
+          We design, develop, & maintain fully integrated digital platforms that support your business growth, operations, & customer experience.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
@@ -165,7 +165,7 @@ const Services = () => (
               <div>
                 <h4 className="font-display text-lg mb-2">SEO & Search Optimization</h4>
                 <p className="text-muted-foreground text-sm leading-relaxed">
-                  Every site is built with search visibility in mind — from metadata and structured content to performance optimization — so your business gets found by the right people.
+                  Every site is built with search visibility in mind — from metadata & structured content to performance optimization — so your business gets found by the right people.
                 </p>
               </div>
             </div>
@@ -176,7 +176,7 @@ const Services = () => (
               <div>
                 <h4 className="font-display text-lg mb-2">Industry & Compliance Research</h4>
                 <p className="text-muted-foreground text-sm leading-relaxed">
-                  We research the laws, regulations, and best practices specific to your industry and location — ensuring your site isn't just beautiful, but fully compliant and trustworthy.
+                  We research the laws, regulations, & best practices specific to your industry & location — ensuring your site isn't just beautiful, but fully compliant & trustworthy.
                 </p>
               </div>
             </div>
@@ -195,20 +195,20 @@ const Services = () => (
         </div>
         <h2 className="font-display text-3xl md:text-5xl text-center mb-6">Ongoing Platform Protection</h2>
         <p className="text-center text-muted-foreground text-lg mb-8 max-w-2xl mx-auto leading-relaxed">
-          Your digital platform is not a one-time build — it requires ongoing protection, maintenance, and optimization to perform at its best.
+          Your digital platform is not a one-time build — it requires ongoing protection, maintenance, & optimization to perform at its best.
         </p>
 
         <div className="glass-card p-8 md:p-10 mb-8">
           <p className="text-muted-foreground text-sm mb-6 leading-relaxed">
-            We offer continued support to ensure your system remains secure, functional, optimized, and scalable. This includes:
+            We offer continued support to ensure your system remains secure, functional, optimized, & scalable. This includes:
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
               "Security monitoring",
               "Performance optimization",
-              "Backup and recovery systems",
+              "Backup & recovery systems",
               "Uptime monitoring",
-              "System updates and maintenance",
+              "System updates & maintenance",
               "Integration monitoring",
               "Priority support when issues arise",
             ].map((item) => (
@@ -250,10 +250,10 @@ const Services = () => (
       <div className="max-w-3xl mx-auto text-center">
         <h2 className="font-display text-3xl md:text-4xl mb-8">Pricing</h2>
         <p className="text-muted-foreground text-lg leading-relaxed mb-6">
-          Every project is custom scoped based on system complexity, number of features, integrations required, and long-term business goals.
+          Every project is custom scoped based on system complexity, number of features, integrations required, & long-term business goals.
         </p>
         <p className="text-foreground font-display text-xl mb-8">
-          Every build is tailored to your goals — reach out and we'll scope a solution that fits.
+          Every build is tailored to your goals — reach out & we'll scope a solution that fits.
         </p>
         <Link
           to="/contact"
@@ -386,7 +386,7 @@ const Services = () => (
             </div>
             <h3 className="font-display text-xl mb-3">AI Search Optimization</h3>
             <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-              Google isn't the only search engine anymore. ChatGPT, Perplexity, and Gemini are now how people discover businesses. We structure your digital presence so AI engines cite <em>you</em> as the answer — not your competitor.
+              Google isn't the only search engine anymore. ChatGPT, Perplexity, & Gemini are now how people discover businesses. We structure your digital presence so AI engines cite <em>you</em> as the answer — not your competitor.
             </p>
             <p className="text-primary/70 text-xs uppercase tracking-widest font-semibold">Generative Engine Optimization (GEO)</p>
           </div>
@@ -397,7 +397,7 @@ const Services = () => (
             </div>
             <h3 className="font-display text-xl mb-3">Cinematic Brand Media</h3>
             <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-              Static websites are becoming background noise. We create video-first brand experiences — cinematic practice previews, motion-driven storytelling, and dynamic content that stops the scroll and builds trust before a single word is read.
+              Static websites are becoming background noise. We create video-first brand experiences — cinematic practice previews, motion-driven storytelling, & dynamic content that stops the scroll & builds trust before a single word is read.
             </p>
             <p className="text-primary/70 text-xs uppercase tracking-widest font-semibold">Video-First Digital Presence</p>
           </div>
