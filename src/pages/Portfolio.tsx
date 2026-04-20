@@ -19,7 +19,7 @@ const projects = [
     title: "Rē Retreats",
     tagline: "rēset • rēstore • rēimagine",
     subtitle: "Where Women Come Home to Themselves",
-    description: "Women's Wellness Retreats in the Mountains of Southern Vermont. A serene, nature-inspired brand and web presence designed to reflect the transformative retreat experience.",
+    description: "Women's Wellness Retreats in the Mountains of Southern Vermont. A serene, nature-inspired brand & web presence designed to reflect the transformative retreat experience.",
     url: "https://re-retreats.com",
     images: [
       { src: rr1, alt: "Rē Retreats homepage" },

@@ -236,7 +236,7 @@ const Media = () => {
         <div>
           <h1 className="text-2xl font-display tracking-wider">Media Gallery</h1>
           <p className="text-sm text-black/60 mt-1">
-            Private image, video, and asset library.
+            Private image, video, & asset library.
           </p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>

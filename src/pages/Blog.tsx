@@ -38,7 +38,7 @@ const Blog = () => {
       <main className="pt-24 pb-16 px-6 max-w-5xl mx-auto">
         <h1 className="text-4xl md:text-5xl font-display tracking-wider mb-4">Blog</h1>
         <p className="text-muted-foreground mb-12 max-w-2xl">
-          Insights on branding, web design, and growing your digital presence.
+          Insights on branding, web design, & growing your digital presence.
         </p>
 
         {loading ? (

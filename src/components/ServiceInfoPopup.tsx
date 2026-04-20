@@ -22,15 +22,15 @@ const tierDetails = {
     features: [
       {
         name: "One-page scrolling website",
-        description: "A beautifully designed single-page site that tells your story from top to bottom. Includes hero section, about, services overview, and contact information."
+        description: "A beautifully designed single-page site that tells your story from top to bottom. Includes hero section, about, services overview, & contact information."
       },
       {
         name: "Mobile optimization",
-        description: "Your site will look and function flawlessly on phones and tablets—where most of your visitors will be."
+        description: "Your site will look & function flawlessly on phones & tablets—where most of your visitors will be."
       },
       {
         name: "Clear call-to-action",
-        description: "Strategic placement of buttons and prompts that guide visitors toward contacting you or taking the next step."
+        description: "Strategic placement of buttons & prompts that guide visitors toward contacting you or taking the next step."
       },
       {
         name: "Domain connection",
@@ -38,11 +38,11 @@ const tierDetails = {
       },
       {
         name: "Light SEO setup",
-        description: "Basic search engine optimization including meta titles, descriptions, and proper page structure to help you get found online."
+        description: "Basic search engine optimization including meta titles, descriptions, & proper page structure to help you get found online."
       },
       {
         name: "One revision included",
-        description: "After the initial build is complete and you're happy with the foundation, you get one revision session to refine the details."
+        description: "After the initial build is complete & you're happy with the foundation, you get one revision session to refine the details."
       }
     ],
     revisionNote: null
@@ -50,16 +50,16 @@ const tierDetails = {
   2: {
     title: "Professional Brand Website",
     subtitle: "Tier 2",
-    intro: "For businesses ready to level up their online presence with clearer messaging and more structure. This builds on everything in Tier 1 with expanded capabilities.",
+    intro: "For businesses ready to level up their online presence with clearer messaging & more structure. This builds on everything in Tier 1 with expanded capabilities.",
     inheritNote: "Everything included in Tier 1, plus:",
     features: [
       {
         name: "Multi-section or multi-page website",
-        description: "Expand beyond a single page with dedicated sections or separate pages for services, about, contact, testimonials, and more."
+        description: "Expand beyond a single page with dedicated sections or separate pages for services, about, contact, testimonials, & more."
       },
       {
         name: "Done-for-you copywriting",
-        description: "No more staring at a blank page. I'll craft compelling copy that speaks to your ideal clients and reflects your brand voice."
+        description: "No more staring at a blank page. I'll craft compelling copy that speaks to your ideal clients & reflects your brand voice."
       },
       {
         name: "Contact forms",
@@ -67,36 +67,36 @@ const tierDetails = {
       },
       {
         name: "SEO foundations",
-        description: "Comprehensive SEO setup including keyword optimization, image alt texts, structured data, and sitemap submission."
+        description: "Comprehensive SEO setup including keyword optimization, image alt texts, structured data, & sitemap submission."
       },
       {
         name: "Launch-ready build",
-        description: "Your site is delivered polished, tested, and ready to go live—not a rough draft you have to finish yourself."
+        description: "Your site is delivered polished, tested, & ready to go live—not a rough draft you have to finish yourself."
       },
       {
         name: "Two revisions included",
-        description: "After the site is polished and you resonate with it, you get two revision sessions to make changes."
+        description: "After the site is polished & you resonate with it, you get two revision sessions to make changes."
       }
     ],
-    revisionNote: "Revision sessions begin once the site is polished and you feel aligned with it. Take a week or two to sit with it, keep notes on any changes you'd like, and we'll refine together. Functionality bugs and fixes are treated with priority and do not count toward your revision credits."
+    revisionNote: "Revision sessions begin once the site is polished & you feel aligned with it. Take a week or two to sit with it, keep notes on any changes you'd like, & we'll refine together. Functionality bugs & fixes are treated with priority & do not count toward your revision credits."
   },
   3: {
     title: "Signature Brand Presence",
     subtitle: "Tier 3",
-    intro: "For brands that want a cohesive, aligned presence across their website and messaging. This is the complete package for businesses serious about their brand.",
+    intro: "For brands that want a cohesive, aligned presence across their website & messaging. This is the complete package for businesses serious about their brand.",
     inheritNote: "Everything included in Tier 1 & 2, plus:",
     features: [
       {
         name: "Full website build",
-        description: "A comprehensive, custom-designed website with all the pages and functionality your business needs to thrive online."
+        description: "A comprehensive, custom-designed website with all the pages & functionality your business needs to thrive online."
       },
       {
         name: "Brand kit (colors, fonts, direction)",
-        description: "A complete visual identity guide including your color palette, typography choices, and design direction you can use across all platforms."
+        description: "A complete visual identity guide including your color palette, typography choices, & design direction you can use across all platforms."
       },
       {
         name: "Refined messaging",
-        description: "Deep-dive messaging work to clarify your brand voice, value proposition, and how you communicate with your audience."
+        description: "Deep-dive messaging work to clarify your brand voice, value proposition, & how you communicate with your audience."
       },
       {
         name: "Social bio copy",
@@ -104,7 +104,7 @@ const tierDetails = {
       },
       {
         name: "Client & Admin Dashboards",
-        description: "A private client dashboard with Google/social login so your clients can access their content—plus an admin dashboard for you to manage clients, content, and interactions from the backend."
+        description: "A private client dashboard with Google/social login so your clients can access their content—plus an admin dashboard for you to manage clients, content, & interactions from the backend."
       },
       {
         name: "Post-launch support",
@@ -112,10 +112,10 @@ const tierDetails = {
       },
       {
         name: "Three revisions included",
-        description: "After the site is polished and you resonate with it, you get three revision sessions to perfect every detail."
+        description: "After the site is polished & you resonate with it, you get three revision sessions to perfect every detail."
       }
     ],
-    revisionNote: "Revision sessions begin once the site is polished and you feel aligned with it. Take a week or two to sit with it, keep notes on any changes you'd like, and we'll refine together. Functionality bugs and fixes are treated with priority and do not count toward your revision credits."
+    revisionNote: "Revision sessions begin once the site is polished & you feel aligned with it. Take a week or two to sit with it, keep notes on any changes you'd like, & we'll refine together. Functionality bugs & fixes are treated with priority & do not count toward your revision credits."
   }
 };
 

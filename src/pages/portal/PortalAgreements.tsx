@@ -11,7 +11,7 @@ const PortalAgreements = () => {
           <FileSignature className="h-12 w-12 text-muted-foreground/40 mb-4" />
           <h3 className="font-display text-lg mb-2">DocuSign Integration Coming Soon</h3>
           <p className="text-muted-foreground text-sm max-w-md">
-            You'll be able to view and sign your project agreements directly from this portal. 
+            You'll be able to view & sign your project agreements directly from this portal. 
             We're working on connecting DocuSign for a seamless experience.
           </p>
         </CardContent>

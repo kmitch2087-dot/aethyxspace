@@ -31,7 +31,7 @@ const testimonials = [
     date: "October 2025",
     image: testimonial1,
     review:
-      "Kristin made the entire process so easy! As a small business owner, I barely have time to breathe, let alone figure out website stuff. She took everything off my plate and delivered something beautiful. The SEO alone has already brought in more traffic than I ever expected. Worth every penny!",
+      "Kristin made the entire process so easy! As a small business owner, I barely have time to breathe, let alone figure out website stuff. She took everything off my plate & delivered something beautiful. The SEO alone has already brought in more traffic than I ever expected. Worth every penny!",
   },
   {
     id: 2,
@@ -40,7 +40,7 @@ const testimonials = [
     date: "November 2025",
     image: testimonial2,
     review:
-      "I was skeptical at first, but Kristin really listened to understand my vision and what my business actually needed. She didn't try to upsell me on things I didn't need. The website pays for itself with the new clients I'm getting. So grateful to have this off my plate!",
+      "I was skeptical at first, but Kristin really listened to understand my vision & what my business actually needed. She didn't try to upsell me on things I didn't need. The website pays for itself with the new clients I'm getting. So grateful to have this off my plate!",
   },
   {
     id: 3,
@@ -49,7 +49,7 @@ const testimonials = [
     date: "December 2025",
     image: testimonial3,
     review:
-      "Hands down the best investment I've made for my business this year. Kristin was amazing to work with—patient, creative, and really got what I was going for. My web traffic has tripled since launch, and that's just from the SEO optimization. Can't recommend her enough!",
+      "Hands down the best investment I've made for my business this year. Kristin was amazing to work with—patient, creative, & really got what I was going for. My web traffic has tripled since launch, & that's just from the SEO optimization. Can't recommend her enough!",
   },
   {
     id: 4,
@@ -58,7 +58,7 @@ const testimonials = [
     date: "January 2026",
     image: testimonial4,
     review:
-      "Finally, someone who speaks my language! Kristin took the time to learn exactly what my business does and who my customers are. The whole process was seamless, and now I have a website that actually works for me. The uptick in organic traffic has been incredible.",
+      "Finally, someone who speaks my language! Kristin took the time to learn exactly what my business does & who my customers are. The whole process was seamless, & now I have a website that actually works for me. The uptick in organic traffic has been incredible.",
   },
   {
     id: 5,
@@ -67,7 +67,7 @@ const testimonials = [
     date: "February 2026",
     image: testimonial5,
     review:
-      "I put off getting a real website for years because it felt so overwhelming. Kristin made it painless. She handled everything and kept me in the loop without overwhelming me with decisions. The SEO results speak for themselves—new customers are finding me every week!",
+      "I put off getting a real website for years because it felt so overwhelming. Kristin made it painless. She handled everything & kept me in the loop without overwhelming me with decisions. The SEO results speak for themselves—new customers are finding me every week!",
   },
 ];
 
@@ -153,7 +153,7 @@ const Testimonials = () => {
                               <TooltipContent className="max-w-xs text-center">
                                 <p>
                                   Customers are validated through third-party
-                                  systems to maintain transparency and privacy.
+                                  systems to maintain transparency & privacy.
                                 </p>
                               </TooltipContent>
                             </Tooltip>

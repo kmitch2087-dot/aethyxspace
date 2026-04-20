@@ -31,7 +31,7 @@ const painPoints = [
   {
     icon: Sparkles,
     title: 'The "clinical" look',
-    desc: "Sites that feel cold and dated rather than modern and luxurious.",
+    desc: "Sites that feel cold & dated rather than modern & luxurious.",
   },
   {
     icon: CalendarCheck,
@@ -54,7 +54,7 @@ const features = [
   {
     icon: Smartphone,
     title: "Mobile-First Luxury Design",
-    desc: 'Your patients are on their phones. We ensure your site looks stunning and loads in under 2 seconds, providing the "luxury feel" from the first tap.',
+    desc: 'Your patients are on their phones. We ensure your site looks stunning & loads in under 2 seconds, providing the "luxury feel" from the first tap.',
     image: webMockupImg,
   },
   {
@@ -72,7 +72,7 @@ const features = [
   {
     icon: FileText,
     title: "High-Conversion Landing Pages",
-    desc: "Specific, branded pages for Botox, Fillers, Lasers, and Skincare designed to turn search traffic into scheduled consultations.",
+    desc: "Specific, branded pages for Botox, Fillers, Lasers, & Skincare designed to turn search traffic into scheduled consultations.",
     image: detailShotImg,
   },
 ];
@@ -84,11 +84,11 @@ const faqs = [
   },
   {
     q: "Will I lose my current Google rankings?",
-    a: "Absolutely not. We use advanced SEO migration protocols to ensure your current rankings are protected and then built upon.",
+    a: "Absolutely not. We use advanced SEO migration protocols to ensure your current rankings are protected & then built upon.",
   },
   {
     q: "Can you work with my current booking software?",
-    a: "Yes. We specialize in styling and integrating platforms like Mindbody, Boulevard, and Zenoti so they look like a native part of your luxury brand.",
+    a: "Yes. We specialize in styling & integrating platforms like Mindbody, Boulevard, & Zenoti so they look like a native part of your luxury brand.",
   },
 ];
 
@@ -186,9 +186,9 @@ const MedSpa = () => {
               </span>
             </h1>
             <p className="text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed font-['Inter',sans-serif] text-primary-foreground">
-              We build high-performance digital experiences for Med Spas and
+              We build high-performance digital experiences for Med Spas &
               Aesthetic Clinics. Turn your website into your highest-converting
-              patient coordinator with seamless booking, luxury branding, and
+              patient coordinator with seamless booking, luxury branding, &
               local SEO that dominates.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -217,7 +217,7 @@ const MedSpa = () => {
             <span className="text-[hsl(40,30%,55%)]">Costing You Patients?</span>
           </h2>
           <p className="text-[hsl(40,10%,55%)] text-center max-w-2xl mx-auto mb-16 text-lg leading-relaxed font-['Inter',sans-serif]">
-            You've spent years perfecting your technique and building a luxury
+            You've spent years perfecting your technique & building a luxury
             clinic experience. But if your digital "front door" is slow, clunky,
             or hard to navigate on mobile, you're losing high-value leads before
             they ever see your results.
@@ -254,7 +254,7 @@ const MedSpa = () => {
             <p className="text-[hsl(40,10%,55%)] text-lg leading-relaxed font-['Inter',sans-serif]">
               At aethyx.space, we don't just "design websites." We build patient
               acquisition engines specifically for the aesthetics industry. We
-              bridge the gap between clinical excellence and digital performance.
+              bridge the gap between clinical excellence & digital performance.
             </p>
           </div>
           <div className="rounded-2xl overflow-hidden border border-[hsl(40,10%,18%)]">
@@ -328,7 +328,7 @@ const MedSpa = () => {
               </div>
               <h3 className={`${serif} text-lg mb-3 text-[hsl(40,20%,90%)]`}>AI Search Visibility</h3>
               <p className="text-[hsl(40,10%,55%)] text-sm leading-relaxed font-['Inter',sans-serif] mb-4">
-                Patients are asking ChatGPT and Perplexity "best Botox clinic near me" instead of Googling it. We structure your content so AI search engines recommend <em className="text-[hsl(40,20%,75%)]">your practice</em> by name — not your competitor down the street.
+                Patients are asking ChatGPT & Perplexity "best Botox clinic near me" instead of Googling it. We structure your content so AI search engines recommend <em className="text-[hsl(40,20%,75%)]">your practice</em> by name — not your competitor down the street.
               </p>
               <p className="text-[hsl(40,30%,50%)] text-xs uppercase tracking-widest font-semibold font-['Inter',sans-serif]">Generative Engine Optimization</p>
             </div>
@@ -339,7 +339,7 @@ const MedSpa = () => {
               </div>
               <h3 className={`${serif} text-lg mb-3 text-[hsl(40,20%,90%)]`}>Cinematic Practice Previews</h3>
               <p className="text-[hsl(40,10%,55%)] text-sm leading-relaxed font-['Inter',sans-serif] mb-4">
-                Static hero images are dead. We create immersive, video-driven brand experiences that let patients <em className="text-[hsl(40,20%,75%)]">feel</em> the luxury of your clinic before they walk through the door — building trust and desire from the first frame.
+                Static hero images are dead. We create immersive, video-driven brand experiences that let patients <em className="text-[hsl(40,20%,75%)]">feel</em> the luxury of your clinic before they walk through the door — building trust & desire from the first frame.
               </p>
               <p className="text-[hsl(40,30%,50%)] text-xs uppercase tracking-widest font-semibold font-['Inter',sans-serif]">Video-First Design</p>
             </div>
@@ -350,7 +350,7 @@ const MedSpa = () => {
               </div>
               <h3 className={`${serif} text-lg mb-3 text-[hsl(40,20%,90%)]`}>Beyond Cookie-Cutter Software</h3>
               <p className="text-[hsl(40,10%,55%)] text-sm leading-relaxed font-['Inter',sans-serif] mb-4">
-                EHR platforms like Pabau and AestheticsPro are bundling generic marketing templates into their software. We build a bespoke digital identity that no SaaS tool can replicate — so your brand is <em className="text-[hsl(40,20%,75%)]">unmistakably yours</em>.
+                EHR platforms like Pabau & AestheticsPro are bundling generic marketing templates into their software. We build a bespoke digital identity that no SaaS tool can replicate — so your brand is <em className="text-[hsl(40,20%,75%)]">unmistakably yours</em>.
               </p>
               <p className="text-[hsl(40,30%,50%)] text-xs uppercase tracking-widest font-semibold font-['Inter',sans-serif]">Luxury Brand Moat</p>
             </div>

@@ -12,12 +12,12 @@ const TermsOfService = () => (
         <div className="space-y-8 text-muted-foreground leading-relaxed">
           <section>
             <h2 className="font-display text-xl text-foreground mb-3">Agreement</h2>
-            <p>By accessing and using aethyx.space, you agree to be bound by these terms. If you do not agree, please do not use the site.</p>
+            <p>By accessing & using aethyx.space, you agree to be bound by these terms. If you do not agree, please do not use the site.</p>
           </section>
 
           <section>
             <h2 className="font-display text-xl text-foreground mb-3">Services</h2>
-            <p>Aethyx provides web design, branding, and related digital services. All project details, deliverables, and timelines are agreed upon during the consultation and formalized in a signed agreement before work begins.</p>
+            <p>Aethyx provides web design, branding, & related digital services. All project details, deliverables, & timelines are agreed upon during the consultation & formalized in a signed agreement before work begins.</p>
           </section>
 
           <section>

@@ -31,7 +31,7 @@ const PortalOverview = () => {
         Welcome{profile?.full_name ? `, ${profile.full_name}` : ""}!
       </h1>
       <p className="text-muted-foreground mb-8">
-        This is your client portal. Here you can communicate with our team, view documents, and manage your project.
+        This is your client portal. Here you can communicate with our team, view documents, & manage your project.
       </p>
 
       <div className="grid gap-4 md:grid-cols-3">

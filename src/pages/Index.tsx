@@ -20,7 +20,7 @@ const Index = () => {
             </h1>
             <p className="text-lg text-foreground leading-relaxed max-w-2xl mx-auto font-sans font-medium md:text-2xl">
               Clean, modern websites for small businesses who want to look professional, 
-              feel aligned, and stop overthinking their online presence.
+              feel aligned, & stop overthinking their online presence.
             </p>
           </div>
         </div>
@@ -59,7 +59,7 @@ const Index = () => {
                 You're not alone if your website feels harder than it should be.
               </h2>
               <p className="text-foreground text-base md:text-lg leading-relaxed font-medium">
-                Between picking templates, writing the "right" words, and second-guessing every choice — 
+                Between picking templates, writing the "right" words, & second-guessing every choice — 
                 it's easy to feel stuck. We get it. That's exactly why we focus on clarity over complexity. 
                 You don't need more options. You need the right ones, handled with care.
               </p>
@@ -80,12 +80,12 @@ const Index = () => {
             </h2>
             <div className="space-y-3">
               <p className="text-foreground text-lg md:text-xl leading-relaxed font-medium">
-                We design and build websites that remove the friction — so you can stop worrying 
-                about fonts, layouts, or "what to say" and start showing up with confidence.
+                We design & build websites that remove the friction — so you can stop worrying 
+                about fonts, layouts, or "what to say" & start showing up with confidence.
               </p>
               <p className="text-foreground text-lg md:text-xl leading-relaxed font-medium">
-                We handle the structure, the copy guidance, and all the little details 
-                that make a website feel polished and professional. You stay focused on what you do best.
+                We handle the structure, the copy guidance, & all the little details 
+                that make a website feel polished & professional. You stay focused on what you do best.
               </p>
             </div>
           </div>
@@ -125,7 +125,7 @@ const Index = () => {
                   Professional Brand Website
                 </h3>
                 <p className="text-foreground leading-relaxed font-light text-sm">
-                  A multi-page website with clear structure, thoughtful copy, and a design 
+                  A multi-page website with clear structure, thoughtful copy, & a design 
                   that reflects your unique brand identity.
                 </p>
               </div>
@@ -138,7 +138,7 @@ const Index = () => {
                 </h3>
                 <p className="text-foreground leading-relaxed font-light text-sm">
                   A comprehensive website experience with premium design, 
-                  strategic content, and everything you need to stand out.
+                  strategic content, & everything you need to stand out.
                 </p>
               </div>
             </div>
@@ -188,7 +188,7 @@ const Index = () => {
               {[{
                 num: "1",
                 title: "Intake",
-                desc: "Fill out a simple form so we can understand your needs and vision.",
+                desc: "Fill out a simple form so we can understand your needs & vision.",
                 color: "sage" as const
               }, {
                 num: "2",
@@ -198,7 +198,7 @@ const Index = () => {
               }, {
                 num: "3",
                 title: "Review",
-                desc: "You review and we refine until everything feels just right.",
+                desc: "You review & we refine until everything feels just right.",
                 color: "sage" as const
               }, {
                 num: "4",
@@ -224,7 +224,7 @@ const Index = () => {
                 Choose Your Path
               </h3>
               <p className="text-lg md:text-xl text-foreground font-medium max-w-2xl mx-auto">
-                Whether you're starting from scratch or ready to level up, we have a service that fits your needs and budget.
+                Whether you're starting from scratch or ready to level up, we have a service that fits your needs & budget.
               </p>
             </div>
           </div>
@@ -242,7 +242,7 @@ const Index = () => {
               Your business is evolving. Your website should too.
             </h2>
             <p className="text-foreground text-lg md:text-2xl leading-relaxed mb-8 font-medium">
-              When you're ready for an online presence that feels aligned, clear, and 
+              When you're ready for an online presence that feels aligned, clear, & 
               professional — we're here to help make it happen.
             </p>
             <Link to="/start-here">
