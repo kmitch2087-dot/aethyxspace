@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ReactMarkdown from "react-markdown";
+import DOMPurify from "dompurify";
 import { format } from "date-fns";
 import { ArrowLeft } from "lucide-react";
 
@@ -15,6 +16,41 @@ interface Post {
   published_at: string | null;
   created_at: string;
 }
+
+const isHtml = (s: string) => /^\s*<(\/?[a-zA-Z]+)/.test(s);
+
+const extractFaqSchema = (html: string) => {
+  if (typeof window === "undefined") return null;
+  try {
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    const headings = Array.from(doc.querySelectorAll("h2, h3"));
+    const faqs: { q: string; a: string }[] = [];
+    headings.forEach((h) => {
+      const text = (h.textContent || "").trim();
+      if (!text.endsWith("?")) return;
+      let answer = "";
+      let next = h.nextElementSibling;
+      while (next && !["H1", "H2", "H3", "H4"].includes(next.tagName)) {
+        answer += " " + (next.textContent || "");
+        next = next.nextElementSibling;
+      }
+      const a = answer.trim();
+      if (a) faqs.push({ q: text, a });
+    });
+    if (faqs.length < 2) return null;
+    return {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: faqs.map((f) => ({
+        "@type": "Question",
+        name: f.q,
+        acceptedAnswer: { "@type": "Answer", text: f.a },
+      })),
+    };
+  } catch {
+    return null;
+  }
+};
 
 const BlogPost = () => {
   const { slug } = useParams();
@@ -34,6 +70,25 @@ const BlogPost = () => {
     };
     fetchPost();
   }, [slug]);
+
+  const renderedHtml = useMemo(() => {
+    if (!post || !isHtml(post.content)) return null;
+    return DOMPurify.sanitize(post.content, { ADD_ATTR: ["target", "rel"] });
+  }, [post]);
+
+  useEffect(() => {
+    if (!renderedHtml) return;
+    const schema = extractFaqSchema(renderedHtml);
+    if (!schema) return;
+    const script = document.createElement("script");
+    script.type = "application/ld+json";
+    script.text = JSON.stringify(schema);
+    script.setAttribute("data-faq-schema", "true");
+    document.head.appendChild(script);
+    return () => {
+      script.remove();
+    };
+  }, [renderedHtml]);
 
   if (loading) {
     return (
@@ -85,9 +140,13 @@ const BlogPost = () => {
         </p>
         <h1 className="text-3xl md:text-4xl font-display tracking-wider mb-8">{post.title}</h1>
 
-        <article className="prose prose-invert prose-sm md:prose-base max-w-none prose-headings:font-display prose-headings:tracking-wider prose-a:text-primary">
-          <ReactMarkdown>{post.content}</ReactMarkdown>
-        </article>
+        {renderedHtml ? (
+          <article className="blog-content" dangerouslySetInnerHTML={{ __html: renderedHtml }} />
+        ) : (
+          <article className="blog-content">
+            <ReactMarkdown>{post.content}</ReactMarkdown>
+          </article>
+        )}
       </main>
       <Footer />
     </div>

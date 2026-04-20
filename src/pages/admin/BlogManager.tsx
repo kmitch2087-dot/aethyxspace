@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+
 import { Switch } from "@/components/ui/switch";
 import {
   Table,
@@ -24,7 +24,8 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { Plus, Pencil, Trash2, Eye, EyeOff, Upload } from "lucide-react";
 import { format } from "date-fns";
-import ReactMarkdown from "react-markdown";
+import RichTextEditor from "@/components/blog/RichTextEditor";
+import DOMPurify from "dompurify";
 
 interface BlogPost {
   id: string;
@@ -340,24 +341,24 @@ const BlogManager = () => {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label>Content (Markdown) <span className="text-destructive">*</span></Label>
+                <Label>Content <span className="text-destructive">*</span></Label>
                 <Button variant="ghost" size="sm" onClick={() => setPreviewMode(!previewMode)}>
                   {previewMode ? "Edit" : "Preview"}
                 </Button>
               </div>
               {previewMode ? (
-                <div className="min-h-[300px] p-4 rounded-lg border border-border/30 bg-background prose prose-invert prose-sm max-w-none prose-headings:font-display prose-a:text-primary">
-                  <ReactMarkdown>{form.content}</ReactMarkdown>
-                </div>
+                <div
+                  className="blog-content min-h-[300px] p-4 rounded-lg border border-border/30 bg-background"
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(form.content) }}
+                />
               ) : (
-                <Textarea
+                <RichTextEditor
                   value={form.content}
-                  onChange={(e) => {
-                    setForm((f) => ({ ...f, content: e.target.value }));
-                    if (e.target.value.trim()) setFormErrors((err) => ({ ...err, content: "" }));
+                  onChange={(html) => {
+                    setForm((f) => ({ ...f, content: html }));
+                    if (html.replace(/<[^>]+>/g, "").trim()) setFormErrors((err) => ({ ...err, content: "" }));
                   }}
-                  placeholder="Write your post in Markdown..."
-                  className={`min-h-[300px] font-mono text-sm ${formErrors.content ? "border-destructive" : ""}`}
+                  placeholder="Write your post — use the toolbar to format..."
                 />
               )}
               {formErrors.content && <p className="text-xs text-destructive">{formErrors.content}</p>}
