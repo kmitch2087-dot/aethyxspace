@@ -90,6 +90,25 @@ html {
   .glow-teal {
     text-shadow: 0 0 30px hsl(var(--teal) / 0.3);
   }
+
+  /* Site-wide services ticker */
+  @keyframes ticker {
+    from { transform: translateX(0); }
+    to { transform: translateX(-33.333%); }
+  }
+  .animate-ticker {
+    animation: ticker 45s linear infinite;
+    width: max-content;
+  }
+  .animate-ticker:hover {
+    animation-play-state: paused;
+  }
+
+  /* Outline display text used in hero */
+  .text-outline {
+    -webkit-text-stroke: 1.5px hsl(var(--foreground) / 0.85);
+    color: transparent;
+  }
 }
 
 /* Blog content typography — applied to both editor preview and public reader */
