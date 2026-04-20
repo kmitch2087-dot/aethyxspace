@@ -23,6 +23,8 @@ import {
   FileSignature,
   DollarSign,
   Users,
+  FolderOpen,
+  Image as ImageIcon,
   LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -35,6 +37,8 @@ const navItems = [
   { title: "Agreements", url: "/admin/agreements", icon: FileSignature },
   { title: "Financials", url: "/admin/financials", icon: DollarSign },
   { title: "Clients", url: "/admin/clients", icon: Users },
+  { title: "Documents", url: "/admin/documents", icon: FolderOpen },
+  { title: "Media", url: "/admin/media", icon: ImageIcon },
 ];
 
 function AdminSidebar() {

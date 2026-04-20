@@ -28,6 +28,8 @@ import Reviews from "./pages/admin/Reviews";
 import Agreements from "./pages/admin/Agreements";
 import Financials from "./pages/admin/Financials";
 import Clients from "./pages/admin/Clients";
+import Documents from "./pages/admin/Documents";
+import Media from "./pages/admin/Media";
 import PortalLayout from "./pages/portal/PortalLayout";
 import PortalOverview from "./pages/portal/PortalOverview";
 import PortalMessages from "./pages/portal/PortalMessages";
@@ -74,6 +76,8 @@ const App = () => (
               <Route path="agreements" element={<Agreements />} />
               <Route path="financials" element={<Financials />} />
               <Route path="clients" element={<Clients />} />
+              <Route path="documents" element={<Documents />} />
+              <Route path="media" element={<Media />} />
             </Route>
             <Route
               path="/portal"
