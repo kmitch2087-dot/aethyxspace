@@ -279,6 +279,7 @@ export type Database = {
           payment_date: string | null
           payment_status: string
           service_name: string | null
+          stripe_payment_id: string | null
           stripe_session_id: string | null
           updated_at: string
         }
@@ -291,6 +292,7 @@ export type Database = {
           payment_date?: string | null
           payment_status?: string
           service_name?: string | null
+          stripe_payment_id?: string | null
           stripe_session_id?: string | null
           updated_at?: string
         }
@@ -303,6 +305,7 @@ export type Database = {
           payment_date?: string | null
           payment_status?: string
           service_name?: string | null
+          stripe_payment_id?: string | null
           stripe_session_id?: string | null
           updated_at?: string
         }
