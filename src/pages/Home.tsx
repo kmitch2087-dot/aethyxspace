@@ -123,21 +123,22 @@ const Home = () => {
       />
 
       {/* Services Teaser */}
-      <section className="py-24 px-6">
+      <section className="py-24 px-6 border-t border-border/20">
         <div className="max-w-6xl mx-auto">
-          <h2 className="font-display text-3xl md:text-5xl text-center mb-16 text-[#2a1f0e]">What We Build</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <p className="text-primary text-xs tracking-[0.4em] uppercase text-center mb-4">What We Build</p>
+          <h2 className="font-display text-3xl md:text-5xl text-center mb-16 tracking-tight">Core Services</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {services.map((s) => (
               <Link
                 key={s.title}
                 to="/services"
-                className="rounded-2xl border border-[#8a7a5a]/20 bg-white/30 backdrop-blur-sm p-8 text-center group hover:bg-white/50 hover:shadow-lg transition-all"
+                className="rounded-2xl border border-border/40 bg-card/40 backdrop-blur-sm p-8 text-center group hover:border-primary/50 hover:bg-card/60 transition-all"
               >
-                <div className="w-14 h-14 rounded-full bg-[#1a1a2e]/10 flex items-center justify-center mx-auto mb-6">
-                  <s.icon className="h-6 w-6 text-[#2a1f0e]" />
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6 group-hover:bg-primary/20 transition-colors">
+                  <s.icon className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="font-display text-2xl mb-3 text-[#2a1f0e]">{s.title}</h3>
-                <p className="text-[#4a3a1a]/70 text-sm">{s.desc}</p>
+                <h3 className="font-display text-2xl mb-3">{s.title}</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">{s.desc}</p>
               </Link>
             ))}
           </div>
@@ -145,17 +146,18 @@ const Home = () => {
       </section>
 
       {/* Portfolio Highlights */}
-      <section className="py-24 px-6 border-t border-[#8a7a5a]/20">
+      <section className="py-24 px-6 border-t border-border/20">
         <div className="max-w-6xl mx-auto">
-          <h2 className="font-display text-3xl md:text-5xl text-center mb-16 text-[#2a1f0e]">Selected Work</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <p className="text-primary text-xs tracking-[0.4em] uppercase text-center mb-4">Selected Work</p>
+          <h2 className="font-display text-3xl md:text-5xl text-center mb-16 tracking-tight">Recent Projects</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {portfolioHighlights.map((p) => (
               <a
                 key={p.title}
                 href={p.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group rounded-2xl overflow-hidden border border-[#8a7a5a]/20 bg-white/30 hover:bg-white/50 hover:shadow-lg transition-all"
+                className="group rounded-2xl overflow-hidden border border-border/40 bg-card/40 hover:border-primary/50 hover:bg-card/60 transition-all"
               >
                 <div className="aspect-video overflow-hidden">
                   <img
@@ -165,8 +167,8 @@ const Home = () => {
                   />
                 </div>
                 <div className="p-6">
-                  <h3 className="font-display text-xl mb-1 text-[#2a1f0e]">{p.title}</h3>
-                  <p className="text-[#4a3a1a]/70 text-sm">{p.subtitle}</p>
+                  <h3 className="font-display text-xl mb-1">{p.title}</h3>
+                  <p className="text-muted-foreground text-sm">{p.subtitle}</p>
                 </div>
               </a>
             ))}
@@ -175,14 +177,15 @@ const Home = () => {
       </section>
 
       {/* CTA */}
-      <section className="py-24 px-6 border-t border-[#8a7a5a]/20 text-center">
-        <h2 className="font-display text-3xl md:text-5xl mb-6 text-[#2a1f0e]">Ready to Shift?</h2>
-        <p className="text-[#4a3a1a]/70 text-lg max-w-xl mx-auto mb-10">
-          Book a consultation and let's build something that actually represents you.
+      <section className="py-24 px-6 border-t border-border/20 text-center">
+        <p className="text-primary text-xs tracking-[0.4em] uppercase mb-4">Ready to Shift?</p>
+        <h2 className="font-display text-3xl md:text-5xl mb-6 tracking-tight">Let's build something they can't ignore.</h2>
+        <p className="text-muted-foreground text-lg max-w-xl mx-auto mb-10">
+          Book a consultation and let's build a digital presence that actually represents you.
         </p>
         <Link
           to="/contact"
-          className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-[#1a1a2e] text-white font-semibold tracking-wide uppercase text-sm hover:bg-[#1a1a2e]/90 transition-all hover:-translate-y-0.5"
+          className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-primary-foreground font-semibold tracking-[0.2em] uppercase text-sm hover:bg-primary/90 transition-all hover:-translate-y-0.5"
         >
           Book a Consultation <ArrowRight className="h-4 w-4" />
         </Link>
