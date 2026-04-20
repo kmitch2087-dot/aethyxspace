@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, RefreshCw } from "lucide-react";
 
 interface FinancialRecord {
   id: string;
@@ -45,6 +45,26 @@ const Financials = () => {
   const [editorOpen, setEditorOpen] = useState(false);
   const [editing, setEditing] = useState<FinancialRecord | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [syncing, setSyncing] = useState(false);
+
+  const handleStripeSync = async () => {
+    setSyncing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("stripe-sync");
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast({
+        title: "Stripe sync complete",
+        description: `${data.inserted} new, ${data.updated} updated, ${data.skipped} skipped (of ${data.total} charges).`,
+      });
+      fetchRecords();
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Sync failed";
+      toast({ title: "Stripe sync failed", description: msg, variant: "destructive" });
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   const fetchRecords = async () => {
     const { data } = await supabase
@@ -124,7 +144,13 @@ const Financials = () => {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-display tracking-wider">Financials</h1>
-        <Button onClick={openNew} size="sm"><Plus className="h-4 w-4 mr-1" /> New Record</Button>
+        <div className="flex items-center gap-2">
+          <Button onClick={handleStripeSync} size="sm" variant="outline" disabled={syncing}>
+            <RefreshCw className={`h-4 w-4 mr-1 ${syncing ? "animate-spin" : ""}`} />
+            {syncing ? "Syncing…" : "Sync from Stripe"}
+          </Button>
+          <Button onClick={openNew} size="sm"><Plus className="h-4 w-4 mr-1" /> New Record</Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4 mb-6">
