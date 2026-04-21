@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { Facebook } from "lucide-react";
 
 const Footer = () => (
   <footer className="relative z-10 border-t border-border/20 py-10 px-6">
@@ -10,6 +11,17 @@ const Footer = () => (
         <span className="hidden sm:inline">•</span>
         <a href="tel:+14015891023" className="hover:text-primary transition-colors">
           401.589.1023
+        </a>
+        <span className="hidden sm:inline">•</span>
+        <a
+          href="https://www.facebook.com/Aethyxspace/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Aethyx on Facebook"
+          className="inline-flex items-center gap-1.5 hover:text-primary transition-colors"
+        >
+          <Facebook className="h-4 w-4" />
+          <span>Facebook</span>
         </a>
       </div>
 
