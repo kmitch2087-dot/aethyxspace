@@ -1,64 +1,79 @@
 
+## Add Founder Photo + Rewrite About Page (Solo Founder Voice)
 
-## Plan: Rich Blog Editor + Append SEO Content to Posts 1 & 2
+Two coordinated changes: place Kristin's photo on the About page, and rewrite the site-wide "team/we" language to reflect that Aethyx is a solo founder studio — owned with pride.
 
-### Part 1 — Upgrade the admin Blog editor
+### 1. About page rewrite (`src/pages/About.tsx`)
 
-Replace the plain Markdown textarea with a **WYSIWYG rich-text editor** (TipTap, the modern industry standard) so you can format visually like Google Docs — no Markdown knowledge required. Output is stored as HTML so all formatting is preserved exactly when published.
+**New layout:** Two-column intro on desktop (photo left, heading + opening paragraphs right), stacks on mobile. Rest of page keeps its rhythm but gets new copy.
 
-**Editor toolbar will include:**
-- Headings (H1, H2, H3)
-- Bold, italic, underline, strikethrough
-- **Font family picker** (Montserrat, Inter, Playfair, Georgia, system serif, system sans, monospace)
-- **Font size picker** (small → XL)
-- **Text color picker**
-- Bulleted & numbered lists
-- Blockquotes, code blocks, horizontal rules
-- **Hyperlinks** (paste URL, sets anchor text — perfect for your internal link sections)
-- Image insertion (URL or upload to `blog-covers` bucket)
-- Undo / redo
+**New copy (in brand voice — confident, founder-led, no fluff):**
 
-**Auto-formatting on publish:**
-- Paragraph spacing handled automatically (proper `<p>` margins via Tailwind `prose` styles)
-- Headings get the Aethyx Montserrat display font + tracking
-- Links inherit the teal accent color
-- Blockquotes get a left border + italic styling
-- Lists get proper indent + spacing
+Intro section (next to photo):
+> # About Aethyx
+>
+> Aethyx is me — Kristin Mitchell. One founder, one studio, every pixel.
+>
+> I built this because I kept watching brilliant, hard-working people hide behind websites that didn't come close to matching who they actually are. Too cluttered. Too generic. Too easy to scroll past.
+>
+> Aethyx is my becoming — the thing I built brick by brick, late night by late night, until it became something I'm genuinely proud of. And now I get to do the same for other people: help them see what's actually possible.
 
-### Part 2 — Update `BlogPost.tsx` (public reader)
+Mid-section heading + sub:
+> ## Elevate & Evolve Unapologetically
+> No team to hide behind. No account managers, no handoffs, no "someone will get back to you." You work directly with me — the person designing it, writing it, building it, and obsessing over it until it's right.
 
-Render HTML safely (TipTap output is sanitized) inside a styled `prose` container so the formatting you set in the editor shows up identically on the live page.
+Closing paragraphs:
+> My favorite part of this whole job is the reveal. The moment a client sees their site for the first time and realizes what's actually possible now — the automations, the workflows, the things running quietly in the background — and the fear flips into awe.
+>
+> Most people think a more advanced website means more work for them. It's the opposite. Done right, it means *less* — fewer manual tasks, fewer things to remember, more time to actually do the work you're here to do.
+>
+> *That's the whole point. Your business has evolved. Your website should prove it — and then get out of your way.*
 
-### Part 3 — Backward compatibility
+**Cards section — replace "Our Team" + "Our Values":**
 
-Old posts are stored as Markdown. The reader will detect HTML vs Markdown (HTML starts with `<`) and render appropriately, so nothing breaks.
+Card 1 — **The Studio** (Users icon):
+> Aethyx is a one-woman studio led by Kristin Mitchell. That means every decision, every line of copy, every detail is mine — and I take that personally. No subcontractors. No silent partners. Just direct, founder-led work from start to launch.
 
-### Part 4 — Append SEO content to existing posts
+Card 2 — **What I Stand For** (Target icon):
+> Bold over safe. Clarity over complexity. Craft over shortcuts. Every business deserves a digital presence that commands respect — and I don't stop until yours does.
 
-I'll convert your provided SEO content (Internal Links section + FAQ section + FAQ Schema note) into properly formatted HTML and **append** it to:
-- **Post 1** — "Small Business SEO" (uses links: /website-design-services, /custom-website-development, /how-much-does-a-small-business-website-cost, /signs-your-business-needs-a-new-website, /contact)
-- **Post 2** — "Website Pricing Guide 2026" (uses links: /website-design-services, /custom-website-development, /small-business-seo-services-website-design, /signs-your-business-needs-a-new-website, /contact)
+### 2. Photo placement
 
-Both will get a proper "Suggested Internal Links," "Frequently Asked Questions," and "FAQ Schema Ideas" section with anchor links, H2/H3 hierarchy, and clean spacing. Once appended, you can re-edit them visually in the new editor anytime.
+- Save uploaded image to `src/assets/kristin-founder.jpg`
+- Import into About.tsx
+- Wrapper: `rounded-2xl overflow-hidden border border-primary/20 shadow-[0_0_40px_-10px_hsl(var(--primary)/0.3)]`, max-height constrained on mobile
+- Caption underneath: "Kristin Mitchell — Founder"
+- Layout: `grid md:grid-cols-2 gap-10 items-center` on intro row only; container widens to `max-w-5xl` for that row, rest stays `max-w-3xl`
+- `alt="Kristin Mitchell, Founder of Aethyx"`, `loading="eager"`
 
-### Part 5 — JSON-LD FAQ schema (SEO bonus)
+### 3. Site-wide "we → I" sweep
 
-Since you mentioned FAQ Schema, I'll auto-detect FAQ sections in posts and inject **FAQPage JSON-LD structured data** into the `<head>` of each blog post page, so Google can show rich FAQ results in search.
+Change team/plural language to solo-founder voice across these files (only the customer-facing copy, not variable names or RLS/legal text):
 
-### Files to change
-- `src/pages/admin/BlogManager.tsx` — swap textarea for new editor component
-- `src/components/blog/RichTextEditor.tsx` — **new**, TipTap editor with full toolbar
-- `src/pages/BlogPost.tsx` — render HTML, inject FAQ JSON-LD, handle legacy Markdown
-- `src/index.css` — add `.blog-content` styles for consistent typography
-- Append SEO HTML to both posts via DB insert tool
+- `src/pages/Home.tsx` — any "we build / our team / we believe" → "I build / I / I believe"
+- `src/pages/Services.tsx` — service descriptions, intros
+- `src/pages/StartHere.tsx` — funnel copy
+- `src/pages/Contact.tsx` — intro / reassurance lines
+- `src/pages/Rebrand.tsx` — narrative
+- `src/pages/Seo.tsx` — explainer copy
+- `src/pages/Membership.tsx` — pitch copy
+- `src/pages/MedSpa.tsx` — only the brand-voice sections (keep medspa positioning intact)
+- `src/pages/Portfolio.tsx` — project intros
+- `src/components/Footer.tsx` — tagline if applicable
 
-### Dependencies to add
-- `@tiptap/react`, `@tiptap/starter-kit`, `@tiptap/extension-link`, `@tiptap/extension-image`, `@tiptap/extension-text-style`, `@tiptap/extension-color`, `@tiptap/extension-font-family`, `@tiptap/extension-underline`
+**Preserved unchanged:** Privacy Policy, Terms of Service (legal "we/Aethyx" is standard), admin/portal interfaces, button labels, technical copy.
 
-### What stays the same
-- Slug auto-generation, cover image upload, publish toggle, drafts table — all unchanged
-- Existing 2 posts keep their current content, just get the new sections appended
-- Brand colors, fonts, and tone preserved
+**Approach:** read each file, replace only marketing prose where "we/our/us/team" implies multiple people. Keep "Aethyx" as the brand name where it reads better than "I" (e.g. "Aethyx is built on…" stays).
 
-Want me to proceed?
+### 4. Memory updates
 
+- Update `mem://features/about-page` to reflect solo-founder narrative + photo
+- Update `mem://brand/aethyx-tone` to add: "Solo founder voice — use 'I' not 'we'. Aethyx is Kristin Mitchell. Take pride in the one-woman studio positioning rather than hiding it."
+- Update `mem://index.md` Core to note: "Solo founder studio — Kristin Mitchell. Use 'I' in marketing copy, not 'we/our team'."
+
+### Technical details
+
+- Files edited: `src/pages/About.tsx`, `src/pages/Home.tsx`, `src/pages/Services.tsx`, `src/pages/StartHere.tsx`, `src/pages/Contact.tsx`, `src/pages/Rebrand.tsx`, `src/pages/Seo.tsx`, `src/pages/Membership.tsx`, `src/pages/MedSpa.tsx`, `src/pages/Portfolio.tsx`, `src/components/Footer.tsx`
+- New asset: `src/assets/kristin-founder.jpg` (copied from upload)
+- Memory: 3 files written/updated
+- No DB, no schema, no edge functions, no new dependencies
