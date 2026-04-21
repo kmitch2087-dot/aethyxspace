@@ -144,6 +144,40 @@ const Portfolio = () => {
               </div>
             ))}
           </div>
+
+          {/* Launching Soon Section */}
+          <div className="mt-20">
+            <div className="text-center mb-10">
+              <p className="text-primary text-xs tracking-[0.3em] uppercase mb-2">In the Studio</p>
+              <h2 className="font-display text-3xl md:text-4xl">Launching Soon</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {[
+                { title: "Pournography", url: "https://pournography.com", logo: pournographyLogo, alt: "Pournography logo" },
+                { title: "Ahearn Recovery", url: "https://ahearnrecovery.com", logo: ahearnLogo, alt: "Ahearn Recovery logo" },
+              ].map((item) => (
+                <div key={item.title} className="glass-card overflow-hidden group relative">
+                  <div className="aspect-video overflow-hidden bg-black flex items-center justify-center">
+                    <img
+                      src={item.logo}
+                      alt={item.alt}
+                      className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
+                  <div className="p-6 flex items-center justify-between flex-wrap gap-3">
+                    <div>
+                      <h3 className="font-display text-2xl mb-1">{item.title}</h3>
+                      <p className="text-muted-foreground text-sm">{item.url.replace("https://", "")}</p>
+                    </div>
+                    <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/30 text-primary text-xs uppercase tracking-widest">
+                      <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+                      Launching Soon
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
