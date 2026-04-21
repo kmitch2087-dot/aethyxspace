@@ -216,7 +216,7 @@ const Rebrand = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="consult-details" className="text-foreground/70 text-sm">
-                  Tell us about your project
+                  Tell me about your project
                 </Label>
                 <Textarea
                   id="consult-details"

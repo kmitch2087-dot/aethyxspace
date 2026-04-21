@@ -18,6 +18,8 @@ const services = [
 ];
 
 
+
+
 const trafficButtons = [
   { label: "TikTok", source: "tiktok" as const },
   { label: "Instagram", source: "instagram" as const },
@@ -74,7 +76,7 @@ const Home = () => {
           </p>
 
           <p className="text-foreground/70 text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed">
-            Book a consultation & let's build a digital presence that actually represents you.
+            Book a consultation & let's build a digital presence that actually represents you. Founder-led, start to finish — you work directly with me.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-14">
@@ -130,7 +132,7 @@ const Home = () => {
       {/* Services Teaser */}
       <section className="py-24 px-6 border-t border-border/20">
         <div className="max-w-6xl mx-auto">
-          <p className="text-primary text-xs tracking-[0.4em] uppercase text-center mb-4">What We Build</p>
+          <p className="text-primary text-xs tracking-[0.4em] uppercase text-center mb-4">What I Build</p>
           <h2 className="font-display text-3xl md:text-5xl text-center mb-16 tracking-tight">Core Services</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {services.map((s) => (
@@ -166,7 +168,7 @@ const Home = () => {
             />
           </Link>
           <p className="text-muted-foreground text-base md:text-lg mt-10 mb-8 max-w-xl mx-auto">
-            Real projects. Real results. Every site built with intention.
+            Real projects. Real results. Every site built with intention — by me.
           </p>
           <Link
             to="/portfolio"

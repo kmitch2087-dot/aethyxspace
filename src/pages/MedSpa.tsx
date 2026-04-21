@@ -204,7 +204,7 @@ const MedSpa = () => {
               </span>
             </h1>
             <p className="text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed font-['Inter',sans-serif] text-primary-foreground">
-              We build high-performance digital experiences for Med Spas &
+              I build high-performance digital experiences for Med Spas &
               Aesthetic Clinics. Turn your website into your highest-converting
               patient coordinator with seamless booking, luxury branding, &
               local SEO that dominates.
@@ -220,7 +220,7 @@ const MedSpa = () => {
                 to="/portfolio"
                 className="inline-flex items-center gap-2 px-8 py-4 rounded-full border-2 border-[hsl(40,20%,50%)] hover:border-[hsl(40,30%,60%)] font-semibold tracking-wide uppercase text-sm transition-all hover:-translate-y-0.5 font-['Inter',sans-serif] text-primary-foreground"
               >
-                View Our Aesthetic Portfolio
+                View the Aesthetic Portfolio
               </Link>
             </div>
           </div>
@@ -270,9 +270,9 @@ const MedSpa = () => {
               <span className="text-[hsl(40,30%,55%)]">Patient Acquisition.</span>
             </h2>
             <p className="text-[hsl(40,10%,55%)] text-lg leading-relaxed font-['Inter',sans-serif]">
-              At aethyx.space, we don't just "design websites." We build patient
-              acquisition engines specifically for the aesthetics industry. We
-              bridge the gap between clinical excellence & digital performance.
+              At aethyx.space, I don't just "design websites." I build patient
+              acquisition engines specifically for the aesthetics industry —
+              bridging the gap between clinical excellence & digital performance.
             </p>
           </div>
           <div className="rounded-2xl overflow-hidden border border-[hsl(40,10%,18%)]">
@@ -289,7 +289,7 @@ const MedSpa = () => {
       <section className="py-24 px-6 border-t border-[hsl(40,10%,15%)]">
         <div className="max-w-6xl mx-auto">
           <h2 className={`${serif} text-3xl md:text-5xl text-center mb-16 text-[hsl(40,20%,95%)]`}>
-            What We Deliver
+            What I Deliver
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {features.map((f) => (
@@ -336,7 +336,7 @@ const MedSpa = () => {
             The Future of <span className="text-[hsl(40,30%,55%)]">Med Spa Marketing</span> Is Here.
           </h2>
           <p className="text-[hsl(40,10%,55%)] text-center max-w-2xl mx-auto mb-16 text-lg leading-relaxed font-['Inter',sans-serif]">
-            While your competitors are still optimizing for yesterday's Google, we're building your visibility across the platforms patients are actually using in 2026.
+            While your competitors are still optimizing for yesterday's Google, I'm building your visibility across the platforms patients are actually using in 2026.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -346,7 +346,7 @@ const MedSpa = () => {
               </div>
               <h3 className={`${serif} text-lg mb-3 text-[hsl(40,20%,90%)]`}>AI Search Visibility</h3>
               <p className="text-[hsl(40,10%,55%)] text-sm leading-relaxed font-['Inter',sans-serif] mb-4">
-                Patients are asking ChatGPT & Perplexity "best Botox clinic near me" instead of Googling it. We structure your content so AI search engines recommend <em className="text-[hsl(40,20%,75%)]">your practice</em> by name — not your competitor down the street.
+                Patients are asking ChatGPT & Perplexity "best Botox clinic near me" instead of Googling it. I structure your content so AI search engines recommend <em className="text-[hsl(40,20%,75%)]">your practice</em> by name — not your competitor down the street.
               </p>
               <p className="text-[hsl(40,30%,50%)] text-xs uppercase tracking-widest font-semibold font-['Inter',sans-serif]">Generative Engine Optimization</p>
             </div>
@@ -357,7 +357,7 @@ const MedSpa = () => {
               </div>
               <h3 className={`${serif} text-lg mb-3 text-[hsl(40,20%,90%)]`}>Cinematic Practice Previews</h3>
               <p className="text-[hsl(40,10%,55%)] text-sm leading-relaxed font-['Inter',sans-serif] mb-4">
-                Static hero images are dead. We create immersive, video-driven brand experiences that let patients <em className="text-[hsl(40,20%,75%)]">feel</em> the luxury of your clinic before they walk through the door — building trust & desire from the first frame.
+                Static hero images are dead. I create immersive, video-driven brand experiences that let patients <em className="text-[hsl(40,20%,75%)]">feel</em> the luxury of your clinic before they walk through the door — building trust & desire from the first frame.
               </p>
               <p className="text-[hsl(40,30%,50%)] text-xs uppercase tracking-widest font-semibold font-['Inter',sans-serif]">Video-First Design</p>
             </div>
@@ -368,7 +368,7 @@ const MedSpa = () => {
               </div>
               <h3 className={`${serif} text-lg mb-3 text-[hsl(40,20%,90%)]`}>Beyond Cookie-Cutter Software</h3>
               <p className="text-[hsl(40,10%,55%)] text-sm leading-relaxed font-['Inter',sans-serif] mb-4">
-                EHR platforms like Pabau & AestheticsPro are bundling generic marketing templates into their software. We build a bespoke digital identity that no SaaS tool can replicate — so your brand is <em className="text-[hsl(40,20%,75%)]">unmistakably yours</em>.
+                EHR platforms like Pabau & AestheticsPro are bundling generic marketing templates into their software. I build a bespoke digital identity that no SaaS tool can replicate — so your brand is <em className="text-[hsl(40,20%,75%)]">unmistakably yours</em>.
               </p>
               <p className="text-[hsl(40,30%,50%)] text-xs uppercase tracking-widest font-semibold font-['Inter',sans-serif]">Luxury Brand Moat</p>
             </div>

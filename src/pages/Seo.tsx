@@ -136,7 +136,7 @@ const Seo = () => {
                 SEO in Every Package
               </h2>
               <p className="text-lg md:text-xl text-foreground leading-relaxed font-medium text-center mb-8">
-                For small businesses, SEO is one of the most cost-effective ways to attract new customers. That's why every Vibe Shift Studio package includes foundational SEO setup to help you get started on the right foot.
+                For small businesses, SEO is one of the most cost-effective ways to attract new customers. That's why every Aethyx package includes foundational SEO setup to help you get started on the right foot.
               </p>
               <div className="text-center">
                 <Button 

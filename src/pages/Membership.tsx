@@ -129,7 +129,7 @@ const Membership = () => {
               Ready for peace of mind?
             </h2>
             <p className="text-foreground text-lg md:text-2xl leading-relaxed mb-8 font-medium">
-              Let us handle the maintenance so you can focus on what you do best.
+              Let me handle the maintenance so you can focus on what you do best.
             </p>
             <Button size="lg" onClick={() => setWaitingListOpen(true)} className="text-base px-10 py-6 rounded-full bg-sage hover:bg-sage/90 text-white shadow-warm transition-all duration-300 hover:shadow-warm-lg hover:-translate-y-0.5">
               Get on the Waiting List
