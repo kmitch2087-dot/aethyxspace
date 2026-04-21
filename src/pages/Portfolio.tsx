@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowRight, ExternalLink } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Seo from "@/components/Seo";
@@ -28,6 +28,7 @@ const projects = [
     subtitle: "Where Women Come Home to Themselves",
     description: "Women's Wellness Retreats in the Mountains of Southern Vermont. A serene, nature-inspired brand & web presence designed to reflect the transformative retreat experience.",
     url: "https://re-retreats.com",
+    cardImage: reRetreatsLogo,
     images: [
       { src: rr1, alt: "Rē Retreats homepage" },
       { src: rr2, alt: "Rē Retreats retreat details" },
@@ -85,40 +86,10 @@ const Portfolio = () => {
             Real projects. Real results. Every site built with intention.
           </p>
 
-          {/* Featured Project Hero */}
-          <div className="glass-card overflow-hidden mb-16">
-            <div className="relative aspect-video md:aspect-[21/9] bg-gradient-to-br from-primary/10 via-background to-background flex items-center justify-center p-8">
-              <img src={reRetreatsLogo} alt="Rē Retreats logo" className="max-h-[60%] max-w-[70%] object-contain" />
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent pointer-events-none" />
-              <div className="absolute bottom-0 left-0 p-8 md:p-12">
-                <p className="text-primary text-sm tracking-widest uppercase mb-2">Featured Project</p>
-                <h2 className="font-display text-3xl md:text-5xl mb-3">Rē Retreats</h2>
-                <p className="text-muted-foreground max-w-lg mb-4">
-                  Women's Wellness Retreats in the Mountains of Southern Vermont.
-                </p>
-                <button
-                  onClick={() => setActiveProject(activeProject === 0 ? null : 0)}
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary text-primary-foreground font-semibold text-sm uppercase tracking-wide hover:bg-primary/90 transition-all"
-                >
-                  View Case Study <ArrowRight className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-            {activeProject === 0 && (
-              <div className="px-8 pb-8 space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
-                <p className="text-muted-foreground leading-relaxed max-w-2xl">{projects[0].description}</p>
-                <a href={projects[0].url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-primary text-sm hover:text-primary/80 transition-colors">
-                  <ExternalLink className="h-3.5 w-3.5" /> Visit Live Site
-                </a>
-                <LightboxGallery images={projects[0].images} />
-              </div>
-            )}
-          </div>
-
-          {/* Project Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {projects.slice(1).map((project, i) => (
-              <div key={project.title} className="glass-card overflow-hidden group">
+          {/* Project Cards Grid — 3-up on desktop, centered when fewer than 3 fill the row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
+            {projects.map((project, i) => (
+              <div key={project.title} className="glass-card overflow-hidden group w-full max-w-md">
                 <div className="aspect-video overflow-hidden bg-gradient-to-br from-primary/10 via-background to-background flex items-center justify-center p-6">
                   <img
                     src={(project as any).cardImage || project.images[0].src}
@@ -135,13 +106,13 @@ const Portfolio = () => {
                   <h3 className="font-display text-2xl mb-2">{project.title}</h3>
                   <p className="text-muted-foreground text-sm mb-4">{project.subtitle}</p>
                   <button
-                    onClick={() => setActiveProject(activeProject === i + 1 ? null : i + 1)}
+                    onClick={() => setActiveProject(activeProject === i ? null : i)}
                     className="text-primary text-sm uppercase tracking-widest hover:text-primary/80 transition-colors"
                   >
                     View Case Study →
                   </button>
                 </div>
-                {activeProject === i + 1 && (
+                {activeProject === i && (
                   <div className="px-6 pb-6 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
                     <p className="text-muted-foreground text-sm leading-relaxed">{project.description}</p>
                     <a href={project.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-primary text-sm hover:text-primary/80 transition-colors">
