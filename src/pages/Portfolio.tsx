@@ -17,6 +17,8 @@ import vs2 from "@/assets/portfolio/vibeshift-2.jpg";
 import vs3 from "@/assets/portfolio/vibeshift-3.jpg";
 import ahearnLogo from "@/assets/portfolio/ahearn-recovery-logo.jpg";
 import pournographyLogo from "@/assets/portfolio/pournography-logo.gif";
+import reRetreatsLogo from "@/assets/portfolio/re-retreats-logo.svg";
+import kokopelliLogo from "@/assets/portfolio/kokopelli-logo.png";
 
 const projects = [
   {
@@ -37,6 +39,7 @@ const projects = [
     subtitle: "Luxury Cabin Rental",
     description: "A premium booking-ready website for a luxury cabin rental experience. Clean photography-driven design with seamless reservation integration.",
     url: "https://kokopellikabin.com",
+    cardImage: kokopelliLogo,
     images: [
       { src: kk1, alt: "Kokopelli Kabin homepage" },
       { src: kk2, alt: "Kokopelli Kabin interiors" },
@@ -82,9 +85,9 @@ const Portfolio = () => {
 
           {/* Featured Project Hero */}
           <div className="glass-card overflow-hidden mb-16">
-            <div className="relative aspect-video md:aspect-[21/9]">
-              <img src={rr1} alt="Rē Retreats" className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+            <div className="relative aspect-video md:aspect-[21/9] bg-gradient-to-br from-primary/10 via-background to-background flex items-center justify-center p-8">
+              <img src={reRetreatsLogo} alt="Rē Retreats logo" className="max-h-[60%] max-w-[70%] object-contain" />
+              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent pointer-events-none" />
               <div className="absolute bottom-0 left-0 p-8 md:p-12">
                 <p className="text-primary text-sm tracking-widest uppercase mb-2">Featured Project</p>
                 <h2 className="font-display text-3xl md:text-5xl mb-3">Rē Retreats</h2>
@@ -114,11 +117,15 @@ const Portfolio = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {projects.slice(1).map((project, i) => (
               <div key={project.title} className="glass-card overflow-hidden group">
-                <div className="aspect-video overflow-hidden">
+                <div className="aspect-video overflow-hidden bg-gradient-to-br from-primary/10 via-background to-background flex items-center justify-center p-6">
                   <img
-                    src={project.images[0].src}
+                    src={(project as any).cardImage || project.images[0].src}
                     alt={project.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className={
+                      (project as any).cardImage
+                        ? "max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-500"
+                        : "w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    }
                   />
                 </div>
                 <div className="p-6">
