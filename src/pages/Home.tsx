@@ -9,9 +9,7 @@ import { organizationSchema, websiteSchema } from "@/lib/seoSchemas";
 
 import TrafficSourcePopup from "@/components/TrafficSourcePopup";
 import { supabase } from "@/integrations/supabase/client";
-import reRetreatsThumb from "@/assets/portfolio/re-retreats-thumb.png";
-import kokopelliThumb from "@/assets/portfolio/kokopelli-thumb.png";
-import vibeshiftThumb from "@/assets/portfolio/vibeshift-thumb.png";
+import aethyxLogo from "@/assets/aethyx-calligraphy-updated.png";
 
 const services = [
   { icon: Globe, title: "Web Design", desc: "Custom websites that command attention & convert." },
