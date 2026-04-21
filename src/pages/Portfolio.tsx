@@ -15,6 +15,8 @@ import kk3 from "@/assets/portfolio/kokopelli-3.jpg";
 import vs1 from "@/assets/portfolio/vibeshift-1.jpg";
 import vs2 from "@/assets/portfolio/vibeshift-2.jpg";
 import vs3 from "@/assets/portfolio/vibeshift-3.jpg";
+import ahearnLogo from "@/assets/portfolio/ahearn-recovery-logo.jpg";
+import pournographyLogo from "@/assets/portfolio/pournography-logo.gif";
 
 const projects = [
   {
