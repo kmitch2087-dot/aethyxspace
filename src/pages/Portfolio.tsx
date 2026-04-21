@@ -60,6 +60,15 @@ const Portfolio = () => {
 
   return (
     <div className="min-h-screen bg-transparent text-foreground">
+      <Seo
+        title="Portfolio — Aethyx Web Design Case Studies"
+        description="Selected work from Aethyx — wellness retreat brands, hospitality websites, and full brand evolutions. Real projects with real results."
+        path="/portfolio"
+        jsonLd={breadcrumb([
+          { name: "Home", path: "/" },
+          { name: "Portfolio", path: "/portfolio" },
+        ])}
+      />
       <Navbar />
 
       <div className="pt-28 pb-24 px-6">
