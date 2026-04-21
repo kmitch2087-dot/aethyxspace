@@ -49,13 +49,6 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-transparent text-foreground">
-      <Navbar />
-
-      <div className="pt-28 pb-24 px-6">
-        <div className="max-w-3xl mx-auto">
-          <h1 className="font-display text-4xl md:text-6xl text-center mb-4">Contact</h1>
-  return (
-    <div className="min-h-screen bg-transparent text-foreground">
       <Seo
         title="Contact Aethyx — Book a $50 Strategy Consultation"
         description="Start your project with a paid strategy consultation. Aethyx works with ambitious businesses across the USA on premium web design and digital platforms."
@@ -66,6 +59,7 @@ const Contact = () => {
         ])}
       />
       <Navbar />
+
       <div className="pt-28 pb-24 px-6">
         <div className="max-w-3xl mx-auto">
           <h1 className="font-display text-4xl md:text-6xl text-center mb-4">Let's Build It.</h1>
