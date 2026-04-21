@@ -49,17 +49,18 @@ const About = () => (
           {/* Heading + opening copy */}
           <div className="order-2 md:order-2">
             <h1 className="font-display text-4xl md:text-5xl lg:text-6xl mb-8 leading-tight">
-              About Aethyx
+              Hi, I'm Kristin —<br />
+              <span className="text-primary">Aethyx is my becoming.</span>
             </h1>
             <div className="space-y-5 text-base md:text-lg text-muted-foreground leading-relaxed">
               <p className="text-foreground/90">
-                Aethyx is me — Kristin Mitchell. One founder, one studio, every pixel.
+                One founder. One studio. Every pixel.
               </p>
               <p>
-                I built this because I kept watching brilliant, hard-working people hide behind websites that didn't come close to matching who they actually are. Too cluttered. Too generic. Too easy to scroll past.
+                I built Aethyx because I kept watching brilliant, hard-working people hide behind websites that didn't come close to matching who they actually are. Too cluttered. Too generic. Too easy to scroll past.
               </p>
               <p>
-                Aethyx is my <em className="text-primary not-italic">becoming</em> — the thing I built brick by brick, late night by late night, until it became something I'm genuinely proud of. And now I get to do the same for other people: help them see what's actually possible.
+                This studio is the thing I built brick by brick, late night by late night, until it became something I'm genuinely proud of — & now I get to do the same for other people. Help them see what's actually possible.
               </p>
             </div>
           </div>
