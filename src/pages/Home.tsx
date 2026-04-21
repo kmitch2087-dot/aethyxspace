@@ -4,6 +4,8 @@ import { ArrowRight, Globe, Palette, Layers } from "lucide-react";
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Seo from "@/components/Seo";
+import { organizationSchema, websiteSchema } from "@/lib/seoSchemas";
 
 import TrafficSourcePopup from "@/components/TrafficSourcePopup";
 import { supabase } from "@/integrations/supabase/client";
@@ -44,6 +46,12 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-transparent text-foreground">
+      <Seo
+        title="Aethyx — Premium Web Design & Brand Studio | Rhode Island, USA"
+        description="Aethyx designs and builds premium websites, brands, and digital experiences for ambitious businesses. Based in Rhode Island, serving the entire USA."
+        path="/"
+        jsonLd={[organizationSchema, websiteSchema]}
+      />
       <Navbar />
 
       {/* Hero */}

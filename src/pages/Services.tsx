@@ -2,6 +2,8 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Check, Star, Globe, Diamond, Play, Shield, Search, Layers, Zap, TrendingUp, Lock, ChevronRight, Bot, Video, Eye } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Seo from "@/components/Seo";
+import { breadcrumb, serviceSchema } from "@/lib/seoSchemas";
 import { QUICK_SERVICES, ADD_ONS, APP_DEVELOPMENT } from "@/lib/stripePrices";
 
 const coreServices = [
@@ -75,6 +77,22 @@ const appDev = Object.entries(APP_DEVELOPMENT).map(([, v]) => ({
 
 const Services = () => (
   <div className="min-h-screen bg-transparent text-foreground">
+    <Seo
+      title="Services — Web Design, Branding & Digital Platforms | Aethyx"
+      description="Custom website design, branding, e-commerce, booking systems, automation, and AI-ready digital platforms — built for ambitious businesses across the USA."
+      path="/services"
+      jsonLd={[
+        breadcrumb([
+          { name: "Home", path: "/" },
+          { name: "Services", path: "/services" },
+        ]),
+        serviceSchema(
+          "Web Design & Digital Platform Development",
+          "Custom website design, brand identity systems, e-commerce, booking systems, membership portals, automation, and AI-ready platforms.",
+          "/services"
+        ),
+      ]}
+    />
     <Navbar />
 
     {/* 1. HERO */}

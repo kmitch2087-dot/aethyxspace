@@ -8,6 +8,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Seo from "@/components/Seo";
+import { breadcrumb } from "@/lib/seoSchemas";
 
 const Contact = () => {
   const [name, setName] = useState("");
@@ -47,11 +49,20 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-transparent text-foreground">
+      <Seo
+        title="Contact Aethyx — Book a $50 Strategy Consultation"
+        description="Start your project with a paid strategy consultation. Aethyx works with ambitious businesses across the USA on premium web design and digital platforms."
+        path="/contact"
+        jsonLd={breadcrumb([
+          { name: "Home", path: "/" },
+          { name: "Contact", path: "/contact" },
+        ])}
+      />
       <Navbar />
 
       <div className="pt-28 pb-24 px-6">
         <div className="max-w-3xl mx-auto">
-          <h1 className="font-display text-4xl md:text-6xl text-center mb-4">Contact</h1>
+          <h1 className="font-display text-4xl md:text-6xl text-center mb-4">Let's Build It.</h1>
           <p className="text-center text-muted-foreground text-lg mb-16 max-w-xl mx-auto">
             Ready to build something bold? Fill out the form to book a consultation, or reach out directly.
           </p>

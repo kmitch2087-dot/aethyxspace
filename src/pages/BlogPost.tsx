@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Seo from "@/components/Seo";
 import ReactMarkdown from "react-markdown";
 import DOMPurify from "dompurify";
 import { format } from "date-fns";
@@ -114,8 +115,44 @@ const BlogPost = () => {
     );
   }
 
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    image: post.cover_image_url ? [post.cover_image_url] : undefined,
+    datePublished: post.published_at || post.created_at,
+    dateModified: post.published_at || post.created_at,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `https://aethyx.space/blog/${slug}`,
+    },
+    author: { "@type": "Organization", name: "Aethyx" },
+    publisher: {
+      "@type": "Organization",
+      name: "Aethyx",
+      logo: { "@type": "ImageObject", url: "https://aethyx.space/favicon.png" },
+    },
+  };
+
+  const description =
+    (post.content || "")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, 155) || `${post.title} — insights from the Aethyx blog.`;
+
   return (
     <div className="min-h-screen bg-transparent">
+      <Seo
+        title={`${post.title} | Aethyx Blog`}
+        description={description}
+        path={`/blog/${slug}`}
+        type="article"
+        image={post.cover_image_url || undefined}
+        publishedTime={post.published_at || post.created_at}
+        modifiedTime={post.published_at || post.created_at}
+        jsonLd={articleSchema}
+      />
       <Navbar />
       <main className="pt-24 pb-16 px-6 max-w-3xl mx-auto">
         <Link

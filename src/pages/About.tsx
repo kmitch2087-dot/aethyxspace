@@ -2,6 +2,8 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Users, Target } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Seo from "@/components/Seo";
+import { breadcrumb } from "@/lib/seoSchemas";
 
 const DotDivider = () => (
   <div className="flex items-center justify-center gap-2 py-8">
@@ -13,6 +15,15 @@ const DotDivider = () => (
 
 const About = () => (
   <div className="min-h-screen bg-transparent text-foreground">
+    <Seo
+      title="About Aethyx — Quiet Confidence in Premium Web Design"
+      description="Aethyx builds intentional, high-impact websites for businesses that deserve better than generic. Founder-led design rooted in clarity, craft, and quiet confidence."
+      path="/about"
+      jsonLd={breadcrumb([
+        { name: "Home", path: "/" },
+        { name: "About", path: "/about" },
+      ])}
+    />
     <Navbar />
 
     <div className="pt-28 pb-24 px-6">

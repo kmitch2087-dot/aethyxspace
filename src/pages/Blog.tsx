@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Seo from "@/components/Seo";
+import { breadcrumb } from "@/lib/seoSchemas";
 import { format } from "date-fns";
 
 interface BlogPostSummary {
@@ -34,6 +36,15 @@ const Blog = () => {
 
   return (
     <div className="min-h-screen bg-transparent">
+      <Seo
+        title="Aethyx Blog — Web Design, Branding & Digital Strategy Insights"
+        description="Insights on web design, brand strategy, SEO, and growing your digital presence — written for ambitious businesses by the Aethyx team."
+        path="/blog"
+        jsonLd={breadcrumb([
+          { name: "Home", path: "/" },
+          { name: "Blog", path: "/blog" },
+        ])}
+      />
       <Navbar />
       <main className="pt-24 pb-16 px-6 max-w-5xl mx-auto">
         <h1 className="text-4xl md:text-5xl font-display tracking-wider mb-4">Blog</h1>

@@ -1,8 +1,14 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Seo from "@/components/Seo";
 
 const TermsOfService = () => (
   <div className="min-h-screen bg-transparent text-foreground">
+    <Seo
+      title="Terms of Service | Aethyx"
+      description="Terms governing use of aethyx.space, services provided by Aethyx, payments, intellectual property, and client agreements."
+      path="/terms"
+    />
     <Navbar />
 
     <div className="pt-28 pb-24 px-6">

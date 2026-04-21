@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Seo from "@/components/Seo";
+import { breadcrumb, serviceSchema } from "@/lib/seoSchemas";
 import { useState, useRef } from "react";
 import { Slider } from "@/components/ui/slider";
 
@@ -158,6 +160,22 @@ const MedSpa = () => {
 
   return (
     <div className="min-h-screen bg-[hsl(40,5%,8%)] text-[hsl(40,20%,90%)]">
+      <Seo
+        title="Med Spa Web Design — Premium Websites for Aesthetic Clinics | Aethyx"
+        description="Luxury website design for med spas, aesthetic clinics, and wellness brands. Custom booking integrations, brand-aligned visuals, and SEO built for the aesthetics industry."
+        path="/medspa"
+        jsonLd={[
+          breadcrumb([
+            { name: "Home", path: "/" },
+            { name: "Med Spa Web Design", path: "/medspa" },
+          ]),
+          serviceSchema(
+            "Med Spa & Aesthetic Clinic Web Design",
+            "Premium website design and brand visuals for med spas and aesthetic clinics. Includes booking integration (Mindbody, Boulevard, Zenoti), SEO, and SEO-safe migration.",
+            "/medspa"
+          ),
+        ]}
+      />
       <Navbar />
 
       {/* ─── Hero ─── */}

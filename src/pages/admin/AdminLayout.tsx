@@ -1,5 +1,6 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import Seo from "@/components/Seo";
 import {
   Sidebar,
   SidebarContent,
@@ -100,6 +101,7 @@ function AdminSidebar() {
 const AdminLayout = () => {
   return (
     <SidebarProvider>
+      <Seo title="Admin | Aethyx" description="Aethyx admin dashboard." noindex />
       <div className="min-h-screen flex w-full bg-transparent">
         <AdminSidebar />
         <div className="flex-1 flex flex-col bg-white text-black">
