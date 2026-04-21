@@ -60,7 +60,7 @@ const About = () => (
                 I built Aethyx because I kept watching brilliant, talented, hard-working people miss out on so many opportunities — all because their websites didn't even come close to matching the quality of the work they do or who they actually are.
               </p>
               <p>
-                This studio is the thing I built brick by brick, late night by late night, until it became something I'm genuinely proud of — & now I get to do the same for other people. Help them see what's actually possible.
+                I started Aethyx bewildered & nervous, climbing an uphill battle of information I didn't yet understand. Now that I'm here with the bird's-eye view, this studio has become something I'm genuinely proud of — & I get to do the same for other people. Help them see what's <em className="text-primary not-italic">actually</em> possible in this age of technology.
               </p>
             </div>
           </div>
