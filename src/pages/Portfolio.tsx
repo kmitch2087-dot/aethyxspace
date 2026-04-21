@@ -118,7 +118,6 @@ const Portfolio = () => {
                     <a href={project.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-primary text-sm hover:text-primary/80 transition-colors">
                       <ExternalLink className="h-3.5 w-3.5" /> Visit Live Site
                     </a>
-                    <LightboxGallery images={project.images} />
                   </div>
                 )}
               </div>
