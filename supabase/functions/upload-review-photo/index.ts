@@ -29,6 +29,11 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Block requests from unrecognized origins (curl/scripts/bots)
+  if (!corsHeaders["Access-Control-Allow-Origin"]) {
+    return new Response("Unauthorized origin", { status: 403 });
+  }
+
   if (req.method !== "POST") {
     return new Response(JSON.stringify({ error: "Method not allowed" }), {
       status: 405,
