@@ -17,11 +17,6 @@ const services = [
   { icon: Layers, title: "Digital Experiences", desc: "E-commerce, dashboards, booking — everything you need." },
 ];
 
-const portfolioHighlights = [
-  { img: reRetreatsThumb, title: "Rē Retreats", subtitle: "Women's Wellness Retreats", link: "https://re-retreats.com" },
-  { img: kokopelliThumb, title: "Kokopelli Kabin", subtitle: "Modern Mountain Retreat", link: "https://kokopellikabin.com" },
-  { img: vibeshiftThumb, title: "Vibe Shift → Aethyx", subtitle: "Brand Evolution", link: "https://vibe-shift.com" },
-];
 
 const trafficButtons = [
   { label: "TikTok", source: "tiktok" as const },
