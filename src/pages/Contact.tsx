@@ -8,6 +8,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Seo from "@/components/Seo";
+import { breadcrumb } from "@/lib/seoSchemas";
 
 const Contact = () => {
   const [name, setName] = useState("");

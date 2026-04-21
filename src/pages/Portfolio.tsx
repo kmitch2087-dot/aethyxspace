@@ -2,6 +2,8 @@ import { useState } from "react";
 import { ArrowRight, ExternalLink } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Seo from "@/components/Seo";
+import { breadcrumb } from "@/lib/seoSchemas";
 import LightboxGallery from "@/components/LightboxGallery";
 
 import rr1 from "@/assets/portfolio/re-retreats-1.jpg";

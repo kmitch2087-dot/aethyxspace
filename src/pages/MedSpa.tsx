@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Seo from "@/components/Seo";
+import { breadcrumb, serviceSchema } from "@/lib/seoSchemas";
 import { useState, useRef } from "react";
 import { Slider } from "@/components/ui/slider";
 
