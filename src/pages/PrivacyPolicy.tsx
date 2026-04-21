@@ -1,9 +1,15 @@
 import Header from "@/components/Header";
 import { Link } from "react-router-dom";
+import Seo from "@/components/Seo";
 
 const PrivacyPolicy = () => {
   return (
     <div className="min-h-screen bg-transparent">
+      <Seo
+        title="Privacy Policy | Aethyx"
+        description="How Aethyx collects, uses, and protects information submitted through our website, contact forms, and social channels."
+        path="/privacy-policy"
+      />
       <Header />
 
       <main className="relative z-10 pt-[calc(var(--fixed-banner-height)+32px)] pb-24 px-6 md:px-12 lg:px-24 xl:px-32">
