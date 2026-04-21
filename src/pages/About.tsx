@@ -104,7 +104,7 @@ const About = () => (
             </div>
             <h3 className="font-display text-2xl mb-3">The Studio</h3>
             <p className="text-muted-foreground text-sm leading-relaxed">
-              Aethyx is a one-woman studio led by Kristin Mitchell. That means every decision, every line of copy, every detail is mine — and I take that personally. No subcontractors. No silent partners. Just direct, founder-led work from start to launch.
+              Aethyx is a one-woman studio led by me. That means every decision, every line of copy, every detail is mine — and I take that personally. No subcontractors. No silent partners. Just direct, founder-led work from start to launch.
             </p>
           </div>
 
