@@ -74,9 +74,33 @@ const BlogManager = () => {
   const generateSlug = (title: string) =>
     title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
+  // Starter template prefilled into new posts. Any H2/H3 in the FAQ section
+  // ending in "?" with answer text below auto-generates FAQPage JSON-LD on the
+  // public post page — no extra schema code needed.
+  const STARTER_TEMPLATE = `<p>[Opening hook — one or two sentences that frame the problem this post solves.]</p>
+<p>[Set up the value of the post. Why should the reader keep reading?]</p>
+<h2>[First Main Section Heading]</h2>
+<p>[Body paragraph. Cover the first key idea here.]</p>
+<ul><li>[supporting point]</li><li>[supporting point]</li><li>[supporting point]</li></ul>
+<h2>[Second Main Section Heading]</h2>
+<p>[Body paragraph for the second idea. Link naturally to other pages where it makes sense, e.g. <a href="/services">website design services</a> or <a href="/contact">contact Aethyx.space</a>.]</p>
+<h2>[Third Main Section Heading]</h2>
+<p>[Body paragraph for the third idea.]</p>
+<h2>[Closing Section / Call to Action]</h2>
+<p>[Wrap up the post and tell the reader what to do next. Link to <a href="/contact">contact</a> or another relevant page.]</p>
+<h2>Frequently Asked Questions</h2>
+<h3>[Question 1 ending with a question mark?]</h3>
+<p>[Clear, direct answer in 1-3 sentences. Google reads this as the answer for FAQ rich results.]</p>
+<h3>[Question 2 ending with a question mark?]</h3>
+<p>[Answer.]</p>
+<h3>[Question 3 ending with a question mark?]</h3>
+<p>[Answer.]</p>
+<h3>[Question 4 ending with a question mark?]</h3>
+<p>[Answer.]</p>`;
+
   const openNew = () => {
     setEditingPost(null);
-    setForm({ title: "", slug: "", content: "", excerpt: "", cover_image_url: "", published: false });
+    setForm({ title: "", slug: "", content: STARTER_TEMPLATE, excerpt: "", cover_image_url: "", published: false });
     setPreviewMode(false);
     setFormErrors({});
     setEditorOpen(true);
