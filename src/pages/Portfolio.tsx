@@ -39,6 +39,7 @@ const projects = [
     subtitle: "Luxury Cabin Rental",
     description: "A premium booking-ready website for a luxury cabin rental experience. Clean photography-driven design with seamless reservation integration.",
     url: "https://kokopellikabin.com",
+    cardImage: kokopelliLogo,
     images: [
       { src: kk1, alt: "Kokopelli Kabin homepage" },
       { src: kk2, alt: "Kokopelli Kabin interiors" },
@@ -116,11 +117,15 @@ const Portfolio = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {projects.slice(1).map((project, i) => (
               <div key={project.title} className="glass-card overflow-hidden group">
-                <div className="aspect-video overflow-hidden">
+                <div className="aspect-video overflow-hidden bg-gradient-to-br from-primary/10 via-background to-background flex items-center justify-center p-6">
                   <img
-                    src={project.images[0].src}
+                    src={(project as any).cardImage || project.images[0].src}
                     alt={project.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className={
+                      (project as any).cardImage
+                        ? "max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-500"
+                        : "w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    }
                   />
                 </div>
                 <div className="p-6">
