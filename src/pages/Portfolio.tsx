@@ -133,7 +133,7 @@ const Portfolio = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {[
-                { title: "Pournography", url: "https://pournography.com", logo: pournographyLogo, alt: "Pournography logo" },
+                { title: "PourNoGravy", url: "https://pournogravy.com", logo: pournographyLogo, alt: "PourNoGravy logo" },
                 { title: "Ahearn Recovery", url: "https://ahearnrecovery.com", logo: ahearnLogo, alt: "Ahearn Recovery logo" },
               ].map((item) => (
                 <div key={item.title} className="glass-card overflow-hidden group relative">
