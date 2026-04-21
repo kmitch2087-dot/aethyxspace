@@ -57,7 +57,7 @@ const About = () => (
                 One founder. One studio. Every pixel.
               </p>
               <p>
-                I built Aethyx because I kept watching brilliant, hard-working people hide behind websites that didn't come close to matching who they actually are. Too cluttered. Too generic. Too easy to scroll past.
+                I built Aethyx because I kept watching brilliant, talented, hard-working people miss out on so many opportunities — all because their websites didn't even come close to matching the quality of the work they do or who they actually are.
               </p>
               <p>
                 This studio is the thing I built brick by brick, late night by late night, until it became something I'm genuinely proud of — & now I get to do the same for other people. Help them see what's actually possible.
