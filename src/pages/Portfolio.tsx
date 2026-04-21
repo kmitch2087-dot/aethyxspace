@@ -17,6 +17,8 @@ import vs2 from "@/assets/portfolio/vibeshift-2.jpg";
 import vs3 from "@/assets/portfolio/vibeshift-3.jpg";
 import ahearnLogo from "@/assets/portfolio/ahearn-recovery-logo.jpg";
 import pournographyLogo from "@/assets/portfolio/pournography-logo.gif";
+import reRetreatsLogo from "@/assets/portfolio/re-retreats-logo.svg";
+import kokopelliLogo from "@/assets/portfolio/kokopelli-logo.png";
 
 const projects = [
   {
@@ -82,9 +84,9 @@ const Portfolio = () => {
 
           {/* Featured Project Hero */}
           <div className="glass-card overflow-hidden mb-16">
-            <div className="relative aspect-video md:aspect-[21/9]">
-              <img src={rr1} alt="Rē Retreats" className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+            <div className="relative aspect-video md:aspect-[21/9] bg-gradient-to-br from-primary/10 via-background to-background flex items-center justify-center p-8">
+              <img src={reRetreatsLogo} alt="Rē Retreats logo" className="max-h-[60%] max-w-[70%] object-contain" />
+              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent pointer-events-none" />
               <div className="absolute bottom-0 left-0 p-8 md:p-12">
                 <p className="text-primary text-sm tracking-widest uppercase mb-2">Featured Project</p>
                 <h2 className="font-display text-3xl md:text-5xl mb-3">Rē Retreats</h2>
