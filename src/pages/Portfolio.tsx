@@ -19,6 +19,7 @@ import ahearnLogo from "@/assets/portfolio/ahearn-recovery-logo.jpg";
 import pournographyLogo from "@/assets/portfolio/pournography-logo.gif";
 import reRetreatsLogo from "@/assets/portfolio/re-retreats-logo.svg";
 import kokopelliLogo from "@/assets/portfolio/kokopelli-logo.png";
+import vibeshiftToAethyx from "@/assets/portfolio/vibeshift-to-aethyx-transition.jpg";
 
 const projects = [
   {
@@ -52,6 +53,7 @@ const projects = [
     subtitle: "From Calm to Bold",
     description: "Our own rebrand story. Vibe Shift Studio evolved into Aethyx — a bolder, more unapologetic creative identity. Same vision, sharper execution.",
     url: "https://vibe-shift.com",
+    cardImage: vibeshiftToAethyx,
     images: [
       { src: vs1, alt: "Vibe Shift Studio original" },
       { src: vs2, alt: "Brand transition" },
