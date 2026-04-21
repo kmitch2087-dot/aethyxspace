@@ -89,7 +89,7 @@ const Portfolio = () => {
           {/* Project Cards Grid — 3-up on desktop, centered when fewer than 3 fill the row */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
             {projects.map((project, i) => (
-              <div key={project.title} className="glass-card overflow-hidden group">
+              <div key={project.title} className="glass-card overflow-hidden group w-full max-w-md">
                 <div className="aspect-video overflow-hidden bg-gradient-to-br from-primary/10 via-background to-background flex items-center justify-center p-6">
                   <img
                     src={(project as any).cardImage || project.images[0].src}
@@ -106,13 +106,13 @@ const Portfolio = () => {
                   <h3 className="font-display text-2xl mb-2">{project.title}</h3>
                   <p className="text-muted-foreground text-sm mb-4">{project.subtitle}</p>
                   <button
-                    onClick={() => setActiveProject(activeProject === i + 1 ? null : i + 1)}
+                    onClick={() => setActiveProject(activeProject === i ? null : i)}
                     className="text-primary text-sm uppercase tracking-widest hover:text-primary/80 transition-colors"
                   >
                     View Case Study →
                   </button>
                 </div>
-                {activeProject === i + 1 && (
+                {activeProject === i && (
                   <div className="px-6 pb-6 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
                     <p className="text-muted-foreground text-sm leading-relaxed">{project.description}</p>
                     <a href={project.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-primary text-sm hover:text-primary/80 transition-colors">
