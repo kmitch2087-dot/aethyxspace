@@ -111,7 +111,7 @@ const StartHere = () => {
                     </Button>
                   </a>
                   <p className="text-center text-sm text-muted-foreground mt-3 font-light">
-                    (don't worry, we're not charging you anything yet)
+                    (don't worry, I'm not charging you anything yet)
                   </p>
                 </div>
               </div>

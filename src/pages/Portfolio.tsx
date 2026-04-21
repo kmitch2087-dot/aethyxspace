@@ -52,7 +52,7 @@ const projects = [
     title: "Vibe Shift Studio → Aethyx",
     tagline: "Brand Evolution",
     subtitle: "From Calm to Bold",
-    description: "Our own rebrand story. Vibe Shift Studio evolved into Aethyx — a bolder, more unapologetic creative identity. Same vision, sharper execution.",
+    description: "My own rebrand story. Vibe Shift Studio evolved into Aethyx — a bolder, more unapologetic creative identity. Same vision, sharper execution.",
     url: "https://vibe-shift.com",
     cardImage: vibeshiftToAethyx,
     images: [

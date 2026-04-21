@@ -55,10 +55,10 @@ const coreServices = [
 ];
 
 const processSteps = [
-  { step: "01", title: "Discovery & Strategy", desc: "We learn your business, your audience, & your goals to define the right digital infrastructure." },
-  { step: "02", title: "System Architecture & Planning", desc: "We map out the full ecosystem — features, integrations, user flows, & long-term scalability." },
+  { step: "01", title: "Discovery & Strategy", desc: "I learn your business, your audience, & your goals to define the right digital infrastructure." },
+  { step: "02", title: "System Architecture & Planning", desc: "I map out the full ecosystem — features, integrations, user flows, & long-term scalability." },
   { step: "03", title: "Design & Development", desc: "Every element is custom-built with precision, from brand visuals to backend functionality." },
-  { step: "04", title: "Launch & Ongoing Support", desc: "We launch your platform & provide continued protection, optimization, & strategic guidance." },
+  { step: "04", title: "Launch & Ongoing Support", desc: "I launch your platform & provide continued protection, optimization, & strategic guidance." },
 ];
 
 const quickServices = Object.values(QUICK_SERVICES);
@@ -100,10 +100,10 @@ const Services = () => (
       <div className="max-w-3xl mx-auto">
         <p className="text-primary text-xs uppercase tracking-[0.3em] mb-6">Digital Brand Architecture Studio</p>
         <h1 className="font-display text-4xl md:text-6xl lg:text-7xl mb-6 leading-tight">
-          We Don't Just Build Websites — We Build Digital Ecosystems
+          I Don't Just Build Websites — I Build Digital Ecosystems
         </h1>
         <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
-          We design, develop, & maintain fully integrated digital platforms that support your business growth, operations, & customer experience.
+          I design, develop, & maintain fully integrated digital platforms that support your business growth, operations, & customer experience.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
@@ -128,7 +128,7 @@ const Services = () => (
         <h2 className="font-display text-3xl md:text-5xl lg:text-6xl leading-[1.15] mb-10 tracking-tight">
           Most agencies give you a website.
           <br />
-          We give you a <span className="text-primary">digital infrastructure</span> —
+          I give you a <span className="text-primary">digital infrastructure</span> —
           <br />
           built around <span style={{ color: "hsl(43 60% 65%)" }}>how your business actually operates.</span>
         </h2>
@@ -194,7 +194,7 @@ const Services = () => (
               <div>
                 <h4 className="font-display text-lg mb-2">Industry & Compliance Research</h4>
                 <p className="text-muted-foreground text-sm leading-relaxed">
-                  We research the laws, regulations, & best practices specific to your industry & location — ensuring your site isn't just beautiful, but fully compliant & trustworthy.
+                  I research the laws, regulations, & best practices specific to your industry & location — ensuring your site isn't just beautiful, but fully compliant & trustworthy.
                 </p>
               </div>
             </div>
@@ -218,7 +218,7 @@ const Services = () => (
 
         <div className="glass-card p-8 md:p-10 mb-8">
           <p className="text-muted-foreground text-sm mb-6 leading-relaxed">
-            We offer continued support to ensure your system remains secure, functional, optimized, & scalable. This includes:
+            I offer continued support to ensure your system remains secure, functional, optimized, & scalable. This includes:
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
@@ -247,7 +247,7 @@ const Services = () => (
     {/* 6. PROCESS */}
     <section className="py-20 px-6 border-t border-border/20">
       <div className="max-w-5xl mx-auto">
-        <h2 className="font-display text-3xl md:text-5xl text-center mb-16">Our Process</h2>
+        <h2 className="font-display text-3xl md:text-5xl text-center mb-16">My Process</h2>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {processSteps.map((s, i) => (
             <div key={s.step} className="relative">
@@ -271,7 +271,7 @@ const Services = () => (
           Every project is custom scoped based on system complexity, number of features, integrations required, & long-term business goals.
         </p>
         <p className="text-foreground font-display text-xl mb-8">
-          Every build is tailored to your goals — reach out & we'll scope a solution that fits.
+          Every build is tailored to your goals — reach out & I'll scope a solution that fits.
         </p>
         <Link
           to="/contact"
@@ -393,7 +393,7 @@ const Services = () => (
           <p className="text-primary text-xs uppercase tracking-[0.3em] mb-4">Stay Ahead of the Curve</p>
           <h2 className="font-display text-3xl md:text-5xl mb-4">Cutting-Edge Capabilities</h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            The digital landscape is shifting fast. We build with tomorrow's technology so you're never playing catch-up.
+            The digital landscape is shifting fast. I build with tomorrow's technology so you're never playing catch-up.
           </p>
         </div>
 
@@ -404,7 +404,7 @@ const Services = () => (
             </div>
             <h3 className="font-display text-xl mb-3">AI Search Optimization</h3>
             <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-              Google isn't the only search engine anymore. ChatGPT, Perplexity, & Gemini are now how people discover businesses. We structure your digital presence so AI engines cite <em>you</em> as the answer — not your competitor.
+              Google isn't the only search engine anymore. ChatGPT, Perplexity, & Gemini are now how people discover businesses. I structure your digital presence so AI engines cite <em>you</em> as the answer — not your competitor.
             </p>
             <p className="text-primary/70 text-xs uppercase tracking-widest font-semibold">Generative Engine Optimization (GEO)</p>
           </div>
@@ -415,7 +415,7 @@ const Services = () => (
             </div>
             <h3 className="font-display text-xl mb-3">Cinematic Brand Media</h3>
             <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-              Static websites are becoming background noise. We create video-first brand experiences — cinematic practice previews, motion-driven storytelling, & dynamic content that stops the scroll & builds trust before a single word is read.
+              Static websites are becoming background noise. I create video-first brand experiences — cinematic practice previews, motion-driven storytelling, & dynamic content that stops the scroll & builds trust before a single word is read.
             </p>
             <p className="text-primary/70 text-xs uppercase tracking-widest font-semibold">Video-First Digital Presence</p>
           </div>
@@ -426,7 +426,7 @@ const Services = () => (
             </div>
             <h3 className="font-display text-xl mb-3">Competitive Intelligence</h3>
             <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-              Software platforms are bundling cookie-cutter marketing into their tools. We ensure your brand stands so far above template-driven competitors that no SaaS dashboard can replicate what you have — a bespoke digital identity built for <em>your</em> business.
+              Software platforms are bundling cookie-cutter marketing into their tools. I ensure your brand stands so far above template-driven competitors that no SaaS dashboard can replicate what you have — a bespoke digital identity built for <em>your</em> business.
             </p>
             <p className="text-primary/70 text-xs uppercase tracking-widest font-semibold">Beyond Template Marketing</p>
           </div>
@@ -438,10 +438,10 @@ const Services = () => (
     <section className="py-24 px-6 border-t border-border/20 text-center">
       <div className="max-w-2xl mx-auto">
         <h2 className="font-display text-3xl md:text-5xl mb-6">
-          We don't build one-off websites.
+          I don't build one-off websites.
         </h2>
         <p className="text-muted-foreground text-lg mb-10">
-          We build digital systems designed to support your business long-term.
+          I build digital systems designed to support your business long-term.
         </p>
         <Link
           to="/contact"

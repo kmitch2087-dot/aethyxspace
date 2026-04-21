@@ -90,7 +90,7 @@ const Contact = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="message" className="text-foreground/70 text-sm">Message</Label>
-                <Textarea id="message" placeholder="Tell us about your project..." value={message} onChange={(e) => setMessage(e.target.value)} rows={5} className={`${inputClass} resize-none`} />
+                <Textarea id="message" placeholder="Tell me about your project..." value={message} onChange={(e) => setMessage(e.target.value)} rows={5} className={`${inputClass} resize-none`} />
               </div>
 
               <Button
