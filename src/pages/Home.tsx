@@ -9,9 +9,7 @@ import { organizationSchema, websiteSchema } from "@/lib/seoSchemas";
 
 import TrafficSourcePopup from "@/components/TrafficSourcePopup";
 import { supabase } from "@/integrations/supabase/client";
-import reRetreatsThumb from "@/assets/portfolio/re-retreats-thumb.png";
-import kokopelliThumb from "@/assets/portfolio/kokopelli-thumb.png";
-import vibeshiftThumb from "@/assets/portfolio/vibeshift-thumb.png";
+import aethyxLogo from "@/assets/aethyx-calligraphy-updated.png";
 
 const services = [
   { icon: Globe, title: "Web Design", desc: "Custom websites that command attention & convert." },
@@ -19,11 +17,6 @@ const services = [
   { icon: Layers, title: "Digital Experiences", desc: "E-commerce, dashboards, booking — everything you need." },
 ];
 
-const portfolioHighlights = [
-  { img: reRetreatsThumb, title: "Rē Retreats", subtitle: "Women's Wellness Retreats", link: "https://re-retreats.com" },
-  { img: kokopelliThumb, title: "Kokopelli Kabin", subtitle: "Modern Mountain Retreat", link: "https://kokopellikabin.com" },
-  { img: vibeshiftThumb, title: "Vibe Shift → Aethyx", subtitle: "Brand Evolution", link: "https://vibe-shift.com" },
-];
 
 const trafficButtons = [
   { label: "TikTok", source: "tiktok" as const },
@@ -157,34 +150,30 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Portfolio Highlights */}
+      {/* Portfolio CTA */}
       <section className="py-24 px-6 border-t border-border/20">
-        <div className="max-w-6xl mx-auto">
-          <p className="text-primary text-xs tracking-[0.4em] uppercase text-center mb-4">Selected Work</p>
-          <h2 className="font-display text-3xl md:text-5xl text-center mb-16 tracking-tight">Recent Projects</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {portfolioHighlights.map((p) => (
-              <a
-                key={p.title}
-                href={p.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group rounded-2xl overflow-hidden border border-border/40 bg-card/40 hover:border-primary/50 hover:bg-card/60 transition-all"
-              >
-                <div className="aspect-video overflow-hidden">
-                  <img
-                    src={p.img}
-                    alt={p.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="p-6">
-                  <h3 className="font-display text-xl mb-1">{p.title}</h3>
-                  <p className="text-muted-foreground text-sm">{p.subtitle}</p>
-                </div>
-              </a>
-            ))}
-          </div>
+        <div className="max-w-3xl mx-auto text-center">
+          <p className="text-primary text-xs tracking-[0.4em] uppercase mb-8">Selected Work</p>
+          <Link
+            to="/portfolio"
+            className="group inline-block transition-transform duration-500 hover:scale-[1.03]"
+            aria-label="View the Aethyx portfolio"
+          >
+            <img
+              src={aethyxLogo}
+              alt="Aethyx"
+              className="mx-auto w-full max-w-md md:max-w-lg drop-shadow-[0_0_40px_hsl(var(--primary)/0.25)] group-hover:drop-shadow-[0_0_60px_hsl(var(--primary)/0.45)] transition-all duration-500"
+            />
+          </Link>
+          <p className="text-muted-foreground text-base md:text-lg mt-10 mb-8 max-w-xl mx-auto">
+            Real projects. Real results. Every site built with intention.
+          </p>
+          <Link
+            to="/portfolio"
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-full border border-primary/40 text-primary font-semibold tracking-[0.2em] uppercase text-sm hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all hover:-translate-y-0.5"
+          >
+            View the Portfolio →
+          </Link>
         </div>
       </section>
 
