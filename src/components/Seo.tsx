@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet-async";
 
 const SITE_URL = "https://aethyx.space";
-const DEFAULT_OG = "https://storage.googleapis.com/gpt-engineer-file-uploads/g2MMpPpUsQh5UsOphbgCfs8V92I2/social-images/social-1775501085008-Image_4-6-26_at_2.18_PM_(1).webp";
+const DEFAULT_OG = "https://aethyx.space/og-image.jpg";
 
 interface SeoProps {
   title: string;
