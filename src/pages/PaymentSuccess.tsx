@@ -1,10 +1,12 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle } from "lucide-react";
+import Seo from "@/components/Seo";
 
 const PaymentSuccess = () => {
   return (
     <div className="min-h-screen bg-transparent text-foreground flex flex-col">
+      <Seo title="Payment Successful | Aethyx" description="Your consultation payment was received." noindex />
       <div className="flex-1 flex items-center justify-center px-6 py-16">
         <div className="max-w-lg w-full text-center glass-card p-10 md:p-14">
           <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-8">

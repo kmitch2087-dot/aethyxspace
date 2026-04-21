@@ -1,5 +1,6 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import Seo from "@/components/Seo";
 import {
   Sidebar,
   SidebarContent,
@@ -90,6 +91,7 @@ function PortalSidebar() {
 const PortalLayout = () => {
   return (
     <SidebarProvider>
+      <Seo title="Client Portal | Aethyx" description="Aethyx client portal." noindex />
       <div className="min-h-screen flex w-full bg-transparent">
         <PortalSidebar />
         <div className="flex-1 flex flex-col">
