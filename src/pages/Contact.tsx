@@ -112,7 +112,7 @@ const Contact = () => {
           </div>
 
           {/* Direct Contact */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <a href="mailto:aethyxspace@protonmail.com" className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors">
               <Mail className="h-5 w-5 text-primary" />
               <span className="text-sm">aethyxspace@protonmail.com</span>
@@ -120,6 +120,10 @@ const Contact = () => {
             <a href="tel:+14015891023" className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors">
               <Phone className="h-5 w-5 text-primary" />
               <span className="text-sm">401.589.1023</span>
+            </a>
+            <a href="https://www.facebook.com/Aethyxspace/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors">
+              <Facebook className="h-5 w-5 text-primary" />
+              <span className="text-sm">Facebook</span>
             </a>
             <div className="flex items-center gap-3 text-muted-foreground">
               <MapPin className="h-5 w-5 text-primary" />
