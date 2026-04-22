@@ -1,10 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, MessageCircle, Compass, Heart, ExternalLink } from "lucide-react";
+import { ArrowRight, MessageCircle, Compass, Heart, Search } from "lucide-react";
 import Header from "@/components/Header";
-import ConsultationPayment from "@/components/ConsultationPayment";
-
-const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLScleBGGZeacHU4B-gGHDPiZFzOwpPHu8n_80DkwiypsB2nlEw/viewform?usp=publish-editor";
 
 const StartHere = () => {
   return (
