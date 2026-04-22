@@ -72,6 +72,35 @@ const ClientLoginDialog = ({ open, onClose }: ClientLoginDialogProps) => {
     navigate(isAdmin ? "/admin" : "/portal");
   };
 
+  const handleGoogle = async () => {
+    setLoading(true);
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: window.location.origin,
+    });
+    if (result.error) {
+      setLoading(false);
+      toast({ title: "Google sign-in failed", description: result.error.message, variant: "destructive" });
+      return;
+    }
+    if (result.redirected) return; // browser is navigating
+    // Tokens received — determine role and route
+    const { data: { user } } = await supabase.auth.getUser();
+    let isAdmin = false;
+    if (user) {
+      const { data: roleRow } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+      isAdmin = !!roleRow;
+    }
+    setLoading(false);
+    toast({ title: "Welcome!" });
+    onClose();
+    navigate(isAdmin ? "/admin" : "/portal");
+  };
+
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!fullName.trim()) {
