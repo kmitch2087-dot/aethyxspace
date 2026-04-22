@@ -7,6 +7,37 @@ import Footer from "@/components/Footer";
 import Seo from "@/components/Seo";
 import { organizationSchema, websiteSchema } from "@/lib/seoSchemas";
 
+const homeFaqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "How much does a custom Aethyx website cost?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Aethyx pricing is custom because every brand needs a different system. Most engagements range from $5,000 for focused web design projects to $60,000+ for full brand and digital ecosystem builds. Every project starts with a $50 paid consultation to scope the right approach.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Where is Aethyx based and who do you work with?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Aethyx is a founder-led web design and branding studio based in Rhode Island, working with ambitious businesses across the entire United States. Clients range from new founders launching premium brands to established companies rebranding or rebuilding their digital ecosystem.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What's included in the $50 consultation?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "The consultation is a focused strategy session with the founder. You'll get a clear read on your brand positioning, the gaps in your current website, and the highest-leverage moves to grow online — whether you're rebranding, redesigning, or building from scratch.",
+      },
+    },
+  ],
+};
+
 import TrafficSourcePopup from "@/components/TrafficSourcePopup";
 import { supabase } from "@/integrations/supabase/client";
 import aethyxLogo from "@/assets/aethyx-calligraphy-updated.png";
@@ -45,7 +76,7 @@ const Home = () => {
         title="Aethyx — Premium Web Design & Branding | Rhode Island"
         description="Premium web design, brand identity, and SEO architecture for ambitious businesses. Founder-led studio in Rhode Island, serving the USA. Book a consultation."
         path="/"
-        jsonLd={[organizationSchema, websiteSchema]}
+        jsonLd={[organizationSchema, websiteSchema, homeFaqSchema]}
       />
       <Navbar />
 
