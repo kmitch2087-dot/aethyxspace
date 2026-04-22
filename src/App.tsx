@@ -19,6 +19,8 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import MedSpa from "./pages/MedSpa";
+import Intake from "./pages/Intake";
+import IntakeSuccess from "./pages/IntakeSuccess";
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminLayout from "./pages/admin/AdminLayout";
@@ -31,6 +33,8 @@ import Financials from "./pages/admin/Financials";
 import Clients from "./pages/admin/Clients";
 import Documents from "./pages/admin/Documents";
 import Media from "./pages/admin/Media";
+import Intakes from "./pages/admin/Intakes";
+import IntakeFormManager from "./pages/admin/IntakeForm";
 import PortalLayout from "./pages/portal/PortalLayout";
 import PortalOverview from "./pages/portal/PortalOverview";
 import PortalMessages from "./pages/portal/PortalMessages";
@@ -56,6 +60,8 @@ const App = () => (
             <Route path="/portfolio" element={<Portfolio />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/intake" element={<Intake />} />
+            <Route path="/intake-success" element={<IntakeSuccess />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />
@@ -74,6 +80,8 @@ const App = () => (
               <Route index element={<Dashboard />} />
               <Route path="blog" element={<BlogManager />} />
               <Route path="inquiries" element={<Inquiries />} />
+              <Route path="intakes" element={<Intakes />} />
+              <Route path="intake-form" element={<IntakeFormManager />} />
               <Route path="reviews" element={<Reviews />} />
               <Route path="agreements" element={<Agreements />} />
               <Route path="financials" element={<Financials />} />
