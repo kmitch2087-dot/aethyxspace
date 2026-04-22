@@ -12,9 +12,9 @@ import { supabase } from "@/integrations/supabase/client";
 import aethyxLogo from "@/assets/aethyx-calligraphy-updated.png";
 
 const services = [
-  { icon: Globe, title: "Web Design", desc: "Custom websites that command attention & convert." },
-  { icon: Palette, title: "Branding & Identity", desc: "Logos, assets, & identity systems built to last." },
-  { icon: Layers, title: "Digital Experiences", desc: "E-commerce, dashboards, booking — everything you need." },
+  { icon: Globe, title: "Web Design & Development", desc: "Custom websites and digital ecosystems engineered for SEO architecture, speed, and conversion." },
+  { icon: Palette, title: "Brand Identity", desc: "Logos, visual systems, and brand guidelines built to position you as the premium choice in your market." },
+  { icon: Layers, title: "Digital Experiences", desc: "E-commerce, client portals, booking systems, and AI-ready interfaces — built to scale with you." },
 ];
 
 
@@ -42,8 +42,8 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-transparent text-foreground">
       <Seo
-        title="Aethyx — Premium Web Design & Brand Studio | Rhode Island, USA"
-        description="Aethyx designs and builds premium websites, brands, and digital experiences for ambitious businesses. Based in Rhode Island, serving the entire USA."
+        title="Aethyx — Premium Web Design & Branding | Rhode Island"
+        description="Premium web design, brand identity, and SEO architecture for ambitious businesses. Founder-led studio in Rhode Island, serving the USA. Book a consultation."
         path="/"
         jsonLd={[organizationSchema, websiteSchema]}
       />
@@ -67,16 +67,16 @@ const Home = () => {
           </p>
 
           <h1 className="font-display font-black tracking-tight leading-[1.02] text-5xl md:text-7xl lg:text-[6.5rem] mb-8">
-            <span className="block text-foreground">Build something</span>
+            <span className="block text-foreground">Premium web design</span>
             <span className="block text-outline">they can't ignore.</span>
           </h1>
 
           <p className="text-primary/90 font-display text-base md:text-lg tracking-[0.3em] uppercase mb-6">
-            Built to stand out, designed to perform.
+            Web design, brand identity &amp; SEO architecture
           </p>
 
           <p className="text-foreground/70 text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed">
-            Book a consultation & let's build a digital presence that actually represents you. Founder-led, start to finish — you work directly with me.
+            Aethyx is a Rhode Island web design and branding studio building custom websites, brand systems, and digital ecosystems for ambitious businesses across the USA. Book a consultation and work directly with the founder, start to finish.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-14">
