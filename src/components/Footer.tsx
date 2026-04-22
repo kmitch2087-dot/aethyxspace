@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Facebook, Mail, Phone } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Youtube, Mail, Phone, Twitter } from "lucide-react";
 
 const Footer = () => (
   <footer className="relative z-10 border-t border-border/20 py-10 px-6">
@@ -14,16 +14,23 @@ const Footer = () => (
           <Phone className="h-4 w-4 text-primary" />
           <span>401.589.1023</span>
         </a>
-        <span className="hidden sm:inline">•</span>
-        <a
-          href="https://www.facebook.com/Aethyxspace/"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Aethyx on Facebook"
-          className="inline-flex items-center gap-1.5 hover:text-primary transition-colors"
-        >
-          <Facebook className="h-4 w-4 text-primary" />
-          <span>Facebook</span>
+      </div>
+
+      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+        <a href="https://www.facebook.com/Aethyxspace/" target="_blank" rel="noopener noreferrer" aria-label="Aethyx on Facebook" className="hover:text-primary transition-colors">
+          <Facebook className="h-4 w-4" />
+        </a>
+        <a href="https://www.instagram.com/aethyxspace/" target="_blank" rel="noopener noreferrer" aria-label="Aethyx on Instagram" className="hover:text-primary transition-colors">
+          <Instagram className="h-4 w-4" />
+        </a>
+        <a href="https://www.linkedin.com/company/aethyx/" target="_blank" rel="noopener noreferrer" aria-label="Aethyx on LinkedIn" className="hover:text-primary transition-colors">
+          <Linkedin className="h-4 w-4" />
+        </a>
+        <a href="https://www.youtube.com/@aethyxspace" target="_blank" rel="noopener noreferrer" aria-label="Aethyx on YouTube" className="hover:text-primary transition-colors">
+          <Youtube className="h-4 w-4" />
+        </a>
+        <a href="https://x.com/aethyxspace" target="_blank" rel="noopener noreferrer" aria-label="Aethyx on X" className="hover:text-primary transition-colors">
+          <Twitter className="h-4 w-4" />
         </a>
       </div>
 
@@ -37,12 +44,22 @@ const Footer = () => (
       </div>
     </div>
 
+    <nav aria-label="Footer" className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-muted-foreground">
+      <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+      <Link to="/services" className="hover:text-primary transition-colors">Services</Link>
+      <Link to="/portfolio" className="hover:text-primary transition-colors">Portfolio</Link>
+      <Link to="/about" className="hover:text-primary transition-colors">About</Link>
+      <Link to="/blog" className="hover:text-primary transition-colors">Blog</Link>
+      <Link to="/contact" className="hover:text-primary transition-colors">Contact</Link>
+    </nav>
+
     <div className="mt-6 text-center">
       <p className="text-xs text-muted-foreground">
-        © {new Date().getFullYear()} Aethyx. All rights reserved.
+        © {new Date().getFullYear()} Aethyx — Premium web design &amp; brand studio in Rhode Island. All rights reserved.
       </p>
     </div>
   </footer>
 );
 
 export default Footer;
+

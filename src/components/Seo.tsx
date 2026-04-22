@@ -36,9 +36,12 @@ const Seo = ({
   publishedTime,
   modifiedTime,
 }: SeoProps) => {
-  const resolvedPath =
+  const rawPath =
     path ?? (typeof window !== "undefined" ? window.location.pathname : "/");
-  const canonical = `${SITE_URL}${resolvedPath === "/" ? "" : resolvedPath}`;
+  // Strip trailing slash (except for root) so canonical is single, consistent.
+  const normalized =
+    rawPath.length > 1 && rawPath.endsWith("/") ? rawPath.slice(0, -1) : rawPath;
+  const canonical = `${SITE_URL}${normalized === "/" ? "/" : normalized}`;
   const schemas = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 
   return (
