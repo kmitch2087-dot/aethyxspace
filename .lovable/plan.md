@@ -1,79 +1,112 @@
 
-## Add Founder Photo + Rewrite About Page (Solo Founder Voice)
 
-Two coordinated changes: place Kristin's photo on the About page, and rewrite the site-wide "team/we" language to reflect that Aethyx is a solo founder studio — owned with pride.
+## Reshape the consultation flow → Client Intake Form (with admin-editable questions)
 
-### 1. About page rewrite (`src/pages/About.tsx`)
+### What changes for visitors
 
-**New layout:** Two-column intro on desktop (photo left, heading + opening paragraphs right), stacks on mobile. Rest of page keeps its rhythm but gets new copy.
+Today: Every "Book a Consultation" button takes the visitor to a Stripe checkout for $50, then a "we'll be in touch" page. There is no scheduling tool wired up — but the copy implies they're booking a meeting, which sets the wrong expectation.
 
-**New copy (in brand voice — confident, founder-led, no fluff):**
+New flow:
+1. Visitor clicks **Book a Consultation** anywhere on the site.
+2. Lands on a new **/intake** page with your full intake form (free to submit).
+3. Submits → sees a confirmation: *"Thanks. I'll personally review your submission, do real research on your business, and reach out within 2 business days with a $50 invoice for our strategy session."*
+4. You review in admin, send them a Stripe invoice manually (or one-click from the new Inquiries detail view), then schedule the call once paid.
 
-Intro section (next to photo):
-> # About Aethyx
->
-> Aethyx is me — Kristin Mitchell. One founder, one studio, every pixel.
->
-> I built this because I kept watching brilliant, hard-working people hide behind websites that didn't come close to matching who they actually are. Too cluttered. Too generic. Too easy to scroll past.
->
-> Aethyx is my becoming — the thing I built brick by brick, late night by late night, until it became something I'm genuinely proud of. And now I get to do the same for other people: help them see what's actually possible.
+The Stripe checkout button on the homepage hero, Contact page, and Start Here page all get replaced with **"Begin Intake"** routing to `/intake`. The Stripe consultation flow stays intact behind the scenes for when you send the invoice — just no longer triggered from a public button.
 
-Mid-section heading + sub:
-> ## Elevate & Evolve Unapologetically
-> No team to hide behind. No account managers, no handoffs, no "someone will get back to you." You work directly with me — the person designing it, writing it, building it, and obsessing over it until it's right.
+### The Client Intake Form (deep research set)
 
-Closing paragraphs:
-> My favorite part of this whole job is the reveal. The moment a client sees their site for the first time and realizes what's actually possible now — the automations, the workflows, the things running quietly in the background — and the fear flips into awe.
->
-> Most people think a more advanced website means more work for them. It's the opposite. Done right, it means *less* — fewer manual tasks, fewer things to remember, more time to actually do the work you're here to do.
->
-> *That's the whole point. Your business has evolved. Your website should prove it — and then get out of your way.*
+Single page, your existing dark/teal styling, grouped into 4 sections:
 
-**Cards section — replace "Our Team" + "Our Values":**
+**1. About you**
+- Full name *
+- Email *
+- Phone
+- Business name *
+- Website (current, if any)
+- Industry *
 
-Card 1 — **The Studio** (Users icon):
-> Aethyx is a one-woman studio led by Kristin Mitchell. That means every decision, every line of copy, every detail is mine — and I take that personally. No subcontractors. No silent partners. Just direct, founder-led work from start to launch.
+**2. The project**
+- Project type * (rebrand / new build / redesign / scale existing / not sure)
+- Biggest challenge right now *
+- Top 3 goals for this project *
+- Timeline *
+- Budget range *
+- Brand assets status (none / partial / complete)
+- Content readiness (need help / drafted / finalized)
 
-Card 2 — **What I Stand For** (Target icon):
-> Bold over safe. Clarity over complexity. Craft over shortcuts. Every business deserves a digital presence that commands respect — and I don't stop until yours does.
+**3. The market**
+- Target audience *
+- 2–3 competitors (URLs)
+- Current marketing channels
+- How will you measure success *
 
-### 2. Photo placement
+**4. Anything else**
+- Inspiration links / references
+- Anything else I should know
 
-- Save uploaded image to `src/assets/kristin-founder.jpg`
-- Import into About.tsx
-- Wrapper: `rounded-2xl overflow-hidden border border-primary/20 shadow-[0_0_40px_-10px_hsl(var(--primary)/0.3)]`, max-height constrained on mobile
-- Caption underneath: "Kristin Mitchell — Founder"
-- Layout: `grid md:grid-cols-2 gap-10 items-center` on intro row only; container widens to `max-w-5xl` for that row, rest stays `max-w-3xl`
-- `alt="Kristin Mitchell, Founder of Aethyx"`, `loading="eager"`
+Every field is stored. Required fields marked with *.
 
-### 3. Site-wide "we → I" sweep
+### Admin-editable questions (so you can change it anytime)
 
-Change team/plural language to solo-founder voice across these files (only the customer-facing copy, not variable names or RLS/legal text):
+New `intake_form_fields` table. The intake page renders fields **dynamically from this table**, so when you add or change a question in admin you don't need a rebuild.
 
-- `src/pages/Home.tsx` — any "we build / our team / we believe" → "I build / I / I believe"
-- `src/pages/Services.tsx` — service descriptions, intros
-- `src/pages/StartHere.tsx` — funnel copy
-- `src/pages/Contact.tsx` — intro / reassurance lines
-- `src/pages/Rebrand.tsx` — narrative
-- `src/pages/Seo.tsx` — explainer copy
-- `src/pages/Membership.tsx` — pitch copy
-- `src/pages/MedSpa.tsx` — only the brand-voice sections (keep medspa positioning intact)
-- `src/pages/Portfolio.tsx` — project intros
-- `src/components/Footer.tsx` — tagline if applicable
+Each field row:
+- label, help text, field type (text / textarea / email / tel / url / select / multiselect), options (for select), required (yes/no), section (about / project / market / extra), display order, active (yes/no).
 
-**Preserved unchanged:** Privacy Policy, Terms of Service (legal "we/Aethyx" is standard), admin/portal interfaces, button labels, technical copy.
+Seeded with the 18 questions above. New admin page at `/admin/intake-form` lets you add, edit, reorder (drag handle), toggle active, and delete questions.
 
-**Approach:** read each file, replace only marketing prose where "we/our/us/team" implies multiple people. Keep "Aethyx" as the brand name where it reads better than "I" (e.g. "Aethyx is built on…" stays).
+### Where submissions live
 
-### 4. Memory updates
+New `client_intakes` table:
+- Identity columns (name, email, phone, business)
+- `responses` jsonb — the full answer set keyed by field id, so it survives field changes
+- status: `new` / `reviewing` / `invoice_sent` / `paid` / `archived`
+- `linked_user_id` (filled when they later create a portal account with the same email)
+- timestamps
 
-- Update `mem://features/about-page` to reflect solo-founder narrative + photo
-- Update `mem://brand/aethyx-tone` to add: "Solo founder voice — use 'I' not 'we'. Aethyx is Kristin Mitchell. Take pride in the one-woman studio positioning rather than hiding it."
-- Update `mem://index.md` Core to note: "Solo founder studio — Kristin Mitchell. Use 'I' in marketing copy, not 'we/our team'."
+New admin page `/admin/intakes` (replaces the current Inquiries page's role for new leads, or sits alongside it):
+- List view, filter by status
+- Detail drawer shows all responses cleanly grouped
+- Buttons: "Mark reviewing" / "Send $50 invoice" (creates a Stripe invoice for that email and marks `invoice_sent`) / "Archive"
 
-### Technical details
+### Client profile is created from the intake — not duplicated
 
-- Files edited: `src/pages/About.tsx`, `src/pages/Home.tsx`, `src/pages/Services.tsx`, `src/pages/StartHere.tsx`, `src/pages/Contact.tsx`, `src/pages/Rebrand.tsx`, `src/pages/Seo.tsx`, `src/pages/Membership.tsx`, `src/pages/MedSpa.tsx`, `src/pages/Portfolio.tsx`, `src/components/Footer.tsx`
-- New asset: `src/assets/kristin-founder.jpg` (copied from upload)
-- Memory: 3 files written/updated
-- No DB, no schema, no edge functions, no new dependencies
+When a lead later signs up via Client Login using the same email as their intake:
+- Their `client_profiles` row is auto-prefilled from the intake responses (name, business, phone).
+- The intake's `linked_user_id` is set so you can see "Intake → Profile → Documents → Agreements → Payments" all on one client record.
+
+The Portal stays the place they see documents, agreements, messages, and payment history — exactly as it works now. Nothing about the portal UI changes.
+
+### Admin login = Client Login button (same door)
+
+Right now `/admin/login` is a separate page. Change: when **you** click **Client Login** in the navbar and sign in:
+- `useAuth` already resolves `isAdmin`. After successful login, the dialog routes admins to `/admin` and clients to `/portal`.
+- `/admin/login` keeps existing for direct bookmarks but the public path is the same Client Login button.
+
+### Files touched
+
+**New**
+- `src/pages/Intake.tsx` — the public intake form, dynamically rendered from `intake_form_fields`
+- `src/pages/IntakeSuccess.tsx` — confirmation page
+- `src/pages/admin/IntakeForm.tsx` — drag-to-reorder field manager
+- `src/pages/admin/Intakes.tsx` — submissions inbox + detail drawer + "Send $50 invoice" action
+- `supabase/functions/send-consultation-invoice/index.ts` — creates a Stripe invoice for the lead
+- Migration: `intake_form_fields`, `client_intakes` tables + RLS (public INSERT into `client_intakes` with field-length caps, admin-only SELECT/UPDATE; admin-only on `intake_form_fields` with public SELECT for active rows)
+- Migration: trigger on `auth.users` insert to backfill `client_profiles` + link `client_intakes` by email
+
+**Edited**
+- `src/App.tsx` — add `/intake`, `/intake-success`, `/admin/intake-form`, `/admin/intakes` routes
+- `src/pages/Home.tsx` — three "Book a Consultation" buttons → "Begin Intake" → `/intake`. Update "Why book a consultation" copy: *"Click below to share your business with me through a short intake form. I'll review it, do real research on your brand and competitors, then reach out with a $50 invoice for a focused strategy session — so when we talk, I come with real data, not generic advice."*
+- `src/pages/Contact.tsx` — replace the Stripe checkout form with a short "Begin Intake" CTA + the existing direct-contact row
+- `src/pages/StartHere.tsx` — remove the `<ConsultationPayment />` card; the right-hand column becomes a "Strategy Consultation" card that explains the new flow and links to `/intake`
+- `src/components/ClientLoginDialog.tsx` — after login, route admins to `/admin` and clients to `/portal`
+- `src/pages/admin/AdminLayout.tsx` — add "Intakes" and "Intake Form" sidebar links
+
+**Untouched**: Portal pages, brand styling, hero, navbar layout, Stripe consultation edge function (still used by the new invoice flow).
+
+### What stays manual / outside this build
+
+- Scheduling the actual call still happens in your existing calendar; no booking widget is added.
+- Sending the $50 invoice is a one-click action from admin, but you decide *when* to send it after reviewing.
+
