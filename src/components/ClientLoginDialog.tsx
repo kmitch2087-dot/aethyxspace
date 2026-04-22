@@ -43,18 +43,32 @@ const ClientLoginDialog = ({ open, onClose }: ClientLoginDialogProps) => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email: loginEmail,
       password: loginPassword,
     });
-    setLoading(false);
     if (error) {
+      setLoading(false);
       toast({ title: "Login failed", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "Welcome back!" });
-      onClose();
-      navigate("/portal");
+      return;
     }
+
+    // Check if this user is an admin and route accordingly
+    let isAdmin = false;
+    if (data.user) {
+      const { data: roleRow } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", data.user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+      isAdmin = !!roleRow;
+    }
+
+    setLoading(false);
+    toast({ title: "Welcome back!" });
+    onClose();
+    navigate(isAdmin ? "/admin" : "/portal");
   };
 
   const handleSignup = async (e: React.FormEvent) => {

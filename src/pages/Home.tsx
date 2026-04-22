@@ -112,10 +112,10 @@ const Home = () => {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-14">
             <Link
-              to="/contact"
+              to="/intake"
               className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-primary-foreground font-semibold tracking-[0.2em] uppercase text-sm hover:bg-primary/90 transition-all hover:-translate-y-0.5"
             >
-              Book a Consultation <ArrowRight className="h-4 w-4" />
+              Begin Intake <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
               to="/services"
@@ -212,19 +212,19 @@ const Home = () => {
               </p>
             </div>
             <div>
-              <h3 className="font-display text-xl mb-3 text-foreground">Why book a consultation</h3>
+              <h3 className="font-display text-xl mb-3 text-foreground">Why begin with the intake</h3>
               <p className="leading-relaxed text-base">
-                The consultation is where strategy starts. In one session you'll get a clear read on your brand positioning, the gaps in your current site, and the highest-leverage moves to grow online. Whether you're rebranding, redesigning, or building from scratch, this is the fastest way to know what your business actually needs.
+                Click below to share your business with me through a short intake form. I'll personally review it, do real research on your brand, market, and competitors, then reach out with a $50 invoice for a focused strategy session — so when we talk, I come with real data, not generic advice.
               </p>
             </div>
           </div>
 
           <div className="text-center mt-12">
             <Link
-              to="/contact"
+              to="/intake"
               className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-primary-foreground font-semibold tracking-[0.2em] uppercase text-sm hover:bg-primary/90 transition-all hover:-translate-y-0.5"
             >
-              Book a Consultation <ArrowRight className="h-4 w-4" />
+              Begin Intake <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </div>
@@ -262,13 +262,13 @@ const Home = () => {
         <p className="text-primary text-xs tracking-[0.4em] uppercase mb-4">Ready to Shift?</p>
         <h2 className="font-display text-3xl md:text-5xl mb-6 tracking-tight">Let's build something they can't ignore.</h2>
         <p className="text-muted-foreground text-lg max-w-xl mx-auto mb-10">
-          Book a consultation & let's build a digital presence that actually represents you.
+          Start with the intake. I'll do real research before we ever get on a call.
         </p>
         <Link
-          to="/contact"
+          to="/intake"
           className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-primary-foreground font-semibold tracking-[0.2em] uppercase text-sm hover:bg-primary/90 transition-all hover:-translate-y-0.5"
         >
-          Book a Consultation <ArrowRight className="h-4 w-4" />
+          Begin Intake <ArrowRight className="h-4 w-4" />
         </Link>
       </section>
 

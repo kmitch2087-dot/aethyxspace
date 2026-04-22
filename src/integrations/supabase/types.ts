@@ -206,6 +206,48 @@ export type Database = {
         }
         Relationships: []
       }
+      client_intakes: {
+        Row: {
+          business_name: string | null
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          linked_user_id: string | null
+          notes: string | null
+          phone: string | null
+          responses: Json
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          business_name?: string | null
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          linked_user_id?: string | null
+          notes?: string | null
+          phone?: string | null
+          responses?: Json
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          business_name?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          linked_user_id?: string | null
+          notes?: string | null
+          phone?: string | null
+          responses?: Json
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       client_messages: {
         Row: {
           created_at: string
@@ -307,6 +349,51 @@ export type Database = {
           service_name?: string | null
           stripe_payment_id?: string | null
           stripe_session_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      intake_form_fields: {
+        Row: {
+          active: boolean
+          created_at: string
+          display_order: number
+          field_key: string
+          field_type: string
+          help_text: string | null
+          id: string
+          label: string
+          options: Json | null
+          required: boolean
+          section: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          display_order?: number
+          field_key: string
+          field_type: string
+          help_text?: string | null
+          id?: string
+          label: string
+          options?: Json | null
+          required?: boolean
+          section: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          display_order?: number
+          field_key?: string
+          field_type?: string
+          help_text?: string | null
+          id?: string
+          label?: string
+          options?: Json | null
+          required?: boolean
+          section?: string
           updated_at?: string
         }
         Relationships: []

@@ -32,8 +32,10 @@ import { Button } from "@/components/ui/button";
 
 const navItems = [
   { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
-  { title: "Blog", url: "/admin/blog", icon: FileText },
+  { title: "Intakes", url: "/admin/intakes", icon: MessageSquare },
+  { title: "Intake Form", url: "/admin/intake-form", icon: FileSignature },
   { title: "Inquiries", url: "/admin/inquiries", icon: MessageSquare },
+  { title: "Blog", url: "/admin/blog", icon: FileText },
   { title: "Reviews", url: "/admin/reviews", icon: Star },
   { title: "Agreements", url: "/admin/agreements", icon: FileSignature },
   { title: "Financials", url: "/admin/financials", icon: DollarSign },

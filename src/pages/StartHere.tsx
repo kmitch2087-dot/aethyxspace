@@ -1,10 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, MessageCircle, Compass, Heart, ExternalLink } from "lucide-react";
+import { ArrowRight, MessageCircle, Compass, Heart, Search } from "lucide-react";
 import Header from "@/components/Header";
-import ConsultationPayment from "@/components/ConsultationPayment";
-
-const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLScleBGGZeacHU4B-gGHDPiZFzOwpPHu8n_80DkwiypsB2nlEw/viewform?usp=publish-editor";
 
 const StartHere = () => {
   return (
@@ -77,7 +74,7 @@ const StartHere = () => {
                 Choose Your Path
               </h2>
               <p className="text-muted-foreground text-lg leading-relaxed font-light max-w-2xl mx-auto">
-                Fill out the intake form to share your needs, or book a paid consultation for a comprehensive review & action plan.
+                Share your project through the intake form. I personally review every submission and follow up with a focused strategy session — backed by real research on your business.
               </p>
             </div>
 
@@ -86,38 +83,53 @@ const StartHere = () => {
               <div className="card-elevated rounded-3xl p-8 md:p-10 flex flex-col">
                 <div className="mb-6">
                   <span className="inline-block text-sm font-medium text-ocean tracking-wide uppercase mb-2">
-                    Free
+                    Free to submit
                   </span>
                   <h3 className="text-xl md:text-2xl font-medium text-foreground mb-3">
                     Client Intake Form
                   </h3>
                   <p className="text-muted-foreground font-light leading-relaxed">
-                    Share a bit about your business & what you're looking for. I'll review your responses & reach out with next steps.
+                    Tell me about your business, goals, and timeline. I'll review your responses personally and reach out with next steps within 2 business days.
                   </p>
                 </div>
-                
+
                 <div className="mt-auto">
-                  <a 
-                    href={GOOGLE_FORM_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Button 
-                      size="lg" 
+                  <Link to="/intake">
+                    <Button
+                      size="lg"
                       className="w-full text-base px-8 py-7 rounded-full bg-sage hover:bg-sage/90 text-white shadow-warm transition-all duration-300 hover:shadow-warm-lg hover:-translate-y-0.5"
                     >
-                      Fill Out Form
-                      <ExternalLink className="ml-2 h-4 w-4" />
+                      Begin Intake
+                      <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
-                  </a>
+                  </Link>
                   <p className="text-center text-sm text-muted-foreground mt-3 font-light">
-                    (don't worry, I'm not charging you anything yet)
+                    No payment required at this step.
                   </p>
                 </div>
               </div>
 
-              {/* Paid Consultation Option */}
-              <ConsultationPayment />
+              {/* Strategy Consultation Card (informational) */}
+              <div className="card-elevated rounded-3xl p-8 md:p-10 flex flex-col">
+                <div className="mb-6">
+                  <div className="w-10 h-10 rounded-full bg-sage-light flex items-center justify-center mb-4">
+                    <Search className="h-5 w-5 text-sage" />
+                  </div>
+                  <span className="inline-block text-sm font-medium text-ocean tracking-wide uppercase mb-2">
+                    $50 — After Intake
+                  </span>
+                  <h3 className="text-xl md:text-2xl font-medium text-foreground mb-3">
+                    Strategy Consultation
+                  </h3>
+                  <p className="text-muted-foreground font-light leading-relaxed">
+                    After your intake, I dig into your brand, market, and competitors before our call. The $50 covers that research time, so when we meet I bring real data and clear recommendations — not generic advice.
+                  </p>
+                </div>
+
+                <div className="mt-auto text-sm text-muted-foreground font-light italic">
+                  You'll receive a Stripe invoice once your intake has been reviewed.
+                </div>
+              </div>
             </div>
           </div>
         </div>
