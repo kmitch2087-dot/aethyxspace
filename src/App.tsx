@@ -8,6 +8,7 @@ import GlobalBackground from "@/components/GlobalBackground";
 import ScrollToTop from "@/components/ScrollToTop";
 import AdminRoute from "@/components/AdminRoute";
 import ClientRoute from "@/components/ClientRoute";
+import CookieConsent from "@/components/CookieConsent";
 import Home from "./pages/Home";
 import Services from "./pages/Services";
 import Portfolio from "./pages/Portfolio";
@@ -106,6 +107,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
           </div>
+          <CookieConsent />
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
