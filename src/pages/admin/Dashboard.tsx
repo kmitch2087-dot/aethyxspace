@@ -105,16 +105,7 @@ const Dashboard = () => {
     },
   ];
 
-  const handleSaveFacebook = async () => {
-    setSavingFb(true);
-    try {
-      localStorage.setItem("fb_page_id", fbPageId);
-      localStorage.setItem("fb_access_token", fbAccessToken);
-      toast({ title: "Saved", description: "Facebook credentials saved locally. They'll be configured as secrets when you're ready." });
-    } finally {
-      setSavingFb(false);
-    }
-  };
+
 
   return (
     <div>
