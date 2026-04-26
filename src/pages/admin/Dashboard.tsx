@@ -2,11 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { toast } from "@/hooks/use-toast";
-import { FileText, MessageSquare, Star, DollarSign, FileSignature, BarChart3, Share2, Facebook, Save } from "lucide-react";
+import { FileText, MessageSquare, Star, DollarSign, FileSignature, BarChart3, Share2, Facebook, ShieldCheck } from "lucide-react";
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -21,11 +17,14 @@ const Dashboard = () => {
   });
   const [trafficStats, setTrafficStats] = useState({ tiktok: 0, instagram: 0, facebook: 0, other: 0, total: 0 });
   const [loading, setLoading] = useState(true);
-  const [fbPageId, setFbPageId] = useState(() => localStorage.getItem("fb_page_id") || "");
-  const [fbAccessToken, setFbAccessToken] = useState(() => localStorage.getItem("fb_access_token") || "");
-  const [savingFb, setSavingFb] = useState(false);
 
   useEffect(() => {
+    // Cleanup: remove any FB credentials previously persisted in localStorage (now stored as backend secrets)
+    try {
+      localStorage.removeItem("fb_page_id");
+      localStorage.removeItem("fb_access_token");
+    } catch {}
+
     const fetchStats = async () => {
       const [postsRes, inquiriesRes, reviewsRes, agreementsRes, financialsRes, trafficRes] =
         await Promise.all([
@@ -112,16 +111,7 @@ const Dashboard = () => {
     },
   ];
 
-  const handleSaveFacebook = async () => {
-    setSavingFb(true);
-    try {
-      localStorage.setItem("fb_page_id", fbPageId);
-      localStorage.setItem("fb_access_token", fbAccessToken);
-      toast({ title: "Saved", description: "Facebook credentials saved locally. They'll be configured as secrets when you're ready." });
-    } finally {
-      setSavingFb(false);
-    }
-  };
+
 
   return (
     <div>
@@ -186,39 +176,28 @@ const Dashboard = () => {
             <Card className="border-border/30">
               <CardHeader>
                 <div className="flex items-center gap-2">
-                  <Facebook className="h-5 w-5 text-blue-500" />
+                  <Facebook className="h-5 w-5 text-primary" />
                   <CardTitle className="text-lg">Facebook Business Page</CardTitle>
                 </div>
                 <CardDescription>
-                  Auto-post published blog articles to your Facebook page. Enter your Page ID & long-lived Page Access Token below.
+                  Auto-post published blog articles to your Facebook page.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="fb-page-id">Page ID</Label>
-                  <Input
-                    id="fb-page-id"
-                    placeholder="e.g. 123456789012345"
-                    value={fbPageId}
-                    onChange={(e) => setFbPageId(e.target.value)}
-                  />
+                <div className="rounded-lg border border-border/40 bg-muted/30 p-4 space-y-3">
+                  <div className="flex items-start gap-2">
+                    <ShieldCheck className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium">Credentials are stored server-side</p>
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        For security, your Facebook Page ID and Access Token are stored as encrypted backend secrets — never in your browser. Ask Lovable to add the secrets <code className="px-1 py-0.5 rounded bg-background/50">FACEBOOK_PAGE_ID</code> and <code className="px-1 py-0.5 rounded bg-background/50">FACEBOOK_ACCESS_TOKEN</code>, and they'll be available to the auto-posting edge function.
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="fb-token">Page Access Token</Label>
-                  <Input
-                    id="fb-token"
-                    type="password"
-                    placeholder="Paste your long-lived token here"
-                    value={fbAccessToken}
-                    onChange={(e) => setFbAccessToken(e.target.value)}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Get this from Meta Business Suite → Graph API Explorer → generate a long-lived token with <code>pages_manage_posts</code> permission.
-                  </p>
-                </div>
-                <Button onClick={handleSaveFacebook} disabled={savingFb} className="gap-2">
-                  <Save className="h-4 w-4" /> Save Credentials
-                </Button>
+                <p className="text-xs text-muted-foreground">
+                  Generate a long-lived Page Access Token from Meta Business Suite → Graph API Explorer with the <code>pages_manage_posts</code> permission, then have Lovable save it as a secret.
+                </p>
               </CardContent>
             </Card>
 
