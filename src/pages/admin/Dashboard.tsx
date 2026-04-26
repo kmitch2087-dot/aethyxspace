@@ -17,9 +17,6 @@ const Dashboard = () => {
   });
   const [trafficStats, setTrafficStats] = useState({ tiktok: 0, instagram: 0, facebook: 0, other: 0, total: 0 });
   const [loading, setLoading] = useState(true);
-  const [fbPageId, setFbPageId] = useState(() => localStorage.getItem("fb_page_id") || "");
-  const [fbAccessToken, setFbAccessToken] = useState(() => localStorage.getItem("fb_access_token") || "");
-  const [savingFb, setSavingFb] = useState(false);
 
   useEffect(() => {
     const fetchStats = async () => {
