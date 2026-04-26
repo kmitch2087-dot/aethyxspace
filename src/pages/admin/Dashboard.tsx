@@ -19,6 +19,12 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Cleanup: remove any FB credentials previously persisted in localStorage (now stored as backend secrets)
+    try {
+      localStorage.removeItem("fb_page_id");
+      localStorage.removeItem("fb_access_token");
+    } catch {}
+
     const fetchStats = async () => {
       const [postsRes, inquiriesRes, reviewsRes, agreementsRes, financialsRes, trafficRes] =
         await Promise.all([
