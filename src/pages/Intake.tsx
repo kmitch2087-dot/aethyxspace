@@ -163,8 +163,8 @@ const Intake = () => {
   return (
     <div className="min-h-screen bg-transparent text-foreground">
       <Seo
-        title="Client Intake — Aethyx Strategy Consultation"
-        description="Share your business goals through a short intake form. Aethyx personally reviews every submission and follows up to discuss next steps."
+        title="Let's Connect — Aethyx"
+        description="Share a few details about your brand. Aethyx personally reviews every submission and follows up to discuss next steps."
         path="/intake"
       />
       <Navbar />
@@ -175,10 +175,10 @@ const Intake = () => {
             Begin with intent
           </p>
           <h1 className="font-display text-4xl md:text-6xl text-center mb-6 tracking-tight">
-            Client Intake
+            Let's Connect
           </h1>
           <p className="text-center text-muted-foreground text-base md:text-lg max-w-2xl mx-auto mb-14 leading-relaxed">
-            Tell me about your brand. I'll personally review your submission, do real research on
+            Tell me a bit about your brand. I'll personally review your submission, do real research on
             your market and competitors, then reach out within 2 business days to discuss next
             steps — so when we meet, I come with real data.
           </p>
@@ -234,7 +234,7 @@ const Intake = () => {
                     </>
                   ) : (
                     <>
-                      Submit Intake <ArrowRight className="ml-2 h-4 w-4" />
+                      Send <ArrowRight className="ml-2 h-4 w-4" />
                     </>
                   )}
                 </Button>

@@ -8,8 +8,8 @@ const IntakeSuccess = () => {
   return (
     <div className="min-h-screen bg-transparent text-foreground">
       <Seo
-        title="Intake Received — Aethyx"
-        description="Your intake has been received. Aethyx will personally review and follow up shortly."
+        title="Message Received — Aethyx"
+        description="Your message has been received. Aethyx will personally review and follow up shortly."
         path="/intake-success"
         noindex
       />
@@ -26,7 +26,7 @@ const IntakeSuccess = () => {
             Thank you.
           </h1>
           <p className="text-muted-foreground text-base md:text-lg leading-relaxed mb-6">
-            Your intake is in. I'll personally review your submission, do real research on your
+            Your message is in. I'll personally review it, do real research on your
             brand, market, and competitors, and reach out within{" "}
             <span className="text-foreground">2 business days</span> to discuss next steps and a
             focused strategy session.
