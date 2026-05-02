@@ -138,7 +138,7 @@ serve(async (req) => {
     console.error("Invoice error:", error);
     return new Response(
       JSON.stringify({
-        error: error instanceof Error ? error.message : "Failed to send invoice",
+        error: "Failed to create or send invoice. Please try again.",
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 },
     );

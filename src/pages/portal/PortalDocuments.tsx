@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { FileText, Download } from "lucide-react";
+import { FileText, Download, Loader2 } from "lucide-react";
 import { format } from "date-fns";
+import { useToast } from "@/hooks/use-toast";
 
 const PortalDocuments = () => {
   const { user } = useAuth();
   const [documents, setDocuments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!user) return;
@@ -22,6 +25,36 @@ const PortalDocuments = () => {
     };
     load();
   }, [user]);
+
+  const handleDownload = async (doc: any) => {
+    setDownloadingId(doc.id);
+    try {
+      // Backwards compatibility: legacy rows stored a full public URL.
+      // New rows store the storage path. Extract the path either way.
+      let path: string = doc.file_url;
+      const marker = "/client-documents/";
+      const idx = path.indexOf(marker);
+      if (idx !== -1) {
+        path = path.substring(idx + marker.length);
+      }
+
+      const { data, error } = await supabase.storage
+        .from("client-documents")
+        .createSignedUrl(path, 3600);
+
+      if (error || !data?.signedUrl) {
+        toast({
+          title: "Unable to open document",
+          description: "Please try again or contact support.",
+          variant: "destructive",
+        });
+        return;
+      }
+      window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+    } finally {
+      setDownloadingId(null);
+    }
+  };
 
   if (loading) {
     return (
@@ -40,12 +73,11 @@ const PortalDocuments = () => {
       ) : (
         <div className="space-y-3">
           {documents.map((doc) => (
-            <a
+            <button
               key={doc.id}
-              href={doc.file_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-4 p-4 rounded-lg border border-border/30 bg-card hover:border-primary/30 transition-colors"
+              onClick={() => handleDownload(doc)}
+              disabled={downloadingId === doc.id}
+              className="w-full flex items-center gap-4 p-4 rounded-lg border border-border/30 bg-card hover:border-primary/30 transition-colors text-left disabled:opacity-60"
             >
               <FileText className="h-5 w-5 text-primary shrink-0" />
               <div className="flex-1 min-w-0">
@@ -54,8 +86,12 @@ const PortalDocuments = () => {
                   {format(new Date(doc.created_at), "MMM d, yyyy")} • Uploaded by {doc.uploaded_by}
                 </p>
               </div>
-              <Download className="h-4 w-4 text-muted-foreground shrink-0" />
-            </a>
+              {downloadingId === doc.id ? (
+                <Loader2 className="h-4 w-4 text-muted-foreground shrink-0 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4 text-muted-foreground shrink-0" />
+              )}
+            </button>
           ))}
         </div>
       )}
