@@ -9,8 +9,8 @@ const Contact = () => {
   return (
     <div className="min-h-screen bg-transparent text-foreground">
       <Seo
-        title="Contact Aethyx — Begin with a Strategy Intake"
-        description="Start your project with a short intake form. Aethyx personally reviews every submission, then follows up with a $50 strategy session — backed by real research."
+        title="Contact Aethyx — Let's Connect"
+        description="Start your project with a short form. Aethyx personally reviews every submission and follows up to discuss next steps — backed by real research."
         path="/contact"
         jsonLd={breadcrumb([
           { name: "Home", path: "/" },
@@ -23,23 +23,23 @@ const Contact = () => {
         <div className="max-w-3xl mx-auto">
           <h1 className="font-display text-4xl md:text-6xl text-center mb-4">Let's Build It.</h1>
           <p className="text-center text-muted-foreground text-lg mb-16 max-w-xl mx-auto">
-            Every project begins with a short intake. I'll personally review your submission, research your market, and follow up within 2 business days with a $50 invoice for a focused strategy session.
+            Every project begins with a quick hello. I'll personally review your submission, research your market, and follow up within 2 business days to discuss next steps.
           </p>
 
-          {/* Begin Intake CTA */}
+          {/* Let's Connect CTA */}
           <div className="glass-card p-10 md:p-14 mb-16 text-center">
             <p className="text-primary text-xs tracking-[0.4em] uppercase mb-4">Begin with intent</p>
             <h2 className="font-display text-3xl md:text-4xl tracking-tight mb-4">
-              Client Intake
+              Let's Connect
             </h2>
             <p className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto mb-8">
-              Free to submit. No payment required at this step. The $50 consultation invoice comes after I've done real research on your brand.
+              Free to submit, no payment required at this time.
             </p>
             <Link
               to="/intake"
               className="inline-flex items-center gap-2 px-10 py-5 rounded-full bg-primary text-primary-foreground font-semibold tracking-[0.2em] uppercase text-sm hover:bg-primary/90 transition-all hover:-translate-y-0.5"
             >
-              Begin Intake <ArrowRight className="h-4 w-4" />
+              Let's Connect <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
 
