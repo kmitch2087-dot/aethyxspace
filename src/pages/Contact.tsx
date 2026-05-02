@@ -45,9 +45,9 @@ const Contact = () => {
 
           {/* Direct Contact */}
           <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-4">
-            <a href="mailto:aethyxspace@protonmail.com" className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors">
+            <a href="mailto:customerservice@aethyx.space" className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors">
               <Mail className="h-5 w-5 text-primary shrink-0" />
-              <span className="text-sm break-all">aethyxspace@protonmail.com</span>
+              <span className="text-sm break-all">customerservice@aethyx.space</span>
             </a>
             <a href="tel:+14015891023" className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors">
               <Phone className="h-5 w-5 text-primary shrink-0" />
