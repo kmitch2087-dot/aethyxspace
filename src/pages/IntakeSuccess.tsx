@@ -28,7 +28,7 @@ const IntakeSuccess = () => {
           <p className="text-muted-foreground text-base md:text-lg leading-relaxed mb-6">
             Your intake is in. I'll personally review your submission, do real research on your
             brand, market, and competitors, and reach out within{" "}
-            <span className="text-foreground">2 business days</span> with a $50 invoice for a
+            <span className="text-foreground">2 business days</span> to discuss next steps and a
             focused strategy session.
           </p>
           <p className="text-muted-foreground text-base md:text-lg leading-relaxed mb-12">

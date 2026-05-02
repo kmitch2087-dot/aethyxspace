@@ -164,7 +164,7 @@ const Intake = () => {
     <div className="min-h-screen bg-transparent text-foreground">
       <Seo
         title="Client Intake — Aethyx Strategy Consultation"
-        description="Share your business goals through a short intake form. Aethyx personally reviews every submission and follows up with a focused $50 strategy session."
+        description="Share your business goals through a short intake form. Aethyx personally reviews every submission and follows up to discuss next steps."
         path="/intake"
       />
       <Navbar />
@@ -179,8 +179,8 @@ const Intake = () => {
           </h1>
           <p className="text-center text-muted-foreground text-base md:text-lg max-w-2xl mx-auto mb-14 leading-relaxed">
             Tell me about your brand. I'll personally review your submission, do real research on
-            your market and competitors, then reach out within 2 business days with a $50 invoice
-            for a focused strategy session — so when we meet, I come with real data.
+            your market and competitors, then reach out within 2 business days to discuss next
+            steps — so when we meet, I come with real data.
           </p>
 
           {loadingFields ? (
