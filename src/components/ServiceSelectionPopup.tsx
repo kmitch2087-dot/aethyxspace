@@ -258,7 +258,7 @@ const ServiceSelectionPopup = ({ open, onOpenChange, serviceName }: ServiceSelec
               </form>
 
               <p className="text-center text-xs text-muted-foreground mt-4 font-light">
-                Secure payment powered by Stripe. After payment, you'll receive a receipt & be redirected to submit your intake form.
+                Secure payment. After payment, you'll receive a receipt and be redirected to share a few project details.
               </p>
             </div>
           </div>
