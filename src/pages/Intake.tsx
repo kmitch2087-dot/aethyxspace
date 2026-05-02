@@ -58,7 +58,8 @@ const Intake = () => {
         .order("display_order", { ascending: true });
 
       if (error) {
-        toast({ title: "Could not load form", description: error.message, variant: "destructive" });
+        console.error("Intake form load error:", error);
+        toast({ title: "Could not load form", description: "Please refresh and try again.", variant: "destructive" });
       } else {
         setFields((data || []) as unknown as IntakeField[]);
       }
@@ -108,7 +109,8 @@ const Intake = () => {
     setSubmitting(false);
 
     if (error) {
-      toast({ title: "Submission failed", description: error.message, variant: "destructive" });
+      console.error("Intake submit error:", error);
+      toast({ title: "Submission failed", description: "Something went wrong. Please try again.", variant: "destructive" });
       return;
     }
 
