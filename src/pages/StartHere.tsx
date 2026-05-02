@@ -44,7 +44,7 @@ const StartHere = () => {
             
             <div className="space-y-4">
               {[
-                { icon: MessageCircle, text: "Short intake form" },
+                { icon: MessageCircle, text: "Quick hello form" },
                 { icon: Compass, text: "Clear recommendations" },
                 { icon: Heart, text: "Calm, guided process" }
               ].map((item, i) => (
@@ -73,8 +73,11 @@ const StartHere = () => {
               <h2 className="text-2xl md:text-3xl lg:text-4xl text-foreground mb-4 font-semibold">
                 Choose Your Path
               </h2>
-              <p className="text-muted-foreground text-lg leading-relaxed font-light max-w-2xl mx-auto">
-                Share your project through the intake form. I personally review every submission and follow up with a focused strategy session — backed by real research on your business.
+              <p className="text-muted-foreground text-lg leading-relaxed font-light max-w-2xl mx-auto mb-6">
+                Share a few details about your project. I personally review every submission and follow up to discuss next steps — backed by real research on your business.
+              </p>
+              <p className="text-sm text-muted-foreground italic">
+                Free to submit, no payment required at this time.
               </p>
             </div>
 
@@ -86,10 +89,10 @@ const StartHere = () => {
                     Free to submit
                   </span>
                   <h3 className="text-xl md:text-2xl font-medium text-foreground mb-3">
-                    Client Intake Form
+                    Let's Connect
                   </h3>
                   <p className="text-muted-foreground font-light leading-relaxed">
-                    Tell me about your business, goals, and timeline. I'll review your responses personally and reach out with next steps within 2 business days.
+                    Tell me a bit about your business, goals, and timeline. I'll review your responses personally and reach out with next steps within 2 business days.
                   </p>
                 </div>
 
@@ -99,12 +102,12 @@ const StartHere = () => {
                       size="lg"
                       className="w-full text-base px-8 py-7 rounded-full bg-sage hover:bg-sage/90 text-white shadow-warm transition-all duration-300 hover:shadow-warm-lg hover:-translate-y-0.5"
                     >
-                      Begin Intake
+                      Let's Connect
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </Link>
                   <p className="text-center text-sm text-muted-foreground mt-3 font-light">
-                    No payment required at this step.
+                    Free to submit, no payment required at this time.
                   </p>
                 </div>
               </div>
@@ -116,18 +119,18 @@ const StartHere = () => {
                     <Search className="h-5 w-5 text-sage" />
                   </div>
                   <span className="inline-block text-sm font-medium text-ocean tracking-wide uppercase mb-2">
-                    $50 — After Intake
+                    $50 — After We Connect
                   </span>
                   <h3 className="text-xl md:text-2xl font-medium text-foreground mb-3">
                     Strategy Consultation
                   </h3>
                   <p className="text-muted-foreground font-light leading-relaxed">
-                    After your intake, I dig into your brand, market, and competitors before our call. The $50 covers that research time, so when we meet I bring real data and clear recommendations — not generic advice.
+                    After we've connected, I dig into your brand, market, and competitors before our call. The $50 covers that research time, so when we meet I bring real data and clear recommendations — not generic advice.
                   </p>
                 </div>
 
                 <div className="mt-auto text-sm text-muted-foreground font-light italic">
-                  You'll receive a Stripe invoice once your intake has been reviewed.
+                  You'll receive a secure invoice once your submission has been reviewed.
                 </div>
               </div>
             </div>
