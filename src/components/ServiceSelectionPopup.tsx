@@ -171,7 +171,7 @@ const ServiceSelectionPopup = ({ open, onOpenChange, serviceName }: ServiceSelec
                     <span className="px-3 py-1 bg-ocean/10 text-ocean text-sm font-semibold rounded-full">Free</span>
                   </div>
                   <p className="text-muted-foreground mb-4 leading-relaxed">
-                    Just want to explore your options? Fill out our quick intake form & schedule a 15-minute call 
+                    Just want to explore your options? Send a quick hello & schedule a 15-minute call 
                     or discuss possibilities over email. No commitment required.
                   </p>
                   <Button 
@@ -180,7 +180,7 @@ const ServiceSelectionPopup = ({ open, onOpenChange, serviceName }: ServiceSelec
                     className="w-full rounded-full py-5 border-ocean text-ocean hover:bg-ocean/10 transition-all duration-300 hover:-translate-y-0.5"
                   >
                     <MessageCircle className="mr-2 h-4 w-4" />
-                    Fill Out Intake Form
+                    Let's Connect
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </div>
