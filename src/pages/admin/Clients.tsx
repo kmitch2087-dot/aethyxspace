@@ -62,14 +62,12 @@ const Clients = () => {
       return;
     }
 
-    const { data: urlData } = supabase.storage
-      .from("client-documents")
-      .getPublicUrl(filePath);
-
+    // Store the storage path (not a public URL) — bucket is private.
+    // Signed URLs are generated on demand at download time in the client portal.
     const { error: insertError } = await supabase.from("client_documents").insert({
       user_id: selectedClient.user_id,
       title: docTitle.trim(),
-      file_url: urlData.publicUrl,
+      file_url: filePath,
       uploaded_by: "admin",
     });
 
