@@ -115,7 +115,7 @@ const Home = () => {
               to="/intake"
               className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-primary-foreground font-semibold tracking-[0.2em] uppercase text-sm hover:bg-primary/90 transition-all hover:-translate-y-0.5"
             >
-              Begin Intake <ArrowRight className="h-4 w-4" />
+              Let's Connect <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
               to="/services"
@@ -212,9 +212,9 @@ const Home = () => {
               </p>
             </div>
             <div>
-              <h3 className="font-display text-xl mb-3 text-foreground">Why begin with the intake</h3>
+              <h3 className="font-display text-xl mb-3 text-foreground">Why start with a quick hello</h3>
               <p className="leading-relaxed text-base">
-                Click below to share your business with me through a short intake form. I'll personally review it, do real research on your brand, market, and competitors, then reach out with a $50 invoice for a focused strategy session — so when we talk, I come with real data, not generic advice.
+                Click below to share your business with me through a short form. I'll personally review it, do real research on your brand, market, and competitors, then reach out to discuss next steps — so when we talk, I come with real data, not generic advice.
               </p>
             </div>
           </div>
@@ -224,7 +224,7 @@ const Home = () => {
               to="/intake"
               className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-primary-foreground font-semibold tracking-[0.2em] uppercase text-sm hover:bg-primary/90 transition-all hover:-translate-y-0.5"
             >
-              Begin Intake <ArrowRight className="h-4 w-4" />
+              Let's Connect <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </div>
