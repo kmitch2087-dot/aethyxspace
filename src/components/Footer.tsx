@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Facebook, Instagram, Linkedin, Youtube, Mail, Phone, Twitter } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Mail, Phone } from "lucide-react";
 
 const Footer = () => (
   <footer className="relative z-10 border-t border-border/20 py-10 px-6">
@@ -25,12 +25,6 @@ const Footer = () => (
         </a>
         <a href="https://www.linkedin.com/company/aethyx/" target="_blank" rel="noopener noreferrer" aria-label="Aethyx on LinkedIn" className="hover:text-primary transition-colors">
           <Linkedin className="h-4 w-4" />
-        </a>
-        <a href="https://www.youtube.com/@aethyxspace" target="_blank" rel="noopener noreferrer" aria-label="Aethyx on YouTube" className="hover:text-primary transition-colors">
-          <Youtube className="h-4 w-4" />
-        </a>
-        <a href="https://x.com/aethyxspace" target="_blank" rel="noopener noreferrer" aria-label="Aethyx on X" className="hover:text-primary transition-colors">
-          <Twitter className="h-4 w-4" />
         </a>
       </div>
 
