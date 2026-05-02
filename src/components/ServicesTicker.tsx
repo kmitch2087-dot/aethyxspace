@@ -1,21 +1,26 @@
-const PILLARS = [
-  "Brand Identity",
-  "Digital Ecosystems",
-  "SEO Architecture",
-  "AI Optimization",
-  "Systems & Automation",
-  "E-Commerce",
-  "Client Portals",
-  "Web Development",
+import { Link } from "react-router-dom";
+
+const PILLARS: { label: string; slug: string }[] = [
+  { label: "Brand Identity", slug: "brand-identity" },
+  { label: "Digital Ecosystems", slug: "digital-ecosystems" },
+  { label: "SEO Architecture", slug: "seo-architecture" },
+  { label: "AI Optimization", slug: "ai-optimization" },
+  { label: "Systems & Automation", slug: "systems-and-automation" },
+  { label: "E-Commerce", slug: "e-commerce" },
+  { label: "Client Portals", slug: "client-portals" },
+  { label: "Web Development", slug: "web-development" },
 ];
 
 const Row = () => (
   <div className="flex shrink-0 items-center gap-10 px-5">
     {PILLARS.map((p) => (
-      <div key={p} className="flex items-center gap-10">
-        <span className="font-display text-[11px] md:text-xs tracking-[0.35em] uppercase text-foreground/85 whitespace-nowrap">
-          {p}
-        </span>
+      <div key={p.slug} className="flex items-center gap-10">
+        <Link
+          to={`/blog/${p.slug}`}
+          className="font-display text-[11px] md:text-xs tracking-[0.35em] uppercase text-foreground/85 hover:text-primary transition-colors whitespace-nowrap"
+        >
+          {p.label}
+        </Link>
         <span className="text-primary text-[10px]" aria-hidden>◆</span>
       </div>
     ))}
