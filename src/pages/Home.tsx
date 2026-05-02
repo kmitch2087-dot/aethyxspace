@@ -262,13 +262,13 @@ const Home = () => {
         <p className="text-primary text-xs tracking-[0.4em] uppercase mb-4">Ready to Shift?</p>
         <h2 className="font-display text-3xl md:text-5xl mb-6 tracking-tight">Let's build something they can't ignore.</h2>
         <p className="text-muted-foreground text-lg max-w-xl mx-auto mb-10">
-          Start with the intake. I'll do real research before we ever get on a call.
+          Free to submit, no payment required at this time.
         </p>
         <Link
           to="/intake"
           className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-primary-foreground font-semibold tracking-[0.2em] uppercase text-sm hover:bg-primary/90 transition-all hover:-translate-y-0.5"
         >
-          Begin Intake <ArrowRight className="h-4 w-4" />
+          Let's Connect <ArrowRight className="h-4 w-4" />
         </Link>
       </section>
 
