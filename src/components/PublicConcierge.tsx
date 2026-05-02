@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { MessageCircle, X, Send, Loader2, Sparkles } from "lucide-react";
+import { MessageCircle, X, Send, Loader2, Sparkles, HelpCircle } from "lucide-react";
 import { useAiChat } from "@/hooks/useAiChat";
+import ConsultationBreakdownPopup from "./ConsultationBreakdownPopup";
 
 const HIDDEN_PREFIXES = ["/admin", "/portal"];
 const PROMPTS = [
