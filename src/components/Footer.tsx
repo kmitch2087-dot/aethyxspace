@@ -23,7 +23,7 @@ const Footer = () => (
         <a href="https://www.instagram.com/aethyxspace/" target="_blank" rel="noopener noreferrer" aria-label="Aethyx on Instagram" className="hover:text-primary transition-colors">
           <Instagram className="h-4 w-4" />
         </a>
-        <a href="https://www.linkedin.com/company/aethyx/" target="_blank" rel="noopener noreferrer" aria-label="Aethyx on LinkedIn" className="hover:text-primary transition-colors">
+        <a href="https://www.linkedin.com/in/kristinaethyx" target="_blank" rel="noopener noreferrer" aria-label="Kristin on LinkedIn" className="hover:text-primary transition-colors">
           <Linkedin className="h-4 w-4" />
         </a>
       </div>
