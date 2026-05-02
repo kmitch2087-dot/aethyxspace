@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileText, MessageSquare, Star, DollarSign, FileSignature, BarChart3, Share2, Facebook, ShieldCheck } from "lucide-react";
+import AdminAssistant from "@/components/AdminAssistant";
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -116,6 +117,10 @@ const Dashboard = () => {
   return (
     <div>
       <h1 className="text-2xl font-display tracking-wider mb-6">Dashboard</h1>
+
+      <div className="mb-8">
+        <AdminAssistant />
+      </div>
 
       <Tabs defaultValue="overview" className="space-y-6">
         <TabsList>
