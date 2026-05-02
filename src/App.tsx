@@ -24,6 +24,7 @@ import MedSpa from "./pages/MedSpa";
 import Intake from "./pages/Intake";
 import IntakeSuccess from "./pages/IntakeSuccess";
 import NotFound from "./pages/NotFound";
+import Unsubscribe from "./pages/Unsubscribe";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminLayout from "./pages/admin/AdminLayout";
 import Dashboard from "./pages/admin/Dashboard";
