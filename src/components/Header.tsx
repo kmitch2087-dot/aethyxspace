@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
-import vibeShiftBanner from "@/assets/vibe-shift-banner-new.png";
+import vibeShiftBanner from "@/assets/vibe-shift-rebrand-to-aethyx-banner.png";
 
 const Header = () => {
   const location = useLocation();

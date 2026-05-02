@@ -3,7 +3,7 @@ import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import PaintSplat from "@/components/PaintSplat";
-import vibeShiftLogo from "@/assets/vibe-shift-logo.jpg";
+import vibeShiftLogo from "@/assets/vibe-shift-creative-studio-logo.jpg";
 
 const Index = () => {
   return (
