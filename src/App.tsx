@@ -9,6 +9,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 import AdminRoute from "@/components/AdminRoute";
 import ClientRoute from "@/components/ClientRoute";
 import CookieConsent from "@/components/CookieConsent";
+import PublicConcierge from "@/components/PublicConcierge";
 import Home from "./pages/Home";
 import Services from "./pages/Services";
 import Portfolio from "./pages/Portfolio";
@@ -107,6 +108,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
           </div>
+          <PublicConcierge />
           <CookieConsent />
         </AuthProvider>
       </BrowserRouter>
