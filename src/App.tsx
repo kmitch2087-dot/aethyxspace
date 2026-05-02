@@ -38,12 +38,14 @@ import Documents from "./pages/admin/Documents";
 import Media from "./pages/admin/Media";
 import Intakes from "./pages/admin/Intakes";
 import IntakeFormManager from "./pages/admin/IntakeForm";
+import Invoices from "./pages/admin/Invoices";
 import PortalLayout from "./pages/portal/PortalLayout";
 import PortalOverview from "./pages/portal/PortalOverview";
 import PortalMessages from "./pages/portal/PortalMessages";
 import PortalDocuments from "./pages/portal/PortalDocuments";
 import PortalAgreements from "./pages/portal/PortalAgreements";
 import PortalPayments from "./pages/portal/PortalPayments";
+import PortalPay from "./pages/portal/PortalPay";
 
 const queryClient = new QueryClient();
 
@@ -90,6 +92,7 @@ const App = () => (
               <Route path="agreements" element={<Agreements />} />
               <Route path="financials" element={<Financials />} />
               <Route path="clients" element={<Clients />} />
+              <Route path="invoices" element={<Invoices />} />
               <Route path="documents" element={<Documents />} />
               <Route path="media" element={<Media />} />
             </Route>
@@ -106,6 +109,7 @@ const App = () => (
               <Route path="documents" element={<PortalDocuments />} />
               <Route path="agreements" element={<PortalAgreements />} />
               <Route path="payments" element={<PortalPayments />} />
+              <Route path="pay/:invoiceId" element={<PortalPay />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
