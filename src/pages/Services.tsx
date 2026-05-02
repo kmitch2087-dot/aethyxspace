@@ -8,6 +8,7 @@ import { QUICK_SERVICES, ADD_ONS, APP_DEVELOPMENT } from "@/lib/stripePrices";
 
 const coreServices = [
   {
+    id: "digital-brand-foundation",
     icon: Diamond,
     title: "Digital Brand Foundation",
     items: [
@@ -18,6 +19,7 @@ const coreServices = [
     ],
   },
   {
+    id: "website-platform-development",
     icon: Globe,
     title: "Website & Platform Development",
     items: [
@@ -30,6 +32,7 @@ const coreServices = [
     ],
   },
   {
+    id: "systems-automation",
     icon: Zap,
     title: "Systems & Automation",
     items: [
@@ -42,6 +45,7 @@ const coreServices = [
     ],
   },
   {
+    id: "growth-visibility",
     icon: TrendingUp,
     title: "Growth & Visibility",
     items: [
@@ -151,7 +155,7 @@ const Services = () => (
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {coreServices.map((service) => (
-            <div key={service.title} className="glass-card p-8 hover:border-primary/30 transition-all">
+            <div id={service.id} key={service.title} className="glass-card p-8 hover:border-primary/30 transition-all scroll-mt-28">
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-6">
                 <service.icon className="h-5 w-5 text-primary" />
               </div>
