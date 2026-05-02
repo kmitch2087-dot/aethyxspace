@@ -144,6 +144,18 @@ const Intake = () => {
       })
       .catch((err) => console.warn("Intake notification email failed:", err));
 
+    // Send confirmation to the client
+    supabase.functions
+      .invoke("send-transactional-email", {
+        body: {
+          templateName: "intake-confirmation",
+          recipientEmail: emailVal,
+          idempotencyKey: `intake-confirm-${intakeId}`,
+          templateData: { name: fullName.split(" ")[0] || fullName },
+        },
+      })
+      .catch((err) => console.warn("Intake confirmation email failed:", err));
+
     navigate("/intake-success");
   };
 
