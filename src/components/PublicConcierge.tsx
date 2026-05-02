@@ -161,6 +161,19 @@ const PublicConcierge = () => {
                 ))}
               </div>
             )}
+
+            {/* Contextual chip when assistant mentions $50 */}
+            {messages.some((m) => m.role === "assistant" && /\$50/.test(m.content)) && (
+              <div className="pt-1">
+                <button
+                  onClick={() => setBreakdownOpen(true)}
+                  className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-primary/15 border border-primary/40 text-primary hover:bg-primary/25"
+                >
+                  <HelpCircle className="h-3 w-3" />
+                  What do I get for my $50?
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="p-3 border-t border-border/30 bg-[#0a0a14]">
