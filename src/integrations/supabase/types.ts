@@ -248,6 +248,77 @@ export type Database = {
         }
         Relationships: []
       }
+      client_invoices: {
+        Row: {
+          amount_due: number
+          amount_paid: number
+          client_profile_id: string | null
+          created_at: string
+          currency: string
+          description: string | null
+          due_date: string | null
+          email: string | null
+          hosted_invoice_url: string | null
+          id: string
+          invoice_number: string | null
+          invoice_pdf: string | null
+          paid_at: string | null
+          status: string
+          stripe_customer_id: string | null
+          stripe_invoice_id: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          amount_due?: number
+          amount_paid?: number
+          client_profile_id?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          due_date?: string | null
+          email?: string | null
+          hosted_invoice_url?: string | null
+          id?: string
+          invoice_number?: string | null
+          invoice_pdf?: string | null
+          paid_at?: string | null
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_invoice_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount_due?: number
+          amount_paid?: number
+          client_profile_id?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          due_date?: string | null
+          email?: string | null
+          hosted_invoice_url?: string | null
+          id?: string
+          invoice_number?: string | null
+          invoice_pdf?: string | null
+          paid_at?: string | null
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_invoice_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_invoices_client_profile_id_fkey"
+            columns: ["client_profile_id"]
+            isOneToOne: false
+            referencedRelation: "client_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_messages: {
         Row: {
           created_at: string
@@ -277,9 +348,14 @@ export type Database = {
           billing_zip: string | null
           business_name: string | null
           created_at: string
+          email: string | null
+          first_name: string | null
           full_name: string
           id: string
+          last_name: string | null
           phone: string | null
+          source: string | null
+          stripe_customer_id: string | null
           updated_at: string
           user_id: string
         }
@@ -290,9 +366,14 @@ export type Database = {
           billing_zip?: string | null
           business_name?: string | null
           created_at?: string
+          email?: string | null
+          first_name?: string | null
           full_name: string
           id?: string
+          last_name?: string | null
           phone?: string | null
+          source?: string | null
+          stripe_customer_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -303,9 +384,14 @@ export type Database = {
           billing_zip?: string | null
           business_name?: string | null
           created_at?: string
+          email?: string | null
+          first_name?: string | null
           full_name?: string
           id?: string
+          last_name?: string | null
           phone?: string | null
+          source?: string | null
+          stripe_customer_id?: string | null
           updated_at?: string
           user_id?: string
         }
