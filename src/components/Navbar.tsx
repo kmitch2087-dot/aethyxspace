@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Phone, User } from "lucide-react";
 import ClientLoginDialog from "@/components/ClientLoginDialog";
 import ServicesTicker from "@/components/ServicesTicker";
-import navLogo from "@/assets/aethyx-calligraphy-updated.png";
+import navLogo from "@/assets/aethyx-web-design-studio-logo.png";
 
 const links = [
   { to: "/", label: "Home" },

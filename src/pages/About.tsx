@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Seo from "@/components/Seo";
 import { breadcrumb } from "@/lib/seoSchemas";
-import kristinPhoto from "@/assets/kristin-founder.jpg";
+import kristinPhoto from "@/assets/founder-kristin-mitchell-aethyx-web-design-studio.jpg";
 
 const DotDivider = () => (
   <div className="flex items-center justify-center gap-2 py-8">

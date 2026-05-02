@@ -40,7 +40,7 @@ const homeFaqSchema = {
 
 import TrafficSourcePopup from "@/components/TrafficSourcePopup";
 import { supabase } from "@/integrations/supabase/client";
-import aethyxLogo from "@/assets/aethyx-calligraphy-updated.png";
+import aethyxLogo from "@/assets/aethyx-web-design-studio-logo.png";
 
 const services = [
   { icon: Globe, title: "Web Design & Development", desc: "Custom websites and digital ecosystems engineered for SEO architecture, speed, and conversion." },

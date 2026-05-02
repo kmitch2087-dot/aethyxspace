@@ -6,20 +6,20 @@ import Seo from "@/components/Seo";
 import { breadcrumb } from "@/lib/seoSchemas";
 import LightboxGallery from "@/components/LightboxGallery";
 
-import rr1 from "@/assets/portfolio/re-retreats-1.jpg";
-import rr2 from "@/assets/portfolio/re-retreats-2.jpg";
-import rr3 from "@/assets/portfolio/re-retreats-3.jpg";
-import kk1 from "@/assets/portfolio/kokopelli-1.jpg";
-import kk2 from "@/assets/portfolio/kokopelli-2.jpg";
-import kk3 from "@/assets/portfolio/kokopelli-3.jpg";
-import vs1 from "@/assets/portfolio/vibeshift-1.jpg";
-import vs2 from "@/assets/portfolio/vibeshift-2.jpg";
-import vs3 from "@/assets/portfolio/vibeshift-3.jpg";
-import ahearnLogo from "@/assets/portfolio/ahearn-recovery-logo.jpg";
-import pournographyLogo from "@/assets/portfolio/pournography-logo.gif";
-import reRetreatsLogo from "@/assets/portfolio/re-retreats-logo.svg";
-import kokopelliLogo from "@/assets/portfolio/kokopelli-logo.png";
-import vibeshiftToAethyx from "@/assets/portfolio/vibeshift-to-aethyx-transition.jpg";
+import rr1 from "@/assets/portfolio/re-retreats-wellness-website-design-1.jpg";
+import rr2 from "@/assets/portfolio/re-retreats-wellness-website-design-2.jpg";
+import rr3 from "@/assets/portfolio/re-retreats-wellness-website-design-3.jpg";
+import kk1 from "@/assets/portfolio/kokopelli-restaurant-website-design-1.jpg";
+import kk2 from "@/assets/portfolio/kokopelli-restaurant-website-design-2.jpg";
+import kk3 from "@/assets/portfolio/kokopelli-restaurant-website-design-3.jpg";
+import vs1 from "@/assets/portfolio/vibe-shift-creative-portfolio-website-1.jpg";
+import vs2 from "@/assets/portfolio/vibe-shift-creative-portfolio-website-2.jpg";
+import vs3 from "@/assets/portfolio/vibe-shift-creative-portfolio-website-3.jpg";
+import ahearnLogo from "@/assets/portfolio/ahearn-recovery-rhode-island-brand-logo.jpg";
+import pournographyLogo from "@/assets/portfolio/pournography-cocktail-brand-logo.gif";
+import reRetreatsLogo from "@/assets/portfolio/re-retreats-wellness-brand-logo.svg";
+import kokopelliLogo from "@/assets/portfolio/kokopelli-restaurant-brand-logo.png";
+import vibeshiftToAethyx from "@/assets/portfolio/studio-rebrand-vibe-shift-to-aethyx.jpg";
 
 const projects = [
   {

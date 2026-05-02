@@ -20,12 +20,12 @@ import { breadcrumb, serviceSchema } from "@/lib/seoSchemas";
 import { useState, useRef } from "react";
 import { Slider } from "@/components/ui/slider";
 
-import lobbyImg from "@/assets/medspa/lobby.png";
-import webMockupImg from "@/assets/medspa/web-mockup.png";
-import practitionerImg from "@/assets/medspa/hero-landing.png";
-import detailShotImg from "@/assets/medspa/detail-shot.png";
-import beforeWebsiteImg from "@/assets/medspa/before-website.jpg";
-import afterWebsiteImg from "@/assets/medspa/after-website.jpg";
+import lobbyImg from "@/assets/medspa/luxury-med-spa-lobby-interior-design.png";
+import webMockupImg from "@/assets/medspa/med-spa-website-design-mockup-aethyx.png";
+import practitionerImg from "@/assets/medspa/med-spa-aesthetic-clinic-website-hero.png";
+import detailShotImg from "@/assets/medspa/med-spa-treatment-detail-photography.png";
+import beforeWebsiteImg from "@/assets/medspa/med-spa-website-before-redesign.jpg";
+import afterWebsiteImg from "@/assets/medspa/med-spa-website-after-redesign-aethyx.jpg";
 
 const serif = "font-['Playfair_Display',serif]";
 

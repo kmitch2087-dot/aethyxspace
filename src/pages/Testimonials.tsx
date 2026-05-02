@@ -17,11 +17,11 @@ import {
 import { CheckCircle, Info, Star, MessageSquarePlus } from "lucide-react";
 import ReviewSubmissionPopup from "@/components/ReviewSubmissionPopup";
 
-import testimonial1 from "@/assets/testimonial-1.jpg";
-import testimonial2 from "@/assets/testimonial-2.jpg";
-import testimonial3 from "@/assets/testimonial-3.jpg";
-import testimonial4 from "@/assets/testimonial-4.jpg";
-import testimonial5 from "@/assets/testimonial-5.jpg";
+import testimonial1 from "@/assets/client-testimonial-rhode-island-web-design-1.jpg";
+import testimonial2 from "@/assets/client-testimonial-rhode-island-web-design-2.jpg";
+import testimonial3 from "@/assets/client-testimonial-rhode-island-web-design-3.jpg";
+import testimonial4 from "@/assets/client-testimonial-rhode-island-web-design-4.jpg";
+import testimonial5 from "@/assets/client-testimonial-rhode-island-web-design-5.jpg";
 
 const testimonials = [
   {
