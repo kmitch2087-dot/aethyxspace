@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { MessageCircle, X, Send, Loader2, Sparkles } from "lucide-react";
+import { MessageCircle, X, Send, Loader2, Sparkles, HelpCircle } from "lucide-react";
 import { useAiChat } from "@/hooks/useAiChat";
+import ConsultationBreakdownPopup from "./ConsultationBreakdownPopup";
 
 const HIDDEN_PREFIXES = ["/admin", "/portal"];
 const PROMPTS = [
@@ -34,6 +35,7 @@ const renderContent = (text: string, onNav: () => void) => {
 const PublicConcierge = () => {
   const location = useLocation();
   const [open, setOpen] = useState(false);
+  const [breakdownOpen, setBreakdownOpen] = useState(false);
   const [nudge, setNudge] = useState(false);
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -159,6 +161,19 @@ const PublicConcierge = () => {
                 ))}
               </div>
             )}
+
+            {/* Contextual chip when assistant mentions $50 */}
+            {messages.some((m) => m.role === "assistant" && /\$50/.test(m.content)) && (
+              <div className="pt-1">
+                <button
+                  onClick={() => setBreakdownOpen(true)}
+                  className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-primary/15 border border-primary/40 text-primary hover:bg-primary/25"
+                >
+                  <HelpCircle className="h-3 w-3" />
+                  What do I get for my $50?
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="p-3 border-t border-border/30 bg-[#0a0a14]">
@@ -185,12 +200,27 @@ const PublicConcierge = () => {
                 {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
               </button>
             </div>
-            <div className="text-[10px] text-muted-foreground mt-2 text-center">
+            <button
+              onClick={() => setBreakdownOpen(true)}
+              className="text-[10px] text-primary/80 hover:text-primary mt-2 mx-auto block underline underline-offset-2"
+            >
+              What do I get for my $50 consultation?
+            </button>
+            <div className="text-[10px] text-muted-foreground mt-1 text-center">
               AI concierge — for human help, email aethyxspace@protonmail.com
             </div>
           </div>
         </div>
       )}
+
+      <ConsultationBreakdownPopup
+        open={breakdownOpen}
+        onOpenChange={setBreakdownOpen}
+        onNavigate={() => {
+          setBreakdownOpen(false);
+          setOpen(false);
+        }}
+      />
     </>
   );
 };
