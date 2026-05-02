@@ -200,12 +200,27 @@ const PublicConcierge = () => {
                 {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
               </button>
             </div>
-            <div className="text-[10px] text-muted-foreground mt-2 text-center">
+            <button
+              onClick={() => setBreakdownOpen(true)}
+              className="text-[10px] text-primary/80 hover:text-primary mt-2 mx-auto block underline underline-offset-2"
+            >
+              What do I get for my $50 consultation?
+            </button>
+            <div className="text-[10px] text-muted-foreground mt-1 text-center">
               AI concierge — for human help, email aethyxspace@protonmail.com
             </div>
           </div>
         </div>
       )}
+
+      <ConsultationBreakdownPopup
+        open={breakdownOpen}
+        onOpenChange={setBreakdownOpen}
+        onNavigate={() => {
+          setBreakdownOpen(false);
+          setOpen(false);
+        }}
+      />
     </>
   );
 };
