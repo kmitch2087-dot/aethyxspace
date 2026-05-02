@@ -15,7 +15,7 @@ export const organizationSchema = {
   url: SITE_URL,
   logo: LOGO,
   image: LOGO,
-  email: "aethyxspace@protonmail.com",
+  email: "customerservice@aethyx.space",
   telephone: "+1-401-589-1023",
   description:
     "Premium web design, branding, and digital experience studio for ambitious brands. Based in Rhode Island, serving the entire United States.",

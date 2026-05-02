@@ -43,7 +43,7 @@ const TermsOfService = () => (
 
           <section>
             <h2 className="font-display text-xl text-foreground mb-3">Contact</h2>
-            <p>Questions about these terms? Reach out at <a href="mailto:Aethyxspace@protonmail.com" className="text-primary hover:text-primary/80 transition-colors">aethyxspace@protonmail.com</a>.</p>
+            <p>Questions about these terms? Reach out at <a href="mailto:customerservice@aethyx.space" className="text-primary hover:text-primary/80 transition-colors">customerservice@aethyx.space</a>.</p>
           </section>
         </div>
       </div>

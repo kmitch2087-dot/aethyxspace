@@ -114,7 +114,7 @@ const Rebrand = () => {
 
           {/* General contact */}
           <a
-            href="mailto:Aethyxspace@protonmail.com"
+            href="mailto:customerservice@aethyx.space"
             className="glass-card group p-8 text-center transition-all duration-300 hover:border-primary/30"
           >
             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-5">
@@ -127,7 +127,7 @@ const Rebrand = () => {
               Non-urgent inquiries, questions, or just want to say hey.
             </p>
             <span className="text-primary/80 text-sm font-medium group-hover:text-primary transition-colors">
-              Aethyxspace@protonmail.com
+              customerservice@aethyx.space
             </span>
           </a>
 
