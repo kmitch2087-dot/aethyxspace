@@ -35,6 +35,7 @@ const renderContent = (text: string, onNav: () => void) => {
 const PublicConcierge = () => {
   const location = useLocation();
   const [open, setOpen] = useState(false);
+  const [breakdownOpen, setBreakdownOpen] = useState(false);
   const [nudge, setNudge] = useState(false);
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
