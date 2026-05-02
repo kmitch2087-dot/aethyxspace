@@ -194,6 +194,26 @@ serve(async (req) => {
 
     console.log("Successfully added to waiting list:", maskEmail(email));
 
+    // Notify admin via transactional email (fire-and-forget)
+    try {
+      await supabaseAdmin.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "inquiry-notification",
+          recipientEmail: "kristinmitchell@aethyx.space",
+          idempotencyKey: `inquiry-notify-${email}-${Date.now()}`,
+          templateData: {
+            name,
+            email,
+            message: `Update frequency: ${updateFrequency}${websiteUrl ? `\n\nExisting site: ${websiteUrl}` : ""}`,
+            source: "Waiting list / Inquiry form",
+            submittedAt: new Date().toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }),
+          },
+        },
+      });
+    } catch (notifyErr) {
+      console.warn("Admin notification email failed:", notifyErr);
+    }
+
     return new Response(
       JSON.stringify({ success: true, message: "Successfully added to waiting list" }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }

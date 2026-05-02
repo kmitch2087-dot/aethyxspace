@@ -98,11 +98,18 @@ const Intake = () => {
     }
 
     setSubmitting(true);
+    const intakeId = crypto.randomUUID();
+    const fullName = (values.full_name || "").trim().slice(0, 200);
+    const emailVal = (values.email || "").trim().toLowerCase().slice(0, 320);
+    const phoneVal = values.phone ? values.phone.trim().slice(0, 50) : null;
+    const businessVal = values.business_name ? values.business_name.trim().slice(0, 200) : null;
+
     const { error } = await supabase.from("client_intakes").insert({
-      full_name: (values.full_name || "").trim().slice(0, 200),
-      email: (values.email || "").trim().toLowerCase().slice(0, 320),
-      phone: values.phone ? values.phone.trim().slice(0, 50) : null,
-      business_name: values.business_name ? values.business_name.trim().slice(0, 200) : null,
+      id: intakeId,
+      full_name: fullName,
+      email: emailVal,
+      phone: phoneVal,
+      business_name: businessVal,
       responses,
       status: "new",
     });
@@ -113,6 +120,29 @@ const Intake = () => {
       toast({ title: "Submission failed", description: "Something went wrong. Please try again.", variant: "destructive" });
       return;
     }
+
+    // Notify admin (fire-and-forget — don't block the user on email failure)
+    const goalsText = Object.values(responses)
+      .filter((r) => r.value)
+      .map((r) => `${r.label}: ${r.value}`)
+      .join("\n");
+    supabase.functions
+      .invoke("send-transactional-email", {
+        body: {
+          templateName: "intake-notification",
+          recipientEmail: "kristinmitchell@aethyx.space",
+          idempotencyKey: `intake-notify-${intakeId}`,
+          templateData: {
+            fullName,
+            email: emailVal,
+            phone: phoneVal || undefined,
+            businessName: businessVal || undefined,
+            goals: goalsText,
+            submittedAt: new Date().toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }),
+          },
+        },
+      })
+      .catch((err) => console.warn("Intake notification email failed:", err));
 
     navigate("/intake-success");
   };
