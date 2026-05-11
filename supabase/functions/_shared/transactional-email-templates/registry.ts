@@ -16,6 +16,9 @@ import { template as portalInvite } from './portal-invite.tsx'
 import { template as portalActivationNotification } from './portal-activation-notification.tsx'
 import { template as newInvoice } from './new-invoice.tsx'
 import { template as paymentReceived } from './payment-received.tsx'
+import { template as documentShare } from './document-share.tsx'
+import { template as invoiceDelivery } from './invoice-delivery.tsx'
+import { template as intakeRequired } from './intake-required.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'inquiry-notification': inquiryNotification,
@@ -25,4 +28,7 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'portal-activation-notification': portalActivationNotification,
   'new-invoice': newInvoice,
   'payment-received': paymentReceived,
+  'document-share': documentShare,
+  'invoice-delivery': invoiceDelivery,
+  'intake-required': intakeRequired,
 }
