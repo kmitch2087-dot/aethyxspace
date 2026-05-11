@@ -143,6 +143,7 @@ export type Database = {
           amount: number | null
           client_email: string | null
           client_name: string
+          client_profile_id: string | null
           created_at: string
           id: string
           notes: string | null
@@ -156,6 +157,7 @@ export type Database = {
           amount?: number | null
           client_email?: string | null
           client_name: string
+          client_profile_id?: string | null
           created_at?: string
           id?: string
           notes?: string | null
@@ -169,6 +171,7 @@ export type Database = {
           amount?: number | null
           client_email?: string | null
           client_name?: string
+          client_profile_id?: string | null
           created_at?: string
           id?: string
           notes?: string | null
@@ -181,6 +184,7 @@ export type Database = {
       }
       client_documents: {
         Row: {
+          client_profile_id: string | null
           created_at: string
           file_url: string
           id: string
@@ -189,6 +193,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          client_profile_id?: string | null
           created_at?: string
           file_url: string
           id?: string
@@ -197,6 +202,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          client_profile_id?: string | null
           created_at?: string
           file_url?: string
           id?: string
@@ -209,6 +215,7 @@ export type Database = {
       client_intakes: {
         Row: {
           business_name: string | null
+          client_profile_id: string | null
           created_at: string
           email: string
           full_name: string
@@ -222,6 +229,7 @@ export type Database = {
         }
         Insert: {
           business_name?: string | null
+          client_profile_id?: string | null
           created_at?: string
           email: string
           full_name: string
@@ -235,6 +243,7 @@ export type Database = {
         }
         Update: {
           business_name?: string | null
+          client_profile_id?: string | null
           created_at?: string
           email?: string
           full_name?: string
@@ -327,18 +336,21 @@ export type Database = {
       }
       client_messages: {
         Row: {
+          client_profile_id: string | null
           created_at: string
           id: string
           message: string
           user_id: string
         }
         Insert: {
+          client_profile_id?: string | null
           created_at?: string
           id?: string
           message: string
           user_id: string
         }
         Update: {
+          client_profile_id?: string | null
           created_at?: string
           id?: string
           message?: string
