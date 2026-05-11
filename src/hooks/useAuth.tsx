@@ -27,6 +27,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // If we already resolved this user, return cached result
     if (adminCheckRef.current === userId) return adminResultRef.current;
     adminCheckRef.current = userId;
+    // New user being checked — mark check as pending so consumers wait
+    setAdminChecked(false);
+    setIsAdmin(false);
+    adminResultRef.current = false;
 
     try {
       const { data, error } = await supabase
