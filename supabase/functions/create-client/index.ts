@@ -81,7 +81,17 @@ Deno.serve(async (req) => {
       profileId = created.id;
     }
 
-    // 4. Send portal invite (creates auth user + email). Forward the admin's
+    // 4. Check intake status — if no intake exists for this email, mark required + send email
+    const { data: existingIntake } = await admin.from("client_intakes")
+      .select("id").ilike("email", email).maybeSingle();
+    const intakeRequired = !existingIntake;
+    if (intakeRequired) {
+      await admin.from("client_profiles").update({ intake_required: true }).eq("id", profileId);
+    } else {
+      await admin.from("client_profiles").update({ intake_completed_at: new Date().toISOString() }).eq("id", profileId).is("intake_completed_at", null);
+    }
+
+    // 5. Send portal invite (creates auth user + email). Forward the admin's
     // bearer token so provision-client-portal can verify admin role — the
     // service-role JWT has no `sub` claim and would fail getUser().
     if (sendInvite) {
@@ -91,6 +101,32 @@ Deno.serve(async (req) => {
       });
       if (inviteRes.error) warnings.push(`Portal invite: ${inviteRes.error.message}`);
     }
+
+    // 6. If intake required, email the client a heads-up
+    if (intakeRequired) {
+      try {
+        await admin.functions.invoke("send-transactional-email", {
+          body: {
+            templateName: "intake-required",
+            recipientEmail: email,
+            idempotencyKey: `intake-required-${profileId}`,
+            templateData: {
+              recipientName: firstName,
+              portalUrl: "https://aethyx.space/portal/intake",
+            },
+          },
+        });
+      } catch (e) {
+        warnings.push(`Intake email: ${e instanceof Error ? e.message : String(e)}`);
+      }
+    }
+
+    // 7. Fire client_added event for any matching document schedules
+    try {
+      await admin.functions.invoke("dispatch-doc-event", {
+        body: { event_name: "client_added", client_profile_id: profileId },
+      });
+    } catch (_) { /* non-blocking */ }
 
     return new Response(JSON.stringify({
       success: true, profileId, stripeCustomerId, warnings,
