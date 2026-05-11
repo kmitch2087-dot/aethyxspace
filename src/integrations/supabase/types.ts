@@ -362,6 +362,7 @@ export type Database = {
           last_name: string | null
           notes: string | null
           phone: string | null
+          portal_activated_at: string | null
           source: string | null
           status: string
           stripe_customer_id: string | null
@@ -384,6 +385,7 @@ export type Database = {
           last_name?: string | null
           notes?: string | null
           phone?: string | null
+          portal_activated_at?: string | null
           source?: string | null
           status?: string
           stripe_customer_id?: string | null
@@ -406,6 +408,7 @@ export type Database = {
           last_name?: string | null
           notes?: string | null
           phone?: string | null
+          portal_activated_at?: string | null
           source?: string | null
           status?: string
           stripe_customer_id?: string | null
