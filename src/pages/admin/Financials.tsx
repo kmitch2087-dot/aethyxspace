@@ -46,6 +46,8 @@ const Financials = () => {
   const [editing, setEditing] = useState<FinancialRecord | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [syncing, setSyncing] = useState(false);
+  const [openInvoicesTotal, setOpenInvoicesTotal] = useState(0);
+  const [openInvoicesCount, setOpenInvoicesCount] = useState(0);
 
   const handleStripeSync = async () => {
     setSyncing(true);
@@ -72,6 +74,19 @@ const Financials = () => {
       .select("*")
       .order("created_at", { ascending: false });
     setRecords(data || []);
+
+    // Pending = open/unpaid invoices from Stripe-synced client_invoices
+    const { data: openInvoices } = await supabase
+      .from("client_invoices")
+      .select("amount_due, amount_paid, status")
+      .in("status", ["open", "draft", "uncollectible"]);
+    const outstanding = (openInvoices || []).reduce(
+      (s, i) => s + Math.max(0, Number(i.amount_due || 0) - Number(i.amount_paid || 0)),
+      0
+    );
+    setOpenInvoicesTotal(outstanding);
+    setOpenInvoicesCount((openInvoices || []).length);
+
     setLoading(false);
   };
 
@@ -129,7 +144,7 @@ const Financials = () => {
   };
 
   const totalPaid = records.filter((r) => r.payment_status === "paid").reduce((s, r) => s + Number(r.amount), 0);
-  const totalPending = records.filter((r) => r.payment_status === "pending").reduce((s, r) => s + Number(r.amount), 0);
+  const totalPending = openInvoicesTotal;
 
   const statusBadge = (status: string) => {
     const styles: Record<string, string> = {
@@ -159,8 +174,9 @@ const Financials = () => {
           <p className="text-2xl font-bold text-emerald-400">${totalPaid.toLocaleString()}</p>
         </div>
         <div className="rounded-lg border border-border/30 p-4">
-          <p className="text-xs text-muted-foreground uppercase tracking-wider">Pending</p>
-          <p className="text-2xl font-bold text-yellow-400">${totalPending.toLocaleString()}</p>
+          <p className="text-xs text-muted-foreground uppercase tracking-wider">Pending (Open Invoices)</p>
+          <p className="text-2xl font-bold text-yellow-400">${totalPending.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+          <p className="text-xs text-muted-foreground mt-1">{openInvoicesCount} unpaid invoice{openInvoicesCount === 1 ? "" : "s"}</p>
         </div>
       </div>
 
