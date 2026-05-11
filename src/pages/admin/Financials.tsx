@@ -174,8 +174,9 @@ const Financials = () => {
           <p className="text-2xl font-bold text-emerald-400">${totalPaid.toLocaleString()}</p>
         </div>
         <div className="rounded-lg border border-border/30 p-4">
-          <p className="text-xs text-muted-foreground uppercase tracking-wider">Pending</p>
-          <p className="text-2xl font-bold text-yellow-400">${totalPending.toLocaleString()}</p>
+          <p className="text-xs text-muted-foreground uppercase tracking-wider">Pending (Open Invoices)</p>
+          <p className="text-2xl font-bold text-yellow-400">${totalPending.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+          <p className="text-xs text-muted-foreground mt-1">{openInvoicesCount} unpaid invoice{openInvoicesCount === 1 ? "" : "s"}</p>
         </div>
       </div>
 
