@@ -40,8 +40,10 @@ Deno.serve(async (req) => {
 
     // Move related records
     await admin.from("client_invoices").update({ client_profile_id: primaryId, user_id: primary.user_id }).eq("client_profile_id", secondaryId);
-    await admin.from("client_documents").update({ user_id: primary.user_id }).eq("user_id", secondary.user_id);
-    await admin.from("client_messages").update({ user_id: primary.user_id }).eq("user_id", secondary.user_id);
+    await admin.from("client_documents").update({ client_profile_id: primaryId, user_id: primary.user_id }).or(`client_profile_id.eq.${secondaryId},user_id.eq.${secondary.user_id}`);
+    await admin.from("client_messages").update({ client_profile_id: primaryId, user_id: primary.user_id }).or(`client_profile_id.eq.${secondaryId},user_id.eq.${secondary.user_id}`);
+    await admin.from("client_agreements").update({ client_profile_id: primaryId }).eq("client_profile_id", secondaryId);
+    await admin.from("client_intakes").update({ client_profile_id: primaryId }).eq("client_profile_id", secondaryId);
     await admin.from("client_projects").update({ client_profile_id: primaryId }).eq("client_profile_id", secondaryId);
 
     // Delete duplicate
