@@ -46,6 +46,8 @@ const Financials = () => {
   const [editing, setEditing] = useState<FinancialRecord | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [syncing, setSyncing] = useState(false);
+  const [openInvoicesTotal, setOpenInvoicesTotal] = useState(0);
+  const [openInvoicesCount, setOpenInvoicesCount] = useState(0);
 
   const handleStripeSync = async () => {
     setSyncing(true);
