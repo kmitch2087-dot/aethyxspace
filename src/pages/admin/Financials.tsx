@@ -74,6 +74,19 @@ const Financials = () => {
       .select("*")
       .order("created_at", { ascending: false });
     setRecords(data || []);
+
+    // Pending = open/unpaid invoices from Stripe-synced client_invoices
+    const { data: openInvoices } = await supabase
+      .from("client_invoices")
+      .select("amount_due, amount_paid, status")
+      .in("status", ["open", "draft", "uncollectible"]);
+    const outstanding = (openInvoices || []).reduce(
+      (s, i) => s + Math.max(0, Number(i.amount_due || 0) - Number(i.amount_paid || 0)),
+      0
+    );
+    setOpenInvoicesTotal(outstanding);
+    setOpenInvoicesCount((openInvoices || []).length);
+
     setLoading(false);
   };
 
