@@ -188,6 +188,8 @@ export type Database = {
           created_at: string
           file_url: string
           id: string
+          note: string | null
+          parent_admin_doc_id: string | null
           title: string
           uploaded_by: string
           user_id: string
@@ -197,6 +199,8 @@ export type Database = {
           created_at?: string
           file_url: string
           id?: string
+          note?: string | null
+          parent_admin_doc_id?: string | null
           title: string
           uploaded_by?: string
           user_id: string
@@ -206,6 +210,8 @@ export type Database = {
           created_at?: string
           file_url?: string
           id?: string
+          note?: string | null
+          parent_admin_doc_id?: string | null
           title?: string
           uploaded_by?: string
           user_id?: string
@@ -338,22 +344,28 @@ export type Database = {
         Row: {
           client_profile_id: string | null
           created_at: string
+          document_id: string | null
           id: string
           message: string
+          sender: string
           user_id: string
         }
         Insert: {
           client_profile_id?: string | null
           created_at?: string
+          document_id?: string | null
           id?: string
           message: string
+          sender?: string
           user_id: string
         }
         Update: {
           client_profile_id?: string | null
           created_at?: string
+          document_id?: string | null
           id?: string
           message?: string
+          sender?: string
           user_id?: string
         }
         Relationships: []
@@ -371,6 +383,8 @@ export type Database = {
           first_name: string | null
           full_name: string
           id: string
+          intake_completed_at: string | null
+          intake_required: boolean
           last_name: string | null
           notes: string | null
           phone: string | null
@@ -394,6 +408,8 @@ export type Database = {
           first_name?: string | null
           full_name: string
           id?: string
+          intake_completed_at?: string | null
+          intake_required?: boolean
           last_name?: string | null
           notes?: string | null
           phone?: string | null
@@ -417,6 +433,8 @@ export type Database = {
           first_name?: string | null
           full_name?: string
           id?: string
+          intake_completed_at?: string | null
+          intake_required?: boolean
           last_name?: string | null
           notes?: string | null
           phone?: string | null
@@ -470,6 +488,87 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      document_categories: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      document_schedules: {
+        Row: {
+          active: boolean
+          admin_document_id: string
+          created_at: string
+          cron_expr: string | null
+          delivery: string
+          event_name: string | null
+          id: string
+          last_run_at: string | null
+          message: string | null
+          next_run_at: string | null
+          recurrence: string | null
+          run_at: string | null
+          subject: string | null
+          target_client_ids: string[]
+          target_type: string
+          trigger_type: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          admin_document_id: string
+          created_at?: string
+          cron_expr?: string | null
+          delivery?: string
+          event_name?: string | null
+          id?: string
+          last_run_at?: string | null
+          message?: string | null
+          next_run_at?: string | null
+          recurrence?: string | null
+          run_at?: string | null
+          subject?: string | null
+          target_client_ids?: string[]
+          target_type?: string
+          trigger_type: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          admin_document_id?: string
+          created_at?: string
+          cron_expr?: string | null
+          delivery?: string
+          event_name?: string | null
+          id?: string
+          last_run_at?: string | null
+          message?: string | null
+          next_run_at?: string | null
+          recurrence?: string | null
+          run_at?: string | null
+          subject?: string | null
+          target_client_ids?: string[]
+          target_type?: string
+          trigger_type?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       email_send_log: {
         Row: {
