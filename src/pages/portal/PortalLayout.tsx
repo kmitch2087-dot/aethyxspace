@@ -1,8 +1,9 @@
-import { useEffect } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Outlet, useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import Seo from "@/components/Seo";
+import { AlertCircle } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -92,16 +93,25 @@ function PortalSidebar() {
 
 const PortalLayout = () => {
   const { user } = useAuth();
+  const [needsIntake, setNeedsIntake] = useState(false);
 
   // Notify admin once when an invited client first signs in.
   useEffect(() => {
     if (!user) return;
     const key = `portal-activation-notified:${user.id}`;
-    if (sessionStorage.getItem(key)) return;
-    sessionStorage.setItem(key, "1");
-    supabase.functions.invoke("notify-portal-activation").catch(() => {
-      sessionStorage.removeItem(key);
-    });
+    if (!sessionStorage.getItem(key)) {
+      sessionStorage.setItem(key, "1");
+      supabase.functions.invoke("notify-portal-activation")
+        .then(() => supabase.functions.invoke("dispatch-doc-event", { body: { event_name: "portal_activated" } }))
+        .catch(() => sessionStorage.removeItem(key));
+    }
+    // Check intake status
+    supabase.from("client_profiles")
+      .select("intake_required, intake_completed_at")
+      .eq("user_id", user.id).maybeSingle()
+      .then(({ data }) => {
+        if (data && !data.intake_completed_at) setNeedsIntake(true);
+      });
   }, [user]);
 
   return (
