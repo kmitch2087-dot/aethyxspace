@@ -24,11 +24,12 @@ import {
   FolderOpen,
   FileSignature,
   CreditCard,
+  ClipboardList,
   LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const navItems = [
+const baseNavItems = [
   { title: "Overview", url: "/portal", icon: LayoutDashboard },
   { title: "Messages", url: "/portal/messages", icon: MessageSquare },
   { title: "Documents", url: "/portal/documents", icon: FolderOpen },
@@ -36,7 +37,10 @@ const navItems = [
   { title: "Payments", url: "/portal/payments", icon: CreditCard },
 ];
 
-function PortalSidebar() {
+function PortalSidebar({ showIntake }: { showIntake: boolean }) {
+  const navItems = showIntake
+    ? [...baseNavItems, { title: "Intake Form", url: "/portal/intake", icon: ClipboardList }]
+    : baseNavItems;
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const { signOut } = useAuth();
@@ -118,7 +122,7 @@ const PortalLayout = () => {
     <SidebarProvider>
       <Seo title="Client Portal | Aethyx" description="Aethyx client portal." noindex />
       <div className="min-h-screen flex w-full bg-transparent">
-        <PortalSidebar />
+        <PortalSidebar showIntake={needsIntake} />
         <div className="flex-1 flex flex-col">
           <header className="h-12 flex items-center border-b border-border/30 px-4">
             <SidebarTrigger />
@@ -126,6 +130,17 @@ const PortalLayout = () => {
               Aethyx<span className="text-primary">.space</span> Portal
             </span>
           </header>
+          {needsIntake && (
+            <div className="bg-primary/10 border-b border-primary/30 px-6 py-3 flex items-center gap-3 text-sm">
+              <AlertCircle className="h-4 w-4 text-primary shrink-0" />
+              <span className="flex-1">
+                Please complete your client intake form so we can start working together.
+              </span>
+              <Link to="/portal/intake" className="text-primary font-medium hover:underline whitespace-nowrap">
+                Complete now →
+              </Link>
+            </div>
+          )}
           <main className="flex-1 p-6">
             <Outlet />
           </main>
