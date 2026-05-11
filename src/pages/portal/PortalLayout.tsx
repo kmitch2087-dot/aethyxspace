@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import Seo from "@/components/Seo";
 import {
   Sidebar,
@@ -89,6 +91,19 @@ function PortalSidebar() {
 }
 
 const PortalLayout = () => {
+  const { user } = useAuth();
+
+  // Notify admin once when an invited client first signs in.
+  useEffect(() => {
+    if (!user) return;
+    const key = `portal-activation-notified:${user.id}`;
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, "1");
+    supabase.functions.invoke("notify-portal-activation").catch(() => {
+      sessionStorage.removeItem(key);
+    });
+  }, [user]);
+
   return (
     <SidebarProvider>
       <Seo title="Client Portal | Aethyx" description="Aethyx client portal." noindex />
