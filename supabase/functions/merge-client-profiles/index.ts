@@ -1,5 +1,5 @@
 // Admin-only: merge a duplicate client profile into a primary one.
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
+import { createClient } from "npm:@supabase/supabase-js@2.49.4";
 import { getCors } from "../_shared/admin-cors.ts";
 
 Deno.serve(async (req) => {

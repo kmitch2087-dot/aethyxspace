@@ -1,6 +1,6 @@
 // Admin-only: create + send a Stripe invoice, store locally, notify client by email.
-import Stripe from "https://esm.sh/stripe@18.5.0";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
+import Stripe from "npm:stripe@18.5.0";
+import { createClient } from "npm:@supabase/supabase-js@2.49.4";
 
 const allowedOrigins = [
   "https://aethyxspace.lovable.app",

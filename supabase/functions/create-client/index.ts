@@ -1,6 +1,6 @@
 // Admin-only: create a new client profile, Stripe customer, and send portal invite — all in one.
-import Stripe from "https://esm.sh/stripe@18.5.0";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
+import Stripe from "npm:stripe@18.5.0";
+import { createClient } from "npm:@supabase/supabase-js@2.49.4";
 import { getCors } from "../_shared/admin-cors.ts";
 
 Deno.serve(async (req) => {
