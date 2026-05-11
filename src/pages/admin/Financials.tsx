@@ -144,7 +144,7 @@ const Financials = () => {
   };
 
   const totalPaid = records.filter((r) => r.payment_status === "paid").reduce((s, r) => s + Number(r.amount), 0);
-  const totalPending = records.filter((r) => r.payment_status === "pending").reduce((s, r) => s + Number(r.amount), 0);
+  const totalPending = openInvoicesTotal;
 
   const statusBadge = (status: string) => {
     const styles: Record<string, string> = {
