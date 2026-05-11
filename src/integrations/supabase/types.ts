@@ -262,7 +262,9 @@ export type Database = {
           id: string
           invoice_number: string | null
           invoice_pdf: string | null
+          needs_review: boolean
           paid_at: string | null
+          review_reason: string | null
           status: string
           stripe_customer_id: string | null
           stripe_invoice_id: string | null
@@ -282,7 +284,9 @@ export type Database = {
           id?: string
           invoice_number?: string | null
           invoice_pdf?: string | null
+          needs_review?: boolean
           paid_at?: string | null
+          review_reason?: string | null
           status?: string
           stripe_customer_id?: string | null
           stripe_invoice_id?: string | null
@@ -302,7 +306,9 @@ export type Database = {
           id?: string
           invoice_number?: string | null
           invoice_pdf?: string | null
+          needs_review?: boolean
           paid_at?: string | null
+          review_reason?: string | null
           status?: string
           stripe_customer_id?: string | null
           stripe_invoice_id?: string | null
@@ -342,6 +348,7 @@ export type Database = {
       }
       client_profiles: {
         Row: {
+          archived_at: string | null
           billing_address: string | null
           billing_city: string | null
           billing_state: string | null
@@ -353,13 +360,17 @@ export type Database = {
           full_name: string
           id: string
           last_name: string | null
+          notes: string | null
           phone: string | null
           source: string | null
+          status: string
           stripe_customer_id: string | null
+          stripe_customer_ids: string[]
           updated_at: string
           user_id: string
         }
         Insert: {
+          archived_at?: string | null
           billing_address?: string | null
           billing_city?: string | null
           billing_state?: string | null
@@ -371,13 +382,17 @@ export type Database = {
           full_name: string
           id?: string
           last_name?: string | null
+          notes?: string | null
           phone?: string | null
           source?: string | null
+          status?: string
           stripe_customer_id?: string | null
+          stripe_customer_ids?: string[]
           updated_at?: string
           user_id: string
         }
         Update: {
+          archived_at?: string | null
           billing_address?: string | null
           billing_city?: string | null
           billing_state?: string | null
@@ -389,13 +404,57 @@ export type Database = {
           full_name?: string
           id?: string
           last_name?: string | null
+          notes?: string | null
           phone?: string | null
           source?: string | null
+          status?: string
           stripe_customer_id?: string | null
+          stripe_customer_ids?: string[]
           updated_at?: string
           user_id?: string
         }
         Relationships: []
+      }
+      client_projects: {
+        Row: {
+          client_profile_id: string
+          created_at: string
+          id: string
+          lovable_url: string | null
+          name: string
+          notes: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          client_profile_id: string
+          created_at?: string
+          id?: string
+          lovable_url?: string | null
+          name: string
+          notes?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          client_profile_id?: string
+          created_at?: string
+          id?: string
+          lovable_url?: string | null
+          name?: string
+          notes?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_projects_client_profile_id_fkey"
+            columns: ["client_profile_id"]
+            isOneToOne: false
+            referencedRelation: "client_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       email_send_log: {
         Row: {

@@ -52,18 +52,23 @@ Deno.serve(async (req) => {
     const firstName = first || "";
     const lastName = rest.join(" ") || "";
 
-    // Upsert client_profile (without user_id — that's set when they accept invite)
-    const { data: existingProfile } = await admin
-      .from("client_profiles")
-      .select("*")
-      .or(`stripe_customer_id.eq.${customer.id},email.eq.${cleanEmail}`)
-      .maybeSingle();
+    // Match by stripe_customer_ids array OR exact email
+    const { data: byCust } = await admin.from("client_profiles").select("*")
+      .contains("stripe_customer_ids", [customer.id]).maybeSingle();
+    const { data: byEmail } = byCust ? { data: null } : await admin.from("client_profiles").select("*")
+      .eq("email", cleanEmail).maybeSingle();
+    const existingProfile = byCust || byEmail;
 
     let profileId: string;
     if (existingProfile) {
+      const mergedIds = Array.from(new Set([
+        ...(existingProfile.stripe_customer_ids || []),
+        customer.id,
+      ]));
       const { data: updated } = await admin.from("client_profiles").update({
-        stripe_customer_id: customer.id,
-        email: cleanEmail,
+        stripe_customer_id: existingProfile.stripe_customer_id || customer.id,
+        stripe_customer_ids: mergedIds,
+        email: existingProfile.email || cleanEmail,
         first_name: firstName || existingProfile.first_name,
         last_name: lastName || existingProfile.last_name,
         full_name: name || existingProfile.full_name,
@@ -71,12 +76,11 @@ Deno.serve(async (req) => {
       }).eq("id", existingProfile.id).select().single();
       profileId = updated!.id;
     } else {
-      // user_id is required NOT NULL in existing schema — use a sentinel for "unclaimed"
-      // We use a UUID derived from the stripe customer id namespace so it's deterministic & unique.
       const sentinelUserId = crypto.randomUUID();
       const { data: created, error: createErr } = await admin.from("client_profiles").insert({
         user_id: sentinelUserId,
         stripe_customer_id: customer.id,
+        stripe_customer_ids: [customer.id],
         email: cleanEmail,
         first_name: firstName,
         last_name: lastName,
