@@ -57,7 +57,7 @@ const Financials = () => {
       if (data?.error) throw new Error(data.error);
       toast({
         title: "Stripe sync complete",
-        description: `${data.inserted} new, ${data.updated} updated, ${data.skipped} skipped (of ${data.total} charges).`,
+        description: `${data.inserted} new, ${data.updated} updated, ${data.skipped} skipped (of ${data.total} charges). Invoices refreshed: ${data.invoicesSynced ?? 0}.`,
       });
       fetchRecords();
     } catch (e) {
