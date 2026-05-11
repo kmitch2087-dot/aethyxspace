@@ -452,30 +452,51 @@ export type Database = {
         Row: {
           client_profile_id: string
           created_at: string
+          current_phase: string | null
+          dns_provider: string | null
+          hosting_provider: string | null
           id: string
+          live_url: string | null
           lovable_url: string | null
           name: string
           notes: string | null
+          progress_pct: number
+          repo_url: string | null
+          staging_url: string | null
           status: string
           updated_at: string
         }
         Insert: {
           client_profile_id: string
           created_at?: string
+          current_phase?: string | null
+          dns_provider?: string | null
+          hosting_provider?: string | null
           id?: string
+          live_url?: string | null
           lovable_url?: string | null
           name: string
           notes?: string | null
+          progress_pct?: number
+          repo_url?: string | null
+          staging_url?: string | null
           status?: string
           updated_at?: string
         }
         Update: {
           client_profile_id?: string
           created_at?: string
+          current_phase?: string | null
+          dns_provider?: string | null
+          hosting_provider?: string | null
           id?: string
+          live_url?: string | null
           lovable_url?: string | null
           name?: string
           notes?: string | null
+          progress_pct?: number
+          repo_url?: string | null
+          staging_url?: string | null
           status?: string
           updated_at?: string
         }
@@ -770,6 +791,106 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      project_tasks: {
+        Row: {
+          assignee: string
+          client_profile_id: string | null
+          completed_at: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          due_date: string | null
+          id: string
+          priority: string
+          project_id: string
+          source: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assignee?: string
+          client_profile_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          priority?: string
+          project_id: string
+          source?: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assignee?: string
+          client_profile_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          priority?: string
+          project_id?: string
+          source?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_tasks_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "client_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_updates: {
+        Row: {
+          client_profile_id: string | null
+          created_at: string
+          created_by: string
+          id: string
+          kind: string
+          payload: Json
+          project_id: string
+          summary: string
+        }
+        Insert: {
+          client_profile_id?: string | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          kind?: string
+          payload?: Json
+          project_id: string
+          summary: string
+        }
+        Update: {
+          client_profile_id?: string | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          kind?: string
+          payload?: Json
+          project_id?: string
+          summary?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_updates_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "client_projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       review_submissions: {
         Row: {
