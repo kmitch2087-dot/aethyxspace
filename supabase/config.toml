@@ -3,6 +3,9 @@ project_id = "kjobyawxvdycizbfmlfe"
 [functions.stripe-webhook]
 verify_jwt = false
 
+[functions.github-webhook]
+verify_jwt = false
+
 [functions.sitemap]
 verify_jwt = false
 
