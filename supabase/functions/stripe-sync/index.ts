@@ -96,6 +96,42 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Also re-sync existing client_invoices statuses from Stripe so
+    // payments that succeeded after the original webhook (or where the webhook
+    // was missed) get reflected in the admin's "Pending" totals.
+    let invoicesSynced = 0;
+    const { data: localInvoices } = await admin
+      .from("client_invoices")
+      .select("id, stripe_invoice_id, status")
+      .not("stripe_invoice_id", "is", null)
+      .neq("status", "paid");
+
+    for (const li of localInvoices || []) {
+      try {
+        const si = await stripe.invoices.retrieve(li.stripe_invoice_id!);
+        const newStatus = si.status || li.status;
+        const amountPaid = (si.amount_paid || 0) / 100;
+        const amountDue = (si.amount_due || 0) / 100;
+        const paidAt = si.status_transitions?.paid_at
+          ? new Date(si.status_transitions.paid_at * 1000).toISOString()
+          : null;
+        await admin
+          .from("client_invoices")
+          .update({
+            status: newStatus,
+            amount_paid: amountPaid,
+            amount_due: amountDue,
+            paid_at: paidAt,
+            hosted_invoice_url: si.hosted_invoice_url || null,
+            invoice_pdf: si.invoice_pdf || null,
+          })
+          .eq("id", li.id);
+        invoicesSynced++;
+      } catch (e) {
+        console.warn("[stripe-sync] invoice sync failed", li.stripe_invoice_id, e);
+      }
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
@@ -103,6 +139,7 @@ Deno.serve(async (req) => {
         updated,
         skipped,
         total: charges.data.length,
+        invoicesSynced,
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
