@@ -11,16 +11,27 @@ const PortalMessages = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [messages, setMessages] = useState<any[]>([]);
+  const [profileId, setProfileId] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const fetchMessages = async () => {
     if (!user) return;
+    const { data: profile } = await supabase
+      .from("client_profiles")
+      .select("id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    const pid = profile?.id || null;
+    setProfileId(pid);
+    const filter = pid
+      ? `client_profile_id.eq.${pid},user_id.eq.${user.id}`
+      : `user_id.eq.${user.id}`;
     const { data } = await supabase
       .from("client_messages")
       .select("*")
-      .eq("user_id", user.id)
+      .or(filter)
       .order("created_at", { ascending: false });
     setMessages(data || []);
     setLoading(false);
@@ -35,6 +46,7 @@ const PortalMessages = () => {
     setSending(true);
     const { error } = await supabase.from("client_messages").insert({
       user_id: user.id,
+      client_profile_id: profileId,
       message: newMessage.trim(),
     });
     setSending(false);
