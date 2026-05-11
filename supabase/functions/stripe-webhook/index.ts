@@ -138,7 +138,7 @@ Deno.serve(async (req) => {
       }
       case "customer.created": {
         const cust = event.data.object as Stripe.Customer;
-        await ensureProfileFromCustomer(cust.id, cust.email, cust.name);
+        await matchOrCreateProfile(cust.id, cust.email, cust.name);
         break;
       }
       case "invoice.created":
