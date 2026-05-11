@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import Seo from "@/components/Seo";
 import {
   Sidebar,
