@@ -166,6 +166,14 @@ Deno.serve(async (req) => {
             },
           });
         }
+        // Fire invoice_paid event for any matching document schedules
+        if (profile?.id) {
+          try {
+            await admin.functions.invoke("dispatch-doc-event", {
+              body: { event_name: "invoice_paid", client_profile_id: profile.id },
+            });
+          } catch (_) { /* non-blocking */ }
+        }
         break;
       }
       default:

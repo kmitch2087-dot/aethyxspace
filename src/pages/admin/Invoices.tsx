@@ -1,19 +1,19 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import {
-  Dialog, DialogContent, DialogHeader, DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
-import { FileText, Plus, Loader2, RefreshCcw, ExternalLink } from "lucide-react";
+import {
+  FileText, Plus, Loader2, RefreshCcw, ExternalLink, MoreHorizontal,
+  Mail, Link as LinkIcon, CheckCircle2, XCircle, Bell, RotateCcw, Download,
+} from "lucide-react";
 import { format } from "date-fns";
 
 interface Profile {
@@ -29,9 +29,12 @@ interface Invoice {
   id: string;
   invoice_number: string | null;
   amount_due: number;
+  amount_paid: number;
   status: string;
   description: string | null;
   hosted_invoice_url: string | null;
+  invoice_pdf: string | null;
+  stripe_invoice_id: string | null;
   created_at: string;
   email: string | null;
   client_profile_id: string | null;
@@ -45,13 +48,21 @@ const Invoices = () => {
   const [syncOpen, setSyncOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  // Create form state
+  // Email composer
+  const [emailInv, setEmailInv] = useState<Invoice | null>(null);
+  const [emailRecipient, setEmailRecipient] = useState("");
+  const [emailSubject, setEmailSubject] = useState("");
+  const [emailMessage, setEmailMessage] = useState("");
+
+  // Refund
+  const [refundInv, setRefundInv] = useState<Invoice | null>(null);
+  const [refundAmount, setRefundAmount] = useState("");
+
   const [profileId, setProfileId] = useState("");
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
   const [daysUntilDue, setDaysUntilDue] = useState("14");
 
-  // Sync form state
   const [syncEmail, setSyncEmail] = useState("");
   const [syncName, setSyncName] = useState("");
   const [inviteAfterSync, setInviteAfterSync] = useState(true);
@@ -74,21 +85,14 @@ const Invoices = () => {
     if (!profileId || !description.trim() || !amount) return;
     setSubmitting(true);
     const { data, error } = await supabase.functions.invoke("create-admin-invoice", {
-      body: {
-        profileId,
-        description: description.trim(),
-        amount: Number(amount),
-        daysUntilDue: Number(daysUntilDue) || 14,
-      },
+      body: { profileId, description: description.trim(), amount: Number(amount), daysUntilDue: Number(daysUntilDue) || 14 },
     });
     setSubmitting(false);
     if (error || !data?.success) {
-      toast({ title: "Failed to create invoice", description: data?.error || error?.message, variant: "destructive" });
-      return;
+      toast({ title: "Failed to create invoice", description: data?.error || error?.message, variant: "destructive" }); return;
     }
     toast({ title: "Invoice created", description: "Client has been notified by email." });
-    setCreateOpen(false);
-    setDescription(""); setAmount(""); setProfileId("");
+    setCreateOpen(false); setDescription(""); setAmount(""); setProfileId("");
     fetchAll();
   };
 
@@ -100,29 +104,57 @@ const Invoices = () => {
     });
     if (error || !data?.success) {
       setSubmitting(false);
-      toast({ title: "Sync failed", description: data?.error || error?.message, variant: "destructive" });
-      return;
+      toast({ title: "Sync failed", description: data?.error || error?.message, variant: "destructive" }); return;
     }
     toast({ title: "Synced from Stripe", description: `${data.invoicesUpserted} invoice(s) imported.` });
-
     if (inviteAfterSync) {
       const inviteRes = await supabase.functions.invoke("provision-client-portal", {
-        body: {
-          email: syncEmail.trim(),
-          firstName: (syncName.trim().split(/\s+/)[0]) || undefined,
-          profileId: data.profileId,
-        },
+        body: { email: syncEmail.trim(), firstName: syncName.trim().split(/\s+/)[0] || undefined, profileId: data.profileId },
       });
-      if (inviteRes.error) {
-        toast({ title: "Invite email failed", description: inviteRes.error.message, variant: "destructive" });
-      } else {
-        toast({ title: "Portal invite sent", description: `Invitation emailed to ${syncEmail}.` });
-      }
+      if (inviteRes.error) toast({ title: "Invite email failed", description: inviteRes.error.message, variant: "destructive" });
+      else toast({ title: "Portal invite sent" });
     }
-    setSubmitting(false);
-    setSyncOpen(false);
-    setSyncEmail(""); setSyncName("");
+    setSubmitting(false); setSyncOpen(false); setSyncEmail(""); setSyncName("");
     fetchAll();
+  };
+
+  const runAction = async (inv: Invoice, action: string, body: Record<string, any> = {}) => {
+    const { error, data } = await supabase.functions.invoke("invoice-actions", {
+      body: { action, invoiceRowId: inv.id, ...body },
+    });
+    if (error || data?.error) {
+      toast({ title: "Action failed", description: data?.error || error?.message, variant: "destructive" });
+      return false;
+    }
+    toast({ title: "Done" });
+    fetchAll();
+    return true;
+  };
+
+  const openEmail = (inv: Invoice) => {
+    setEmailInv(inv);
+    const profile = profiles.find((p) => p.id === inv.client_profile_id);
+    setEmailRecipient(inv.email || profile?.email || "");
+    setEmailSubject(`Invoice ${inv.invoice_number || ""} from Aethyx`);
+    setEmailMessage("");
+  };
+
+  const submitEmail = async () => {
+    if (!emailInv || !emailRecipient.trim()) return;
+    setSubmitting(true);
+    const ok = await runAction(emailInv, "email_to_client", {
+      recipientEmail: emailRecipient.trim(), subject: emailSubject, message: emailMessage,
+    });
+    setSubmitting(false);
+    if (ok) setEmailInv(null);
+  };
+
+  const submitRefund = async () => {
+    if (!refundInv) return;
+    setSubmitting(true);
+    const ok = await runAction(refundInv, "refund", refundAmount ? { amount: Number(refundAmount) } : {});
+    setSubmitting(false);
+    if (ok) { setRefundInv(null); setRefundAmount(""); }
   };
 
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin" /></div>;
@@ -134,12 +166,8 @@ const Invoices = () => {
           <FileText className="h-6 w-6 text-primary" /> Invoices
         </h1>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => setSyncOpen(true)}>
-            <RefreshCcw className="h-4 w-4 mr-2" /> Sync from Stripe
-          </Button>
-          <Button size="sm" onClick={() => setCreateOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" /> New Invoice
-          </Button>
+          <Button variant="outline" size="sm" onClick={() => setSyncOpen(true)}><RefreshCcw className="h-4 w-4 mr-2" /> Sync from Stripe</Button>
+          <Button size="sm" onClick={() => setCreateOpen(true)}><Plus className="h-4 w-4 mr-2" /> New Invoice</Button>
         </div>
       </div>
 
@@ -149,6 +177,8 @@ const Invoices = () => {
         <div className="space-y-2">
           {invoices.map((inv) => {
             const profile = profiles.find((p) => p.id === inv.client_profile_id);
+            const isStripe = !!inv.stripe_invoice_id;
+            const canRefund = isStripe && (inv.amount_paid > 0);
             return (
               <Card key={inv.id}>
                 <CardContent className="pt-4 flex items-center justify-between gap-4 flex-wrap">
@@ -162,15 +192,48 @@ const Invoices = () => {
                     </p>
                     <p className="text-xs text-muted-foreground/70 mt-1">{format(new Date(inv.created_at), "MMM d, yyyy")}</p>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
                     <span className="font-display text-lg">${Number(inv.amount_due).toFixed(2)}</span>
                     {inv.hosted_invoice_url && (
-                      <Button variant="ghost" size="sm" asChild>
-                        <a href={inv.hosted_invoice_url} target="_blank" rel="noreferrer">
-                          <ExternalLink className="h-3 w-3" />
-                        </a>
+                      <Button variant="ghost" size="sm" asChild title="View hosted invoice">
+                        <a href={inv.hosted_invoice_url} target="_blank" rel="noreferrer"><ExternalLink className="h-3 w-3" /></a>
                       </Button>
                     )}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm"><MoreHorizontal className="h-4 w-4" /></Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-56">
+                        <DropdownMenuItem onClick={() => openEmail(inv)}>
+                          <Mail className="h-4 w-4 mr-2" /> Email to client
+                        </DropdownMenuItem>
+                        {inv.invoice_pdf && (
+                          <DropdownMenuItem asChild>
+                            <a href={inv.invoice_pdf} target="_blank" rel="noreferrer"><Download className="h-4 w-4 mr-2" />Download PDF</a>
+                          </DropdownMenuItem>
+                        )}
+                        {inv.hosted_invoice_url && (
+                          <DropdownMenuItem onClick={() => { navigator.clipboard.writeText(inv.hosted_invoice_url!); toast({ title: "Payment link copied" }); }}>
+                            <LinkIcon className="h-4 w-4 mr-2" /> Copy payment link
+                          </DropdownMenuItem>
+                        )}
+                        {isStripe && inv.status !== "paid" && (
+                          <>
+                            <DropdownMenuItem onClick={() => runAction(inv, "send_reminder")}><Bell className="h-4 w-4 mr-2" /> Send Stripe reminder</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => runAction(inv, "mark_paid")}><CheckCircle2 className="h-4 w-4 mr-2" /> Mark as paid</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => runAction(inv, "void")}><XCircle className="h-4 w-4 mr-2" /> Void</DropdownMenuItem>
+                          </>
+                        )}
+                        {canRefund && (
+                          <>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={() => { setRefundInv(inv); setRefundAmount(""); }} className="text-destructive">
+                              <RotateCcw className="h-4 w-4 mr-2" /> Refund
+                            </DropdownMenuItem>
+                          </>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </CardContent>
               </Card>
@@ -179,7 +242,7 @@ const Invoices = () => {
         </div>
       )}
 
-      {/* Create Invoice Dialog */}
+      {/* Create */}
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader><DialogTitle>New Invoice</DialogTitle></DialogHeader>
@@ -195,52 +258,64 @@ const Invoices = () => {
                 </SelectContent>
               </Select>
             </div>
-            <div>
-              <Label>Description</Label>
-              <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Phase 1 — Discovery & wireframes" rows={3} maxLength={500} />
-            </div>
+            <div><Label>Description</Label><Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} maxLength={500} /></div>
             <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label>Amount (USD)</Label>
-                <Input type="number" step="0.01" min="1" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="2500.00" />
-              </div>
-              <div>
-                <Label>Due in (days)</Label>
-                <Input type="number" min="1" value={daysUntilDue} onChange={(e) => setDaysUntilDue(e.target.value)} />
-              </div>
+              <div><Label>Amount (USD)</Label><Input type="number" step="0.01" min="1" value={amount} onChange={(e) => setAmount(e.target.value)} /></div>
+              <div><Label>Due in (days)</Label><Input type="number" min="1" value={daysUntilDue} onChange={(e) => setDaysUntilDue(e.target.value)} /></div>
             </div>
             <Button onClick={handleCreate} disabled={submitting || !profileId || !description.trim() || !amount} className="w-full">
-              {submitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-              Create & send invoice
+              {submitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null} Create & send
             </Button>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* Sync from Stripe Dialog */}
+      {/* Sync */}
       <Dialog open={syncOpen} onOpenChange={setSyncOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader><DialogTitle>Sync client from Stripe</DialogTitle></DialogHeader>
           <div className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              Pulls the customer + all invoices from Stripe and creates a client profile.
-            </p>
-            <div>
-              <Label>Email</Label>
-              <Input type="email" value={syncEmail} onChange={(e) => setSyncEmail(e.target.value)} placeholder="client@example.com" />
-            </div>
-            <div>
-              <Label>Full name <span className="text-muted-foreground text-xs">(only if creating new in Stripe)</span></Label>
-              <Input value={syncName} onChange={(e) => setSyncName(e.target.value)} placeholder="Adam Oppenheimer" />
-            </div>
+            <div><Label>Email</Label><Input type="email" value={syncEmail} onChange={(e) => setSyncEmail(e.target.value)} /></div>
+            <div><Label>Full name (optional)</Label><Input value={syncName} onChange={(e) => setSyncName(e.target.value)} /></div>
             <label className="flex items-center gap-2 text-sm">
               <input type="checkbox" checked={inviteAfterSync} onChange={(e) => setInviteAfterSync(e.target.checked)} />
-              Send portal invite email after sync
+              Send portal invite after sync
             </label>
             <Button onClick={handleSync} disabled={submitting || !syncEmail.trim()} className="w-full">
-              {submitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-              Sync from Stripe
+              {submitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null} Sync
             </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Email composer */}
+      <Dialog open={!!emailInv} onOpenChange={(o) => !o && setEmailInv(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader><DialogTitle>Email invoice to client</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div><Label>To</Label><Input type="email" value={emailRecipient} onChange={(e) => setEmailRecipient(e.target.value)} /></div>
+            <div><Label>Subject</Label><Input value={emailSubject} onChange={(e) => setEmailSubject(e.target.value)} /></div>
+            <div><Label>Personal message (optional)</Label><Textarea rows={4} value={emailMessage} onChange={(e) => setEmailMessage(e.target.value)} /></div>
+            <p className="text-xs text-muted-foreground">A secure link to the hosted invoice and PDF will be included automatically.</p>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setEmailInv(null)} disabled={submitting}>Cancel</Button>
+              <Button onClick={submitEmail} disabled={submitting || !emailRecipient.trim()}>{submitting ? "Sending…" : "Send"}</Button>
+            </DialogFooter>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Refund */}
+      <Dialog open={!!refundInv} onOpenChange={(o) => !o && setRefundInv(null)}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader><DialogTitle>Refund invoice</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground">Leave blank to refund the full amount paid (${refundInv?.amount_paid.toFixed(2)}).</p>
+            <div><Label>Amount (USD)</Label><Input type="number" step="0.01" min="0.01" value={refundAmount} onChange={(e) => setRefundAmount(e.target.value)} placeholder="Full refund" /></div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setRefundInv(null)} disabled={submitting}>Cancel</Button>
+              <Button onClick={submitRefund} disabled={submitting} variant="destructive">{submitting ? "Refunding…" : "Confirm refund"}</Button>
+            </DialogFooter>
           </div>
         </DialogContent>
       </Dialog>
