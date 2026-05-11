@@ -13,12 +13,19 @@ const PortalOverview = () => {
   useEffect(() => {
     if (!user) return;
     const load = async () => {
-      const [profileRes, msgRes, docRes] = await Promise.all([
-        supabase.from("client_profiles").select("*").eq("user_id", user.id).maybeSingle(),
-        supabase.from("client_messages").select("id").eq("user_id", user.id),
-        supabase.from("client_documents").select("id").eq("user_id", user.id),
+      const { data: profileData } = await supabase
+        .from("client_profiles")
+        .select("*")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      setProfile(profileData);
+      const pid = profileData?.id;
+      const msgFilter = pid ? `client_profile_id.eq.${pid},user_id.eq.${user.id}` : `user_id.eq.${user.id}`;
+      const docFilter = pid ? `client_profile_id.eq.${pid},user_id.eq.${user.id}` : `user_id.eq.${user.id}`;
+      const [msgRes, docRes] = await Promise.all([
+        supabase.from("client_messages").select("id").or(msgFilter),
+        supabase.from("client_documents").select("id").or(docFilter),
       ]);
-      setProfile(profileRes.data);
       setMsgCount((msgRes.data || []).length);
       setDocCount((docRes.data || []).length);
     };
