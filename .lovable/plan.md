@@ -1,69 +1,97 @@
-## Why your upload disappeared
 
-The document was actually saved — to storage and to `client_documents`. The problem is *who it got attached to*.
+# Admin Dashboard v2 + Project/Task System + Claude Integration
 
-When a client is created from the admin, we generate a temporary `user_id` for the profile (a placeholder) until the invite is accepted. As soon as the client follows the portal invite, `provision-client-portal` swaps that placeholder for the real auth user ID. Your upload happened in the small window between those two states — the file row was tagged with the **old placeholder ID**, but the Documents tab now queries with the **new** user ID, so it doesn't show.
+## 1. Dashboard restructure (`/admin`)
 
-`client_documents`, `client_messages`, `client_agreements`, and `client_intakes` are all linked to clients by indirect keys (auth user ID, or email). That's brittle. The real anchor should be the **client profile itself** (`client_profiles.id`) — that ID never changes.
+New tab layout (replaces single-page Dashboard):
 
-Stripe customer IDs are great for invoices/payments (and we already use them there), but they aren't created for documents, agreements, intakes, or messages, so they can't be the universal join key. The profile ID can.
+- **Overview** (default) — KPI cards (existing) + Traffic Sources + Social/Sharing block + **Project Task Ticker** (see §3) + **Edge Function widgets** (see §2).
+- **Assistant** — moves `<AdminAssistant />` here (its own tab, full-height chat).
+- **Social / Sharing** — keep existing content.
+- **Analytics** — site analytics block (page views, top pages, referrers) sourced from `traffic_clicks` + a new lightweight `page_views` table (anon insert from a `<PageViewTracker />` already implicit in router) — initially shows what we have; expandable later.
 
-## What this plan does
+## 2. Edge Function widgets
 
-1. **Make `client_profile_id` the universal link** on every client-scoped table.
-2. **Backfill** existing rows so nothing gets orphaned (including the doc you just uploaded).
-3. **Read/write** through `client_profile_id` everywhere so future sync gaps can't happen.
-4. Keep `stripe_customer_id` / `stripe_customer_ids` as a secondary identifier, used to auto-attach Stripe-originated invoices (already working) and to surface duplicate-suspect profiles.
+A grid of clickable cards, one per deployed edge function (auto-discovered from `supabase/functions/*`). Each widget shows:
 
----
+- Function name + short description (from a small static map in `src/lib/edgeFunctionsMeta.ts` so we control copy).
+- Status dot (last invocation success/error) and last-run timestamp.
+- Click → opens a drawer with: description, recent invocations, last 20 log lines (via a new `edge-fn-stats` edge function that calls Supabase Management API), and a **"Open in backend"** button.
 
-## Database changes
+Curated descriptions for all current functions: `ai-chat`, `create-admin-invoice`, `create-client`, `create-consultation-payment`, `create-invoice-payment-intent`, `create-service-payment`, `dispatch-doc-event`, `document-actions`, `handle-email-suppression`, `handle-email-unsubscribe`, `invoice-actions`, `merge-client-profiles`, `notify-portal-activation`, `preview-transactional-email`, `process-document-schedules`, `process-email-queue`, `provision-client-portal`, `send-consultation-invoice`, `send-transactional-email`, `sitemap`, `stripe-sync`, `stripe-webhook`, `submit-waiting-list`, `sync-stripe-customer`, `upload-review-photo`.
 
-Add a nullable `client_profile_id uuid` column to:
-- `client_documents`
-- `client_messages`
-- `client_agreements`
-- `client_intakes`
+## 3. Projects + Tasks (clients ↔ admin)
 
-Backfill rules:
-- `client_documents` / `client_messages`: copy `client_profiles.id` where `client_profiles.user_id = row.user_id`. Also catch the orphaned doc by matching against `client_profiles` whose stored placeholder is still the old user_id. As a last resort, leave unmatched rows `NULL` for manual review.
-- `client_agreements`: match on `lower(client_email) = lower(client_profiles.email)`.
-- `client_intakes`: match on `lower(email) = lower(client_profiles.email)` (also use `linked_user_id` if set).
+`client_projects` already exists. Extend with:
 
-Add an index on each new `client_profile_id` column.
+- `project_tasks` — `id`, `project_id`, `client_profile_id`, `title`, `description`, `assignee` (`admin` | `client`), `status` (`todo` | `in_progress` | `blocked` | `done`), `priority` (`low|med|high`), `due_date`, `completed_at`, `created_by` (`admin` | `client` | `claude`), `source` (`manual|claude|portal`), timestamps.
+- `project_updates` — `id`, `project_id`, `kind` (`status_change|note|claude_update|deploy`), `summary`, `payload jsonb`, `created_at`.
+- Extend `client_projects` with `repo_url`, `dns_provider`, `hosting_provider`, `live_url`, `staging_url`, `current_phase`, `progress_pct`.
 
-RLS:
-- Keep the existing admin-manage-all policies.
-- Add "users can view their own" policies based on `client_profile_id IN (SELECT id FROM client_profiles WHERE user_id = auth.uid())` so the portal pages keep working.
+RLS: admin all; clients see rows where `client_profile_id` belongs to them (read for projects/updates, read+update-own-status for `project_tasks` where `assignee='client'`).
 
-No schema-breaking changes — `user_id` and `client_email` columns stay so existing portal queries continue to function during transition.
+### Admin UI
+- New **`/admin/projects`** page (and detail `/admin/projects/:id`): list, create, edit projects; kanban of tasks; updates timeline; quick fields for repo/DNS/hosting.
+- `ClientDetail.tsx` gains a Projects tab + Tasks-for-client tab where admin can "Request from client" (creates `project_tasks` with `assignee='client'`).
 
-## Code changes
+### Client Portal UI
+- New **`/portal/projects`** route — read-only timeline of project evolution + live status/progress + repo/live links if shared.
+- New **`/portal/tasks`** route — client's open requests from admin (upload media, send copy, paste credentials into a secure note field, etc.) with mark-complete + comment.
 
-`src/pages/admin/ClientDetail.tsx`
-- Reads: query documents/messages/agreements/intakes by `client_profile_id = profile.id` first; fall back to email/user_id only when `client_profile_id` is null (handles legacy rows).
-- Document upload: insert with `client_profile_id: profile.id` AND `user_id: profile.user_id` so both keys are present.
-- Storage path: switch from `${profile.user_id}/...` to `${profile.id}/...` so files stay under a stable folder even if the auth user changes.
+### Project Task Ticker (dashboard)
+Single ticker with three filter chips:
+1. **Mine** — `project_tasks.assignee='admin'` and not done.
+2. **Waiting on client** — `project_tasks.assignee='client'` and not done.
+3. **Activity** — last 20 `project_updates` (incl. Claude-pushed updates).
 
-`supabase/functions/create-client/index.ts`
-- When creating the temporary profile, store the placeholder `user_id` exactly as today, but also set `client_profile_id` on any seeded rows (none today, but documented for future inserts).
+Live updates via Supabase Realtime on `project_tasks` and `project_updates`.
 
-`supabase/functions/provision-client-portal/index.ts`
-- After linking the real auth user, also update `client_documents.user_id` and `client_messages.user_id` for any rows whose `client_profile_id` matches — keeps the portal queries working transparently.
+## 4. Claude integration (Both API + MCP)
 
-`supabase/functions/stripe-webhook/index.ts` and `sync-stripe-customer/index.ts`
-- Already attach invoices via `client_profile_id`; no change needed besides verifying.
+### A. REST endpoint — `claude-project-api` edge function
+Single endpoint, token-auth via header `X-Claude-Token` (new secret `CLAUDE_API_TOKEN`). Verb in body:
 
-Portal pages (`PortalDocuments`, `PortalMessages`, `PortalAgreements`)
-- Switch their fetches to use `client_profile_id` (resolved from the user's profile) as the primary filter, with a fallback to the legacy keys.
+```
+POST /functions/v1/claude-project-api
+{ "action": "list_projects" | "get_project" | "update_project" |
+            "add_task" | "update_task" | "complete_task" |
+            "add_update" | "list_open_tasks",
+  "params": { ... } }
+```
 
-## What you'll see after this ships
+Returns JSON. All writes recorded with `created_by='claude'` and emit a `project_updates` row so the ticker shows them live.
 
-- The Scotty's Adventures PDF will appear under that client's Documents tab automatically (backfill handles it).
-- Any future document, message, agreement, or intake stays attached to the right client even if the auth user changes, the email is updated, or the portal invite is accepted later.
-- The Clients list keeps using exact-email matching for auto-merge (your existing rule), and Stripe customer IDs continue to flag mismatches on invoices.
+### B. MCP server — `claude-mcp` edge function
+Built with `mcp-lite` (Streamable HTTP). Exposes tools:
+`list_projects`, `get_project`, `update_project_status`, `set_project_phase`,
+`add_task`, `complete_task`, `list_open_tasks`, `add_project_update`,
+`set_repo_url`, `set_dns`, `set_hosting`.
+Authenticated via the same `CLAUDE_API_TOKEN` (header at MCP transport level).
 
-## Out of scope (call out if you want it)
+User adds it to Claude Desktop / claude.ai with the function URL + token. From then on, while you work with Claude, you can say "mark Aethyx project as in review and add a task to compress hero video" and the ticker updates instantly.
 
-- A "merge two profiles" admin UI (the `merge-client-profiles` function exists; we could expose a button on the duplicate badge).
-- Surfacing a "Needs profile link" queue for any backfill rows that couldn't be matched automatically.
+### C. Optional GitHub link
+`repo_url` on a project can be a GitHub URL. (No GitHub OAuth in v1 — Claude pushes commits directly via its own GitHub access; we just store the link and surface it to the client.)
+
+## 5. Files to add / change (technical)
+
+### New
+- DB migration: `project_tasks`, `project_updates`, extend `client_projects` (+RLS, realtime publication).
+- Edge functions: `claude-project-api`, `claude-mcp`, `edge-fn-stats`.
+- Pages: `src/pages/admin/Projects.tsx`, `src/pages/admin/ProjectDetail.tsx`, `src/pages/portal/PortalProjects.tsx`, `src/pages/portal/PortalTasks.tsx`.
+- Components: `src/components/admin/ProjectTaskTicker.tsx`, `src/components/admin/EdgeFunctionsGrid.tsx`, `src/components/admin/EdgeFunctionDrawer.tsx`, `src/lib/edgeFunctionsMeta.ts`.
+
+### Edited
+- `src/pages/admin/Dashboard.tsx` — split into tabs (Overview / Assistant / Social / Analytics), wire ticker + widgets.
+- `src/pages/admin/AdminLayout.tsx` — add **Projects** sidebar item.
+- `src/App.tsx` — register new admin + portal routes.
+- `src/pages/admin/ClientDetail.tsx` — Projects + Client Tasks tabs.
+- `src/pages/portal/PortalLayout.tsx` — sidebar links: Projects, Tasks.
+
+## 6. Out of scope (v1)
+- Per-user GitHub OAuth (user's Claude already has repo access).
+- Time tracking / billing on tasks.
+- Editing edge function code from the widget — link to backend instead.
+
+## 7. New secret needed
+- `CLAUDE_API_TOKEN` — random 32-byte token. I'll request it after migration approval so both the REST endpoint and MCP server share the same auth.
