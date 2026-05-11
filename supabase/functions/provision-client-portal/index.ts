@@ -53,10 +53,16 @@ Deno.serve(async (req) => {
       authUserId = created.user!.id;
     }
 
-    // Link the client_profile to the auth user
+    // Link the client_profile to the auth user, and propagate to dependent tables.
     if (profileId && authUserId) {
       await admin.from("client_profiles").update({ user_id: authUserId }).eq("id", profileId);
-      await admin.from("client_invoices").update({ user_id: authUserId }).eq("client_profile_id", profileId);
+      // Backfill stable client_profile_id linkage on rows that may already exist
+      await admin.from("client_invoices").update({ user_id: authUserId, client_profile_id: profileId }).eq("client_profile_id", profileId);
+      await admin.from("client_documents").update({ user_id: authUserId }).eq("client_profile_id", profileId);
+      await admin.from("client_messages").update({ user_id: authUserId }).eq("client_profile_id", profileId);
+      // Link any agreements / intakes whose email matches but weren't tagged yet
+      await admin.from("client_agreements").update({ client_profile_id: profileId }).is("client_profile_id", null).ilike("client_email", cleanEmail);
+      await admin.from("client_intakes").update({ client_profile_id: profileId, linked_user_id: authUserId }).is("client_profile_id", null).ilike("email", cleanEmail);
     }
 
     // Generate password recovery link via Supabase
