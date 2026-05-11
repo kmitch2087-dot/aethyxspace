@@ -93,12 +93,18 @@ const ClientDetail = () => {
     if (!p) { setLoading(false); return; }
     setProfile(p as Profile);
 
+    // Primary linkage: client_profile_id. Fall back to legacy keys (user_id, email) so older rows still appear.
+    const emailLc = p.email ? p.email.toLowerCase() : null;
     const [inv, dc, ag, it, ms, pr] = await Promise.all([
       supabase.from("client_invoices").select("*").eq("client_profile_id", id).order("created_at", { ascending: false }),
-      supabase.from("client_documents").select("*").eq("user_id", p.user_id).order("created_at", { ascending: false }),
-      p.email ? supabase.from("client_agreements").select("*").eq("client_email", p.email).order("created_at", { ascending: false }) : Promise.resolve({ data: [] } as any),
-      p.email ? supabase.from("client_intakes").select("*").eq("email", p.email).order("created_at", { ascending: false }) : Promise.resolve({ data: [] } as any),
-      supabase.from("client_messages").select("*").eq("user_id", p.user_id).order("created_at", { ascending: false }),
+      supabase.from("client_documents").select("*").or(`client_profile_id.eq.${id},user_id.eq.${p.user_id}`).order("created_at", { ascending: false }),
+      emailLc
+        ? supabase.from("client_agreements").select("*").or(`client_profile_id.eq.${id},client_email.eq.${emailLc}`).order("created_at", { ascending: false })
+        : supabase.from("client_agreements").select("*").eq("client_profile_id", id).order("created_at", { ascending: false }),
+      emailLc
+        ? supabase.from("client_intakes").select("*").or(`client_profile_id.eq.${id},email.eq.${emailLc}`).order("created_at", { ascending: false })
+        : supabase.from("client_intakes").select("*").eq("client_profile_id", id).order("created_at", { ascending: false }),
+      supabase.from("client_messages").select("*").or(`client_profile_id.eq.${id},user_id.eq.${p.user_id}`).order("created_at", { ascending: false }),
       supabase.from("client_projects").select("*").eq("client_profile_id", id).order("created_at", { ascending: false }),
     ]);
     setInvoices((inv.data as Invoice[]) || []);
@@ -142,11 +148,16 @@ const ClientDetail = () => {
   const handleUploadDoc = async () => {
     if (!profile || !docFile || !docTitle.trim()) return;
     setUploading(true);
-    const filePath = `${profile.user_id}/${Date.now()}_${docFile.name}`;
+    // Store under the stable profile.id folder so it survives auth user re-linking.
+    const filePath = `${profile.id}/${Date.now()}_${docFile.name}`;
     const { error: upErr } = await supabase.storage.from("client-documents").upload(filePath, docFile);
     if (upErr) { setUploading(false); toast({ title: "Upload failed", description: upErr.message, variant: "destructive" }); return; }
     const { error: insErr } = await supabase.from("client_documents").insert({
-      user_id: profile.user_id, title: docTitle.trim(), file_url: filePath, uploaded_by: "admin",
+      client_profile_id: profile.id,
+      user_id: profile.user_id,
+      title: docTitle.trim(),
+      file_url: filePath,
+      uploaded_by: "admin",
     });
     setUploading(false);
     if (insErr) toast({ title: "Save failed", description: insErr.message, variant: "destructive" });

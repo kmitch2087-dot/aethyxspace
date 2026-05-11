@@ -15,10 +15,18 @@ const PortalDocuments = () => {
   useEffect(() => {
     if (!user) return;
     const load = async () => {
+      const { data: profile } = await supabase
+        .from("client_profiles")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      const filter = profile?.id
+        ? `client_profile_id.eq.${profile.id},user_id.eq.${user.id}`
+        : `user_id.eq.${user.id}`;
       const { data } = await supabase
         .from("client_documents")
         .select("*")
-        .eq("user_id", user.id)
+        .or(filter)
         .order("created_at", { ascending: false });
       setDocuments(data || []);
       setLoading(false);
