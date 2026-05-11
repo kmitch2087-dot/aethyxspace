@@ -39,7 +39,11 @@ Deno.serve(async (req) => {
       else await admin.from("financial_records").insert(record);
     };
 
-    const ensureProfileFromCustomer = async (customerId: string, email?: string | null, name?: string | null) => {
+    // Match strategy:
+    //   1. customer id contained in stripe_customer_ids array
+    //   2. exact email match (lowercased)
+    //   3. else create a new profile and flag the invoice for review
+    const matchOrCreateProfile = async (customerId: string, email?: string | null, name?: string | null) => {
       if (!email) {
         const cust = await stripe.customers.retrieve(customerId);
         if (typeof cust !== "string" && !cust.deleted) {
@@ -47,33 +51,52 @@ Deno.serve(async (req) => {
           name = name || (cust as Stripe.Customer).name;
         }
       }
-      if (!email) return null;
-      const cleanEmail = email.toLowerCase();
-      const [first, ...rest] = (name || "").trim().split(/\s+/);
-      const { data: existing } = await admin.from("client_profiles").select("*")
-        .or(`stripe_customer_id.eq.${customerId},email.eq.${cleanEmail}`).maybeSingle();
-      if (existing) {
-        if (!existing.stripe_customer_id) {
-          await admin.from("client_profiles").update({ stripe_customer_id: customerId }).eq("id", existing.id);
-        }
-        return existing;
+      const cleanEmail = email ? email.toLowerCase() : null;
+
+      // 1. Match by stripe customer id (array)
+      const { data: byCust } = await admin.from("client_profiles").select("*")
+        .contains("stripe_customer_ids", [customerId]).maybeSingle();
+      if (byCust) {
+        const emailMismatch = !!cleanEmail && !!byCust.email && byCust.email.toLowerCase() !== cleanEmail;
+        return { profile: byCust, isNew: false, mismatchReason: emailMismatch
+          ? `Email mismatch: Stripe ${cleanEmail} vs profile ${byCust.email}` : null };
       }
+
+      // 2. Match by email
+      if (cleanEmail) {
+        const { data: byEmail } = await admin.from("client_profiles").select("*")
+          .eq("email", cleanEmail).maybeSingle();
+        if (byEmail) {
+          const merged = Array.from(new Set([...(byEmail.stripe_customer_ids || []), customerId]));
+          await admin.from("client_profiles").update({
+            stripe_customer_ids: merged,
+            stripe_customer_id: byEmail.stripe_customer_id || customerId,
+          }).eq("id", byEmail.id);
+          return { profile: { ...byEmail, stripe_customer_ids: merged }, isNew: false, mismatchReason: null };
+        }
+      }
+
+      // 3. Create new + flag
+      const [first, ...rest] = (name || "").trim().split(/\s+/);
       const { data: created } = await admin.from("client_profiles").insert({
         user_id: crypto.randomUUID(),
         stripe_customer_id: customerId,
+        stripe_customer_ids: [customerId],
         email: cleanEmail,
         first_name: first || "",
         last_name: rest.join(" "),
-        full_name: name || cleanEmail,
+        full_name: name || cleanEmail || "Unknown (Stripe)",
         source: "stripe_webhook",
+        status: "active",
       }).select().single();
-      return created;
+      return { profile: created, isNew: true, mismatchReason: "Auto-created from unmatched Stripe invoice — please confirm" };
     };
 
     const upsertInvoice = async (inv: Stripe.Invoice) => {
-      if (!inv.customer) return;
+      if (!inv.customer) return null;
       const customerId = inv.customer as string;
-      const profile = await ensureProfileFromCustomer(customerId, inv.customer_email, inv.customer_name);
+      const { profile, isNew, mismatchReason } = await matchOrCreateProfile(customerId, inv.customer_email, inv.customer_name);
+      const needsReview = isNew || !!mismatchReason;
       const row = {
         stripe_invoice_id: inv.id,
         stripe_customer_id: customerId,
@@ -90,6 +113,8 @@ Deno.serve(async (req) => {
         due_date: inv.due_date ? new Date(inv.due_date * 1000).toISOString() : null,
         paid_at: inv.status_transitions?.paid_at ? new Date(inv.status_transitions.paid_at * 1000).toISOString() : null,
         email: inv.customer_email || profile?.email || null,
+        needs_review: needsReview,
+        review_reason: mismatchReason,
       };
       await admin.from("client_invoices").upsert(row, { onConflict: "stripe_invoice_id" });
       return profile;
