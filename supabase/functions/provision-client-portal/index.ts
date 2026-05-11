@@ -1,5 +1,5 @@
 // Admin-only: invite a client to the portal. Creates auth user + sends magic-link "set password" email.
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
+import { createClient } from "npm:@supabase/supabase-js@2.49.4";
 
 const allowedOrigins = [
   "https://aethyxspace.lovable.app",
