@@ -47,6 +47,7 @@ import PortalDocuments from "./pages/portal/PortalDocuments";
 import PortalAgreements from "./pages/portal/PortalAgreements";
 import PortalPayments from "./pages/portal/PortalPayments";
 import PortalPay from "./pages/portal/PortalPay";
+import PortalIntake from "./pages/portal/PortalIntake";
 
 const queryClient = new QueryClient();
 
@@ -112,6 +113,7 @@ const App = () => (
               <Route path="agreements" element={<PortalAgreements />} />
               <Route path="payments" element={<PortalPayments />} />
               <Route path="pay/:invoiceId" element={<PortalPay />} />
+              <Route path="intake" element={<PortalIntake />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
