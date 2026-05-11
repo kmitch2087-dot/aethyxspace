@@ -81,10 +81,13 @@ Deno.serve(async (req) => {
       profileId = created.id;
     }
 
-    // 4. Send portal invite (creates auth user + email)
+    // 4. Send portal invite (creates auth user + email). Forward the admin's
+    // bearer token so provision-client-portal can verify admin role — the
+    // service-role JWT has no `sub` claim and would fail getUser().
     if (sendInvite) {
       const inviteRes = await admin.functions.invoke("provision-client-portal", {
         body: { email, firstName, profileId },
+        headers: { Authorization: `Bearer ${token}` },
       });
       if (inviteRes.error) warnings.push(`Portal invite: ${inviteRes.error.message}`);
     }
