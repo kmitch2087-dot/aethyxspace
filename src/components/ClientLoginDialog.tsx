@@ -11,7 +11,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 
@@ -74,31 +73,17 @@ const ClientLoginDialog = ({ open, onClose }: ClientLoginDialogProps) => {
 
   const handleGoogle = async () => {
     setLoading(true);
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/portal`,
+      },
     });
-    if (result.error) {
+    if (error) {
       setLoading(false);
-      toast({ title: "Google sign-in failed", description: result.error.message, variant: "destructive" });
-      return;
+      toast({ title: "Google sign-in failed", description: error.message, variant: "destructive" });
     }
-    if (result.redirected) return; // browser is navigating
-    // Tokens received — determine role and route
-    const { data: { user } } = await supabase.auth.getUser();
-    let isAdmin = false;
-    if (user) {
-      const { data: roleRow } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id)
-        .eq("role", "admin")
-        .maybeSingle();
-      isAdmin = !!roleRow;
-    }
-    setLoading(false);
-    toast({ title: "Welcome!" });
-    onClose();
-    navigate(isAdmin ? "/admin" : "/portal");
+    // On success the browser redirects — no further action needed
   };
 
   const handleSignup = async (e: React.FormEvent) => {
