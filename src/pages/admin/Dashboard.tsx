@@ -195,13 +195,13 @@ const Dashboard = () => {
                     <div className="space-y-1">
                       <p className="text-sm font-medium">Credentials are stored server-side</p>
                       <p className="text-xs text-muted-foreground leading-relaxed">
-                        For security, your Facebook Page ID and Access Token are stored as encrypted backend secrets — never in your browser. Ask Lovable to add the secrets <code className="px-1 py-0.5 rounded bg-background/50">FACEBOOK_PAGE_ID</code> and <code className="px-1 py-0.5 rounded bg-background/50">FACEBOOK_ACCESS_TOKEN</code>, and they'll be available to the auto-posting edge function.
+                        For security, your Facebook Page ID and Access Token are stored as encrypted backend secrets — never in your browser. Add these as secrets in Supabase (Project Settings → Edge Functions → Secrets): <code className="px-1 py-0.5 rounded bg-background/50">FACEBOOK_PAGE_ID</code> and <code className="px-1 py-0.5 rounded bg-background/50">FACEBOOK_ACCESS_TOKEN</code>, and they'll be available to the auto-posting edge function.
                       </p>
                     </div>
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Generate a long-lived Page Access Token from Meta Business Suite → Graph API Explorer with the <code>pages_manage_posts</code> permission, then have Lovable save it as a secret.
+                  Generate a long-lived Page Access Token from Meta Business Suite → Graph API Explorer with the <code>pages_manage_posts</code> permission, then save it as a secret in Supabase (Project Settings → Edge Functions → Secrets).
                 </p>
               </CardContent>
             </Card>

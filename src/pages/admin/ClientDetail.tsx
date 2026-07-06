@@ -54,7 +54,7 @@ interface DocRow { id: string; title: string; file_url: string; created_at: stri
 interface AgreementRow { id: string; service_name: string | null; status: string; amount: number | null; agreement_url: string | null; created_at: string; }
 interface IntakeRow { id: string; status: string; created_at: string; notes: string | null; }
 interface MessageRow { id: string; message: string; created_at: string; }
-interface ProjectRow { id: string; name: string; lovable_url: string | null; status: string; notes: string | null; created_at: string; }
+interface ProjectRow { id: string; name: string; status: string; notes: string | null; created_at: string; }
 
 const ClientDetail = () => {
   const { id } = useParams();
@@ -85,7 +85,6 @@ const ClientDetail = () => {
   // Project creation
   const [projOpen, setProjOpen] = useState(false);
   const [projName, setProjName] = useState("");
-  const [projUrl, setProjUrl] = useState("");
 
   const fetchAll = async () => {
     if (!id) return;
@@ -190,9 +189,8 @@ const ClientDetail = () => {
     await supabase.from("client_projects").insert({
       client_profile_id: profile.id,
       name: projName.trim(),
-      lovable_url: projUrl.trim() || null,
     });
-    setProjOpen(false); setProjName(""); setProjUrl(""); fetchAll();
+    setProjOpen(false); setProjName(""); fetchAll();
   };
 
   const deleteProject = async (pid: string) => {
@@ -346,7 +344,6 @@ const ClientDetail = () => {
             <Card key={p.id}><CardContent className="pt-4 flex items-center justify-between gap-3 flex-wrap">
               <div className="min-w-0 flex-1">
                 <p className="font-medium text-sm">{p.name}</p>
-                {p.lovable_url && <a href={p.lovable_url} target="_blank" rel="noreferrer" className="text-xs text-primary underline break-all">{p.lovable_url}</a>}
               </div>
               <Button size="sm" variant="ghost" onClick={() => deleteProject(p.id)}><Trash2 className="h-4 w-4" /></Button>
             </CardContent></Card>
@@ -424,7 +421,6 @@ const ClientDetail = () => {
           <DialogHeader><DialogTitle>Add Project</DialogTitle></DialogHeader>
           <div className="space-y-3">
             <div><Label>Name</Label><Input value={projName} onChange={(e) => setProjName(e.target.value)} /></div>
-            <div><Label>Lovable URL</Label><Input value={projUrl} onChange={(e) => setProjUrl(e.target.value)} placeholder="https://…lovable.app" /></div>
             <Button onClick={addProject} disabled={!projName.trim()} className="w-full">Add</Button>
           </div>
         </DialogContent>
