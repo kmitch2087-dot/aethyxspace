@@ -457,7 +457,6 @@ export type Database = {
           hosting_provider: string | null
           id: string
           live_url: string | null
-          lovable_url: string | null
           name: string
           notes: string | null
           progress_pct: number
@@ -474,7 +473,6 @@ export type Database = {
           hosting_provider?: string | null
           id?: string
           live_url?: string | null
-          lovable_url?: string | null
           name: string
           notes?: string | null
           progress_pct?: number
@@ -491,7 +489,6 @@ export type Database = {
           hosting_provider?: string | null
           id?: string
           live_url?: string | null
-          lovable_url?: string | null
           name?: string
           notes?: string | null
           progress_pct?: number
