@@ -1,5 +1,5 @@
 // Streaming AI chat endpoint for Aethyx admin assistant + public concierge.
-// Uses Lovable AI Gateway (no API key required from user).
+// Uses Google Gemini API (OpenAI-compatible endpoint).
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -68,8 +68,8 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+    if (!GEMINI_API_KEY) {
       return new Response(JSON.stringify({ error: "AI not configured" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -85,15 +85,15 @@ Deno.serve(async (req: Request) => {
     }));
 
     const response = await fetch(
-      "https://ai.gateway.lovable.dev/v1/chat/completions",
+      "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          Authorization: `Bearer ${GEMINI_API_KEY}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
+          model: "gemini-2.5-flash",
           messages: [{ role: "system", content: system }, ...trimmed],
           stream: true,
         }),
@@ -103,19 +103,13 @@ Deno.serve(async (req: Request) => {
     if (!response.ok) {
       if (response.status === 429) {
         return new Response(
-          JSON.stringify({ error: "Busy right now — try again in a moment." }),
+          JSON.stringify({ error: "AI is rate-limited, please try again shortly." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
       }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "AI usage limit reached. Add credits in workspace settings." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-        );
-      }
       const txt = await response.text();
-      console.error("AI gateway error:", response.status, txt);
-      return new Response(JSON.stringify({ error: "AI gateway error" }), {
+      console.error("AI API error:", response.status, txt);
+      return new Response(JSON.stringify({ error: "AI API error" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
