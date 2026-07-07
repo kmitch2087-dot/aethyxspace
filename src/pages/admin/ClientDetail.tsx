@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import {
   ArrowLeft, Loader2, Save, Upload, Mail, Plus, ExternalLink,
   AlertTriangle, CheckCircle2, Trash2, RefreshCcw, FileText, Bell, Pencil, XCircle,
+  ChevronDown, ChevronUp, Download, ArrowUp, ArrowDown,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -112,6 +113,52 @@ interface AddOnRow {
   } | null;
 }
 
+type AssetCategory = "brand_voice" | "tagline" | "motto" | "mission" | "values" | "logo" | "guideline" | "font" | "other";
+
+interface ClientAsset {
+  id: string;
+  type: "text" | "file";
+  category: AssetCategory;
+  label: string;
+  content?: string;
+  file_url?: string;
+  file_name?: string;
+  file_size?: number;
+  sort_order: number;
+  created_at: string;
+}
+
+interface ProjectPlan {
+  id: string;
+  client_profile_id: string;
+  project_name: string;
+  overview?: string | null;
+  completion_percent: number;
+  status: "planning" | "active" | "review" | "complete" | "paused";
+  start_date?: string | null;
+  target_date?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+interface ProjectPhase {
+  id: string;
+  plan_id: string;
+  name: string;
+  description?: string | null;
+  completion_percent: number;
+  status: "pending" | "in_progress" | "complete";
+  sort_order: number;
+}
+
+interface ProjectUpdate {
+  id: string;
+  plan_id: string;
+  content: string;
+  author: string;
+  created_at: string;
+}
+
 const IMAGE_EXTS = new Set(["jpg", "jpeg", "png", "gif", "webp", "svg", "avif"]);
 
 function fileExt(path: string): string {
@@ -121,6 +168,32 @@ function fileExt(path: string): string {
 function formatAddonPrice(price: number, type: string): string {
   const rounded = Number(price) % 1 === 0 ? Number(price).toFixed(0) : Number(price).toFixed(2);
   return type === "recurring" ? `$${rounded} / mo` : `$${rounded}`;
+}
+
+function assetCategoryInfo(category: AssetCategory): { classes: string; label: string } {
+  const map: Record<AssetCategory, { classes: string; label: string }> = {
+    brand_voice: { classes: "bg-teal-100 text-teal-700 border-teal-200", label: "Brand Voice" },
+    tagline: { classes: "bg-purple-100 text-purple-700 border-purple-200", label: "Tagline" },
+    motto: { classes: "bg-blue-100 text-blue-700 border-blue-200", label: "Motto" },
+    mission: { classes: "bg-green-100 text-green-700 border-green-200", label: "Mission" },
+    values: { classes: "bg-orange-100 text-orange-700 border-orange-200", label: "Values" },
+    logo: { classes: "bg-teal-100 text-teal-700 border-teal-200", label: "Logo" },
+    guideline: { classes: "bg-blue-100 text-blue-700 border-blue-200", label: "Guidelines" },
+    font: { classes: "bg-gray-100 text-gray-600 border-gray-200", label: "Font" },
+    other: { classes: "bg-gray-100 text-gray-600 border-gray-200", label: "Other" },
+  };
+  return map[category] ?? map.other;
+}
+
+function planStatusInfo(status: ProjectPlan["status"]): { classes: string; label: string } {
+  const map: Record<ProjectPlan["status"], { classes: string; label: string }> = {
+    planning: { classes: "bg-gray-100 text-gray-600 border-gray-200", label: "Planning" },
+    active: { classes: "bg-teal-100 text-teal-700 border-teal-200", label: "Active" },
+    review: { classes: "bg-purple-100 text-purple-700 border-purple-200", label: "In Review" },
+    complete: { classes: "bg-green-100 text-green-700 border-green-200", label: "Complete" },
+    paused: { classes: "bg-yellow-100 text-yellow-700 border-yellow-200", label: "Paused" },
+  };
+  return map[status] ?? map.planning;
 }
 
 const ClientDetail = () => {
@@ -150,6 +223,9 @@ const ClientDetail = () => {
   const [sendingDocNotif, setSendingDocNotif] = useState(false);
   const [editingDocId, setEditingDocId] = useState<string | null>(null);
   const [editingDocTitle, setEditingDocTitle] = useState("");
+
+  // Intake collapsible inside Documents tab
+  const [intakesOpen, setIntakesOpen] = useState(false);
 
   // Invoice creation
   const [invOpen, setInvOpen] = useState(false);
@@ -181,6 +257,34 @@ const ClientDetail = () => {
   // Notes expand/collapse
   const [expandedNotes, setExpandedNotes] = useState<Set<string>>(new Set());
 
+  // Assets
+  const [assets, setAssets] = useState<ClientAsset[]>([]);
+  const [assetSignedUrls, setAssetSignedUrls] = useState<Record<string, string>>({});
+  const [addTextAssetOpen, setAddTextAssetOpen] = useState(false);
+  const [addFileAssetOpen, setAddFileAssetOpen] = useState(false);
+  const [textAssetCategory, setTextAssetCategory] = useState<AssetCategory>("brand_voice");
+  const [textAssetLabel, setTextAssetLabel] = useState("");
+  const [textAssetContent, setTextAssetContent] = useState("");
+  const [textAssetSaving, setTextAssetSaving] = useState(false);
+  const [fileAssetCategory, setFileAssetCategory] = useState<AssetCategory>("logo");
+  const [fileAssetLabel, setFileAssetLabel] = useState("");
+  const [fileAssetFile, setFileAssetFile] = useState<File | null>(null);
+  const [fileAssetUploading, setFileAssetUploading] = useState(false);
+
+  // Plan
+  const [plan, setPlan] = useState<ProjectPlan | null>(null);
+  const [phases, setPhases] = useState<ProjectPhase[]>([]);
+  const [planUpdates, setPlanUpdates] = useState<ProjectUpdate[]>([]);
+  const [creatingPlan, setCreatingPlan] = useState(false);
+  const [newUpdateContent, setNewUpdateContent] = useState("");
+  const [newUpdateSaving, setNewUpdateSaving] = useState(false);
+  const [newPhaseName, setNewPhaseName] = useState("");
+  const [addingPhase, setAddingPhase] = useState(false);
+  const [editingPhaseId, setEditingPhaseId] = useState<string | null>(null);
+  const [editingPhaseName, setEditingPhaseName] = useState("");
+  const [editingPlanName, setEditingPlanName] = useState(false);
+  const [editingPlanNameValue, setEditingPlanNameValue] = useState("");
+
   const fetchSignedUrls = async (rows: DocRow[]) => {
     if (!rows.length) { setDocUrls({}); return; }
     const { data: signed } = await supabase.storage
@@ -194,6 +298,20 @@ const ClientDetail = () => {
     setDocUrls(map);
   };
 
+  const fetchAssetSignedUrls = async (fileAssets: ClientAsset[]) => {
+    if (!fileAssets.length) return;
+    const map: Record<string, string> = {};
+    for (const asset of fileAssets) {
+      if (asset.file_name) {
+        const { data: urlData } = await supabase.storage
+          .from("client-assets")
+          .createSignedUrl(asset.file_name, 60 * 60 * 24 * 7);
+        if (urlData?.signedUrl) map[asset.id] = urlData.signedUrl;
+      }
+    }
+    setAssetSignedUrls(map);
+  };
+
   const fetchAll = async () => {
     if (!id) return;
     const { data: p } = await supabase.from("client_profiles").select("*").eq("id", id).maybeSingle();
@@ -202,7 +320,7 @@ const ClientDetail = () => {
 
     const emailLc = p.email ? p.email.toLowerCase() : null;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const [inv, dc, ag, it, ms, pr, ao] = await Promise.all([
+    const [inv, dc, ag, it, ms, pr, ao, as_] = await Promise.all([
       supabase.from("client_invoices").select("*").eq("client_profile_id", id).order("created_at", { ascending: false }),
       supabase.from("client_documents").select("*").or(`client_profile_id.eq.${id},user_id.eq.${p.user_id}`).order("created_at", { ascending: false }),
       emailLc
@@ -215,6 +333,8 @@ const ClientDetail = () => {
       supabase.from("client_projects").select("*").eq("client_profile_id", id).order("created_at", { ascending: false }),
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (supabase as any).from("client_add_ons").select("*, catalog:add_on_catalog_id(name, type, category, display_price)").eq("client_profile_id", id).order("created_at", { ascending: false }),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (supabase as any).from("client_assets").select("*").eq("client_profile_id", id).order("sort_order"),
     ]);
     setInvoices((inv.data as Invoice[]) || []);
     const docRows = (dc.data as DocRow[]) || [];
@@ -224,8 +344,35 @@ const ClientDetail = () => {
     setMessages((ms.data as MessageRow[]) || []);
     setProjects((pr.data as ProjectRow[]) || []);
     setAddOns((ao.data as AddOnRow[]) || []);
+    const assetRows = (as_.data as ClientAsset[]) || [];
+    setAssets(assetRows);
     setLoading(false);
     fetchSignedUrls(docRows);
+    fetchAssetSignedUrls(assetRows.filter((a) => a.type === "file"));
+  };
+
+  const fetchPlan = async () => {
+    if (!id) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: planData } = await (supabase as any)
+      .from("client_project_plans")
+      .select("*")
+      .eq("client_profile_id", id)
+      .maybeSingle();
+    setPlan(planData as ProjectPlan | null);
+    if (planData) {
+      const [{ data: phasesData }, { data: updatesData }] = await Promise.all([
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (supabase as any).from("client_project_phases").select("*").eq("plan_id", planData.id).order("sort_order"),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (supabase as any).from("client_project_updates").select("*").eq("plan_id", planData.id).order("created_at", { ascending: false }),
+      ]);
+      setPhases((phasesData as ProjectPhase[]) || []);
+      setPlanUpdates((updatesData as ProjectUpdate[]) || []);
+    } else {
+      setPhases([]);
+      setPlanUpdates([]);
+    }
   };
 
   const fetchCatalog = async () => {
@@ -238,7 +385,7 @@ const ClientDetail = () => {
     setCatalog((data as CatalogItemSlim[]) || []);
   };
 
-  useEffect(() => { fetchAll(); /* eslint-disable-next-line */ }, [id]);
+  useEffect(() => { fetchAll(); fetchPlan(); /* eslint-disable-next-line */ }, [id]);
   useEffect(() => { fetchCatalog(); }, []);
 
   const saveProfile = async () => {
@@ -430,6 +577,209 @@ const ClientDetail = () => {
     });
   };
 
+  // Asset handlers
+  const addTextAsset = async () => {
+    if (!profile || !textAssetLabel.trim() || !textAssetContent.trim()) return;
+    setTextAssetSaving(true);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any).from("client_assets").insert({
+      client_profile_id: profile.id,
+      type: "text",
+      category: textAssetCategory,
+      label: textAssetLabel.trim(),
+      content: textAssetContent.trim(),
+      sort_order: assets.filter((a) => a.type === "text").length,
+    });
+    setTextAssetSaving(false);
+    if (error) {
+      toast({ title: "Failed to save", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Asset added" });
+      setAddTextAssetOpen(false);
+      setTextAssetLabel("");
+      setTextAssetContent("");
+      setTextAssetCategory("brand_voice");
+      fetchAll();
+    }
+  };
+
+  const uploadFileAsset = async () => {
+    if (!profile || !fileAssetFile || !fileAssetLabel.trim()) return;
+    setFileAssetUploading(true);
+    const storagePath = `${profile.id}/${Date.now()}_${fileAssetFile.name}`;
+    const { error: upErr } = await supabase.storage.from("client-assets").upload(storagePath, fileAssetFile);
+    if (upErr) {
+      setFileAssetUploading(false);
+      toast({ title: "Upload failed", description: upErr.message, variant: "destructive" });
+      return;
+    }
+    const { data: urlData } = await supabase.storage
+      .from("client-assets")
+      .createSignedUrl(storagePath, 60 * 60 * 24 * 7);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: insErr } = await (supabase as any).from("client_assets").insert({
+      client_profile_id: profile.id,
+      type: "file",
+      category: fileAssetCategory,
+      label: fileAssetLabel.trim(),
+      file_name: storagePath,
+      file_url: urlData?.signedUrl || "",
+      file_size: fileAssetFile.size,
+      sort_order: assets.filter((a) => a.type === "file").length,
+    });
+    setFileAssetUploading(false);
+    if (insErr) {
+      toast({ title: "Save failed", description: insErr.message, variant: "destructive" });
+    } else {
+      toast({ title: "File uploaded" });
+      setAddFileAssetOpen(false);
+      setFileAssetLabel("");
+      setFileAssetFile(null);
+      setFileAssetCategory("logo");
+      fetchAll();
+    }
+  };
+
+  const deleteAsset = async (asset: ClientAsset) => {
+    if (asset.type === "file" && asset.file_name) {
+      await supabase.storage.from("client-assets").remove([asset.file_name]);
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any).from("client_assets").delete().eq("id", asset.id);
+    setAssets((prev) => prev.filter((a) => a.id !== asset.id));
+    toast({ title: "Asset deleted" });
+  };
+
+  // Plan handlers
+  const createPlan = async () => {
+    if (!profile) return;
+    setCreatingPlan(true);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any).from("client_project_plans").insert({
+      client_profile_id: profile.id,
+      project_name: "Website Project",
+      status: "planning",
+      completion_percent: 0,
+    });
+    setCreatingPlan(false);
+    if (error) {
+      toast({ title: "Failed to create plan", description: error.message, variant: "destructive" });
+    } else {
+      fetchPlan();
+    }
+  };
+
+  const savePlan = async (updates: Partial<ProjectPlan>) => {
+    if (!plan) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any)
+      .from("client_project_plans")
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq("id", plan.id);
+    if (!error) {
+      setPlan((prev) => prev ? { ...prev, ...updates } : null);
+    }
+  };
+
+  const recalcPlanCompletion = async (updatedPhases: ProjectPhase[]) => {
+    if (!plan) return;
+    const avg = updatedPhases.length
+      ? Math.round(updatedPhases.reduce((sum, p) => sum + p.completion_percent, 0) / updatedPhases.length)
+      : 0;
+    await savePlan({ completion_percent: avg });
+  };
+
+  const updatePhase = async (phaseId: string, updates: Partial<ProjectPhase>) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any).from("client_project_phases").update(updates).eq("id", phaseId);
+    const newPhases = phases.map((p) => p.id === phaseId ? { ...p, ...updates } : p);
+    setPhases(newPhases);
+    if ("completion_percent" in updates) {
+      await recalcPlanCompletion(newPhases);
+    }
+  };
+
+  const deletePhase = async (phaseId: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any).from("client_project_phases").delete().eq("id", phaseId);
+    const newPhases = phases.filter((p) => p.id !== phaseId);
+    setPhases(newPhases);
+    await recalcPlanCompletion(newPhases);
+  };
+
+  const movePhase = async (phaseId: string, direction: "up" | "down") => {
+    const idx = phases.findIndex((p) => p.id === phaseId);
+    if (direction === "up" && idx === 0) return;
+    if (direction === "down" && idx === phases.length - 1) return;
+    const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+    const current = phases[idx];
+    const swap = phases[swapIdx];
+    await Promise.all([
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (supabase as any).from("client_project_phases").update({ sort_order: swap.sort_order }).eq("id", current.id),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (supabase as any).from("client_project_phases").update({ sort_order: current.sort_order }).eq("id", swap.id),
+    ]);
+    const newPhases = [...phases];
+    newPhases[idx] = { ...current, sort_order: swap.sort_order };
+    newPhases[swapIdx] = { ...swap, sort_order: current.sort_order };
+    newPhases.sort((a, b) => a.sort_order - b.sort_order);
+    setPhases(newPhases);
+  };
+
+  const saveEditedPhaseName = async (phase: ProjectPhase) => {
+    const trimmed = editingPhaseName.trim();
+    setEditingPhaseId(null);
+    if (!trimmed || trimmed === phase.name) return;
+    await updatePhase(phase.id, { name: trimmed });
+  };
+
+  const addPhase = async () => {
+    if (!plan || !newPhaseName.trim()) return;
+    setAddingPhase(true);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase as any)
+      .from("client_project_phases")
+      .insert({
+        plan_id: plan.id,
+        name: newPhaseName.trim(),
+        status: "pending",
+        completion_percent: 0,
+        sort_order: phases.length,
+      })
+      .select()
+      .single();
+    setAddingPhase(false);
+    if (error) {
+      toast({ title: "Failed to add phase", description: error.message, variant: "destructive" });
+    } else {
+      setPhases((prev) => [...prev, data as ProjectPhase]);
+      setNewPhaseName("");
+    }
+  };
+
+  const addUpdate = async () => {
+    if (!plan || !newUpdateContent.trim()) return;
+    setNewUpdateSaving(true);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase as any)
+      .from("client_project_updates")
+      .insert({
+        plan_id: plan.id,
+        content: newUpdateContent.trim(),
+        author: "Kristin",
+      })
+      .select()
+      .single();
+    setNewUpdateSaving(false);
+    if (error) {
+      toast({ title: "Failed to post update", description: error.message, variant: "destructive" });
+    } else {
+      setPlanUpdates((prev) => [data as ProjectUpdate, ...prev]);
+      setNewUpdateContent("");
+    }
+  };
+
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   if (!profile) return (
     <div className="py-12 text-center">
@@ -440,6 +790,8 @@ const ClientDetail = () => {
 
   const activeRecurringAddOns = addOns.filter((a) => a.status === "active" && a.catalog?.type === "recurring");
   const totalMonthly = activeRecurringAddOns.reduce((sum, a) => sum + Number(a.price || 0), 0);
+  const textAssets = assets.filter((a) => a.type === "text");
+  const fileAssets = assets.filter((a) => a.type === "file");
 
   return (
     <div className="space-y-6">
@@ -471,8 +823,9 @@ const ClientDetail = () => {
           <TabsTrigger value="documents">Documents ({docs.length})</TabsTrigger>
           <TabsTrigger value="projects">Projects ({projects.length})</TabsTrigger>
           <TabsTrigger value="addons">Add-Ons ({addOns.length})</TabsTrigger>
+          <TabsTrigger value="assets">Assets</TabsTrigger>
+          <TabsTrigger value="plan">Plan</TabsTrigger>
           <TabsTrigger value="agreements">Agreements ({agreements.length})</TabsTrigger>
-          <TabsTrigger value="intakes">Intakes ({intakes.length})</TabsTrigger>
           <TabsTrigger value="messages">Messages ({messages.length})</TabsTrigger>
         </TabsList>
 
@@ -638,6 +991,51 @@ const ClientDetail = () => {
               })}
             </div>
           )}
+
+          {/* Intake Responses collapsible */}
+          <div className="border border-black/10 rounded-xl overflow-hidden">
+            <button
+              className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-black hover:bg-black/5 transition-colors"
+              onClick={() => setIntakesOpen((o) => !o)}
+            >
+              <span>Intake Responses</span>
+              {intakesOpen ? <ChevronUp className="h-4 w-4 text-black/40" /> : <ChevronDown className="h-4 w-4 text-black/40" />}
+            </button>
+            {intakesOpen && (
+              <div className="border-t border-black/10 px-4 pb-4">
+                {intakes.length === 0 ? (
+                  <p className="text-sm text-muted-foreground pt-4 text-center">No intake submissions yet.</p>
+                ) : (
+                  <div className="space-y-5 pt-4">
+                    {intakes.map((intake) => (
+                      <div key={intake.id}>
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-xs text-muted-foreground">
+                            Submitted {format(new Date(intake.created_at), "MMM d, yyyy 'at' h:mm a")}
+                          </p>
+                          <Badge variant="outline" className="text-xs capitalize">{intake.status}</Badge>
+                        </div>
+                        {intake.responses && Object.keys(intake.responses).length > 0 ? (
+                          <dl className="space-y-2">
+                            {Object.values(intake.responses).map((r, idx) => (
+                              <div key={idx} className="border-l-2 border-black/10 pl-3">
+                                <dt className="text-xs uppercase tracking-wider text-black/40">{r.label}</dt>
+                                <dd className="text-sm text-black/80 whitespace-pre-wrap mt-0.5">
+                                  {r.value || <span className="italic text-black/30">—</span>}
+                                </dd>
+                              </div>
+                            ))}
+                          </dl>
+                        ) : (
+                          <p className="text-sm text-muted-foreground italic">No responses recorded.</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </TabsContent>
 
         {/* PROJECTS */}
@@ -745,6 +1143,381 @@ const ClientDetail = () => {
           )}
         </TabsContent>
 
+        {/* ASSETS */}
+        <TabsContent value="assets" className="mt-4 space-y-6">
+          {/* Text Assets */}
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-display text-base tracking-wider">Brand Identity</h3>
+              <Button size="sm" onClick={() => setAddTextAssetOpen(true)}>
+                <Plus className="h-4 w-4 mr-2" /> Add Text Asset
+              </Button>
+            </div>
+            {textAssets.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-6 text-center">No brand identity assets yet.</p>
+            ) : (
+              <div className="space-y-3">
+                {textAssets.map((asset) => {
+                  const { classes, label: catLabel } = assetCategoryInfo(asset.category);
+                  return (
+                    <Card key={asset.id}>
+                      <CardContent className="pt-4 group">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                              <Badge className={`${classes} hover:${classes} text-xs`}>{catLabel}</Badge>
+                              <span className="font-medium text-sm">{asset.label}</span>
+                            </div>
+                            <p className="text-sm text-black/80 whitespace-pre-wrap">{asset.content}</p>
+                          </div>
+                          <button
+                            className="p-1 rounded hover:bg-red-50 text-black/30 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5"
+                            onClick={() => deleteAsset(asset)}
+                            title="Delete"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* File Assets */}
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-display text-base tracking-wider">Brand Files</h3>
+              <Button size="sm" onClick={() => setAddFileAssetOpen(true)}>
+                <Upload className="h-4 w-4 mr-2" /> Upload File
+              </Button>
+            </div>
+            {fileAssets.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-6 text-center">No brand files uploaded yet.</p>
+            ) : (
+              <div className="space-y-2">
+                {fileAssets.map((asset) => {
+                  const { classes, label: catLabel } = assetCategoryInfo(asset.category);
+                  const signedUrl = assetSignedUrls[asset.id];
+                  const displayName = asset.file_name ? asset.file_name.split("/").pop() : "";
+                  return (
+                    <Card key={asset.id}>
+                      <CardContent className="pt-4 group flex items-center justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <Badge className={`${classes} hover:${classes} text-xs`}>{catLabel}</Badge>
+                            <span className="font-medium text-sm">{asset.label}</span>
+                            {displayName && (
+                              <span className="text-xs text-muted-foreground truncate max-w-[180px]">{displayName}</span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0">
+                          {signedUrl && (
+                            <a
+                              href={signedUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="p-1 rounded hover:bg-blue-50 text-black/40 hover:text-blue-600 transition-colors"
+                              title="Download"
+                            >
+                              <Download className="h-3.5 w-3.5" />
+                            </a>
+                          )}
+                          <button
+                            className="p-1 rounded hover:bg-red-50 text-black/30 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={() => deleteAsset(asset)}
+                            title="Delete"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </TabsContent>
+
+        {/* PLAN */}
+        <TabsContent value="plan" className="mt-4 space-y-4">
+          {!plan ? (
+            <div className="text-center py-12">
+              <p className="text-sm text-muted-foreground mb-4">No project plan yet.</p>
+              <Button onClick={createPlan} disabled={creatingPlan}>
+                {creatingPlan && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                <Plus className="h-4 w-4 mr-2" /> Create Project Plan
+              </Button>
+            </div>
+          ) : (
+            <>
+              {/* Plan header */}
+              <Card>
+                <CardContent className="pt-6 space-y-4">
+                  {editingPlanName ? (
+                    <input
+                      autoFocus
+                      className="text-xl font-display font-medium w-full bg-transparent border-b-2 border-primary focus:outline-none pb-1"
+                      value={editingPlanNameValue}
+                      onChange={(e) => setEditingPlanNameValue(e.target.value)}
+                      onBlur={async () => {
+                        setEditingPlanName(false);
+                        const trimmed = editingPlanNameValue.trim();
+                        if (trimmed && trimmed !== plan.project_name) await savePlan({ project_name: trimmed });
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+                        if (e.key === "Escape") setEditingPlanName(false);
+                      }}
+                    />
+                  ) : (
+                    <button
+                      className="text-xl font-display font-medium text-left hover:text-primary transition-colors"
+                      onClick={() => { setEditingPlanName(true); setEditingPlanNameValue(plan.project_name); }}
+                    >
+                      {plan.project_name}
+                    </button>
+                  )}
+
+                  <div className="flex items-center gap-4 flex-wrap">
+                    <Select
+                      value={plan.status}
+                      onValueChange={(v) => savePlan({ status: v as ProjectPlan["status"] })}
+                    >
+                      <SelectTrigger className="w-36 h-8 text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent style={lightVars} className="bg-white text-black">
+                        <SelectItem value="planning">Planning</SelectItem>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="review">In Review</SelectItem>
+                        <SelectItem value="complete">Complete</SelectItem>
+                        <SelectItem value="paused">Paused</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    <div className="flex items-center gap-3 flex-1 min-w-[200px]">
+                      <span className="text-2xl font-display font-semibold text-teal-600 tabular-nums w-16 shrink-0">
+                        {plan.completion_percent}%
+                      </span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-2">
+                        <div
+                          className="bg-teal-500 h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${Math.min(100, plan.completion_percent)}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Start Date</Label>
+                      <Input
+                        type="date"
+                        value={plan.start_date || ""}
+                        onChange={(e) => setPlan((prev) => prev ? { ...prev, start_date: e.target.value } : null)}
+                        onBlur={(e) => savePlan({ start_date: e.target.value || null })}
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Target Date</Label>
+                      <Input
+                        type="date"
+                        value={plan.target_date || ""}
+                        onChange={(e) => setPlan((prev) => prev ? { ...prev, target_date: e.target.value } : null)}
+                        onBlur={(e) => savePlan({ target_date: e.target.value || null })}
+                        className="mt-1"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label className="text-xs text-muted-foreground">Overview</Label>
+                    <Textarea
+                      rows={3}
+                      value={plan.overview || ""}
+                      onChange={(e) => setPlan((prev) => prev ? { ...prev, overview: e.target.value } : null)}
+                      onBlur={(e) => savePlan({ overview: e.target.value || null })}
+                      placeholder="Brief project overview..."
+                      className="mt-1"
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Phases */}
+              <div>
+                <h3 className="font-display text-base tracking-wider mb-3">Project Phases</h3>
+                {phases.length === 0 ? (
+                  <p className="text-sm text-muted-foreground py-4 text-center">No phases added yet.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {phases.map((phase, idx) => (
+                      <Card key={phase.id}>
+                        <CardContent className="pt-4">
+                          <div className="flex items-start gap-3">
+                            <div className="flex flex-col gap-0.5 pt-1 shrink-0">
+                              <button
+                                className="p-0.5 rounded hover:bg-black/5 text-black/30 hover:text-black/60 disabled:opacity-20"
+                                onClick={() => movePhase(phase.id, "up")}
+                                disabled={idx === 0}
+                              >
+                                <ArrowUp className="h-3 w-3" />
+                              </button>
+                              <button
+                                className="p-0.5 rounded hover:bg-black/5 text-black/30 hover:text-black/60 disabled:opacity-20"
+                                onClick={() => movePhase(phase.id, "down")}
+                                disabled={idx === phases.length - 1}
+                              >
+                                <ArrowDown className="h-3 w-3" />
+                              </button>
+                            </div>
+
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap mb-2">
+                                {editingPhaseId === phase.id ? (
+                                  <input
+                                    autoFocus
+                                    className="font-medium text-sm bg-transparent border-b border-primary focus:outline-none"
+                                    value={editingPhaseName}
+                                    onChange={(e) => setEditingPhaseName(e.target.value)}
+                                    onBlur={() => saveEditedPhaseName(phase)}
+                                    onKeyDown={(e) => {
+                                      if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+                                      if (e.key === "Escape") setEditingPhaseId(null);
+                                    }}
+                                  />
+                                ) : (
+                                  <button
+                                    className="font-medium text-sm text-left hover:text-primary transition-colors"
+                                    onClick={() => { setEditingPhaseId(phase.id); setEditingPhaseName(phase.name); }}
+                                  >
+                                    {phase.name}
+                                  </button>
+                                )}
+                                <Select
+                                  value={phase.status}
+                                  onValueChange={(v) => updatePhase(phase.id, { status: v as ProjectPhase["status"] })}
+                                >
+                                  <SelectTrigger className="h-6 w-28 text-xs px-2">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent style={lightVars} className="bg-white text-black">
+                                    <SelectItem value="pending">Pending</SelectItem>
+                                    <SelectItem value="in_progress">In Progress</SelectItem>
+                                    <SelectItem value="complete">Complete</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+
+                              <div className="flex items-center gap-3 mb-1.5">
+                                <div className="flex-1 bg-gray-100 rounded-full h-1.5">
+                                  <div
+                                    className="bg-teal-400 h-1.5 rounded-full transition-all duration-300"
+                                    style={{ width: `${Math.min(100, phase.completion_percent)}%` }}
+                                  />
+                                </div>
+                                <input
+                                  type="number"
+                                  min="0"
+                                  max="100"
+                                  value={phase.completion_percent}
+                                  onChange={(e) => {
+                                    const v = Math.max(0, Math.min(100, Number(e.target.value)));
+                                    setPhases((prev) => prev.map((p) => p.id === phase.id ? { ...p, completion_percent: v } : p));
+                                  }}
+                                  onBlur={(e) => {
+                                    const v = Math.max(0, Math.min(100, Number(e.target.value)));
+                                    updatePhase(phase.id, { completion_percent: v });
+                                  }}
+                                  className="w-16 text-xs border border-black/10 rounded px-2 py-1 text-center focus:outline-none focus:border-teal-400"
+                                />
+                                <span className="text-xs text-muted-foreground w-6">%</span>
+                              </div>
+
+                              {phase.description && (
+                                <p className="text-xs text-muted-foreground">{phase.description}</p>
+                              )}
+                            </div>
+
+                            <button
+                              className="p-1 rounded hover:bg-red-50 text-black/30 hover:text-red-500 shrink-0 mt-0.5 transition-colors"
+                              onClick={() => deletePhase(phase.id)}
+                              title="Delete phase"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+
+                <div className="flex gap-2 mt-3">
+                  <Input
+                    value={newPhaseName}
+                    onChange={(e) => setNewPhaseName(e.target.value)}
+                    placeholder="New phase name..."
+                    className="flex-1"
+                    onKeyDown={(e) => { if (e.key === "Enter") addPhase(); }}
+                  />
+                  <Button size="sm" onClick={addPhase} disabled={!newPhaseName.trim() || addingPhase}>
+                    {addingPhase ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Updates */}
+              <div>
+                <h3 className="font-display text-base tracking-wider mb-3">Project Updates</h3>
+
+                <div className="space-y-2 mb-4">
+                  <Textarea
+                    rows={3}
+                    value={newUpdateContent}
+                    onChange={(e) => setNewUpdateContent(e.target.value)}
+                    placeholder="Add an update, note, or milestone..."
+                  />
+                  <Button
+                    size="sm"
+                    onClick={addUpdate}
+                    disabled={!newUpdateContent.trim() || newUpdateSaving}
+                  >
+                    {newUpdateSaving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                    Post Update
+                  </Button>
+                </div>
+
+                {planUpdates.length === 0 ? (
+                  <p className="text-sm text-muted-foreground py-4 text-center">No updates yet.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {planUpdates.map((update) => (
+                      <Card key={update.id}>
+                        <CardContent className="pt-4">
+                          <p className="text-sm whitespace-pre-wrap">{update.content}</p>
+                          <div className="flex items-center gap-2 mt-2">
+                            <span className="text-xs font-medium text-black/60">{update.author}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {format(new Date(update.created_at), "MMM d, yyyy 'at' h:mm a")}
+                            </span>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </TabsContent>
+
         {/* AGREEMENTS */}
         <TabsContent value="agreements" className="mt-4 space-y-2">
           {agreements.length === 0 ? <p className="text-sm text-muted-foreground py-8 text-center">No agreements.</p> : agreements.map((a) => (
@@ -756,72 +1529,6 @@ const ClientDetail = () => {
               {a.amount && <span className="font-display">${Number(a.amount).toFixed(2)}</span>}
             </CardContent></Card>
           ))}
-        </TabsContent>
-
-        {/* INTAKES */}
-        <TabsContent value="intakes" className="mt-4 space-y-6">
-          {intakes.length === 0 ? (
-            <p className="text-sm text-muted-foreground py-8 text-center">No intake submissions.</p>
-          ) : intakes.map((intake) => {
-            const grouped: Record<string, Array<{ label: string; value: string }>> = { about: [], project: [], market: [], extra: [] };
-            for (const r of Object.values(intake.responses || {})) {
-              (grouped[r.section] ||= []).push({ label: r.label, value: r.value });
-            }
-            const hasResponses = Object.values(grouped).some((g) => g.length > 0);
-            return (
-              <Card key={intake.id}>
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between flex-wrap gap-2">
-                    <div>
-                      <CardTitle className="text-base font-display">{intake.full_name || profile.full_name}</CardTitle>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        Submitted {format(new Date(intake.created_at), "MMM d, yyyy 'at' h:mm a")}
-                      </p>
-                    </div>
-                    <Badge variant="outline" className="text-xs capitalize">{intake.status}</Badge>
-                  </div>
-                  {(intake.phone || intake.business_name) && (
-                    <div className="text-xs text-muted-foreground flex gap-4 mt-1">
-                      {intake.phone && <span>{intake.phone}</span>}
-                      {intake.business_name && <span>{intake.business_name}</span>}
-                    </div>
-                  )}
-                </CardHeader>
-                <CardContent className="space-y-5">
-                  {!hasResponses && (
-                    <p className="text-sm text-muted-foreground italic">No detailed responses recorded.</p>
-                  )}
-                  {(["about", "project", "market", "extra"] as const).map((section) => {
-                    const items = grouped[section] || [];
-                    if (!items.length) return null;
-                    return (
-                      <div key={section}>
-                        <h4 className="font-display text-sm tracking-wider text-black/50 uppercase mb-3">
-                          {section === "extra" ? "Anything else" : `The ${section}`}
-                        </h4>
-                        <dl className="space-y-3">
-                          {items.map((it, idx) => (
-                            <div key={idx} className="border-l-2 border-black/10 pl-4">
-                              <dt className="text-xs uppercase tracking-wider text-black/40">{it.label}</dt>
-                              <dd className="text-sm text-black/80 whitespace-pre-wrap mt-1">
-                                {it.value || <span className="italic text-black/30">— blank —</span>}
-                              </dd>
-                            </div>
-                          ))}
-                        </dl>
-                      </div>
-                    );
-                  })}
-                  {intake.notes && (
-                    <div className="border-t border-black/10 pt-4">
-                      <p className="text-xs uppercase tracking-wider text-black/40 mb-1">Notes</p>
-                      <p className="text-sm text-black/70">{intake.notes}</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            );
-          })}
         </TabsContent>
 
         {/* MESSAGES */}
@@ -1010,6 +1717,106 @@ const ClientDetail = () => {
             >
               {editAddOnSaving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
               Save changes
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Text Asset */}
+      <Dialog open={addTextAssetOpen} onOpenChange={setAddTextAssetOpen}>
+        <DialogContent className="sm:max-w-md bg-white text-black" style={lightVars}>
+          <DialogHeader><DialogTitle className="text-black">Add Text Asset</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label className="text-black">Category</Label>
+              <Select value={textAssetCategory} onValueChange={(v) => setTextAssetCategory(v as AssetCategory)}>
+                <SelectTrigger className="bg-white text-black border-black/20">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent style={lightVars} className="bg-white text-black">
+                  <SelectItem value="brand_voice">Brand Voice</SelectItem>
+                  <SelectItem value="tagline">Tagline</SelectItem>
+                  <SelectItem value="motto">Motto</SelectItem>
+                  <SelectItem value="mission">Mission Statement</SelectItem>
+                  <SelectItem value="values">Brand Values</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-black">Label</Label>
+              <Input
+                value={textAssetLabel}
+                onChange={(e) => setTextAssetLabel(e.target.value)}
+                placeholder="e.g. Primary Tagline, Homepage Hero"
+                className="bg-white text-black border-black/20"
+              />
+            </div>
+            <div>
+              <Label className="text-black">Content</Label>
+              <Textarea
+                rows={4}
+                value={textAssetContent}
+                onChange={(e) => setTextAssetContent(e.target.value)}
+                className="bg-white text-black border-black/20"
+              />
+            </div>
+            <Button
+              onClick={addTextAsset}
+              disabled={textAssetSaving || !textAssetLabel.trim() || !textAssetContent.trim()}
+              className="w-full"
+            >
+              {textAssetSaving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+              Add Asset
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Upload File Asset */}
+      <Dialog open={addFileAssetOpen} onOpenChange={setAddFileAssetOpen}>
+        <DialogContent className="sm:max-w-md bg-white text-black" style={lightVars}>
+          <DialogHeader><DialogTitle className="text-black">Upload Brand File</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label className="text-black">Category</Label>
+              <Select value={fileAssetCategory} onValueChange={(v) => setFileAssetCategory(v as AssetCategory)}>
+                <SelectTrigger className="bg-white text-black border-black/20">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent style={lightVars} className="bg-white text-black">
+                  <SelectItem value="logo">Logo</SelectItem>
+                  <SelectItem value="guideline">Brand Guideline</SelectItem>
+                  <SelectItem value="font">Font</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-black">Label</Label>
+              <Input
+                value={fileAssetLabel}
+                onChange={(e) => setFileAssetLabel(e.target.value)}
+                placeholder="e.g. Primary Logo, Brand Guide 2024"
+                className="bg-white text-black border-black/20"
+              />
+            </div>
+            <div>
+              <Label className="text-black">File</Label>
+              <Input
+                type="file"
+                accept="image/*,.pdf,.zip,.ttf,.otf,.woff,.woff2"
+                onChange={(e) => setFileAssetFile(e.target.files?.[0] || null)}
+                className="bg-white text-black border-black/20"
+              />
+            </div>
+            <Button
+              onClick={uploadFileAsset}
+              disabled={fileAssetUploading || !fileAssetLabel.trim() || !fileAssetFile}
+              className="w-full"
+            >
+              {fileAssetUploading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Upload className="h-4 w-4 mr-2" />}
+              Upload
             </Button>
           </div>
         </DialogContent>
