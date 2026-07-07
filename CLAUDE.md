@@ -55,3 +55,44 @@ shadcn/ui components live in `src/components/ui/`. Add new shadcn components via
 ## Testing
 
 Tests use Vitest + jsdom + `@testing-library/react`. Setup file: `src/test/setup.ts`. Test files follow `*.test.ts` / `*.test.tsx` naming beside the source they test.
+
+## Active Client Project Tracking
+
+**Read this section at the start of every session.**
+
+Aethyx has active client projects stored in Supabase (`client_project_plans`, `client_project_phases`, `client_project_updates`, `client_project_tasks`). These are visible in the admin dashboard at `/admin/projects` and in each client's profile Plan tab.
+
+### Session start checklist
+1. Check if a `.aethyx` config file exists in the current working directory — if so, read it to identify which client project this session is for.
+2. If no `.aethyx` file: ask "Which client project are we working on today?" at a natural point early in the session, or skip if the session is clearly unrelated to client work.
+3. Keep the client project context in mind throughout the session.
+
+### When to update project progress
+- **Automatically at session end** — before ending any session where client work was done, run `/update-projects` to post an update.
+- **On demand** — when asked to "update the project", "log progress", or similar.
+
+### How to update
+Use the Supabase MCP tools or the Supabase client to:
+1. Find the relevant `client_project_plans` row (by client_profile_id or plan id from `.aethyx`).
+2. Review what was accomplished this session (git log, conversation context, files changed).
+3. Update relevant `client_project_phases` completion percentages (0–100).
+4. Recalculate and save `client_project_plans.completion_percent` as the average of all phases.
+5. Insert a row into `client_project_updates` with a plain-English summary of what was done. Set `is_client_visible: true` only if the update is meaningful and ready for the client to see.
+6. Update `client_project_plans.status` if the project moved from one stage to another.
+
+### Schedule tracking
+Each plan has `start_date` and `target_date` (agreed timeline, pulled from the signed agreement). Compare:
+- `expected_pct = elapsed_days / total_days * 100`
+- If `completion_percent < expected_pct - 10` → flag "behind schedule" in the update
+- If `completion_percent > expected_pct + 5` → note "ahead of schedule"
+
+### `.aethyx` config format (in client project repos)
+```json
+{
+  "client_id": "uuid",
+  "client_name": "Client Name",
+  "project_plan_id": "uuid",
+  "project_name": "Project Name",
+  "aethyx_supabase_project": "jsdjcizqwwmtuhfnkvqq"
+}
+```

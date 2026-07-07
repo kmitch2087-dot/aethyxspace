@@ -15,6 +15,7 @@ import {
   ArrowLeft, Loader2, Save, Upload, Mail, Plus, ExternalLink,
   AlertTriangle, CheckCircle2, Trash2, RefreshCcw, FileText, Bell, Pencil, XCircle,
   ChevronDown, ChevronUp, Download, ArrowUp, ArrowDown,
+  Eye, EyeOff, Clock, ListTodo,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -157,6 +158,21 @@ interface ProjectUpdate {
   content: string;
   author: string;
   created_at: string;
+  is_client_visible: boolean;
+}
+
+interface ProjectTask {
+  id: string;
+  plan_id: string;
+  title: string;
+  description?: string;
+  assigned_to: "client" | "aethyx";
+  status: "pending" | "in_progress" | "complete";
+  due_date?: string;
+  priority: "low" | "normal" | "high";
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
 }
 
 const IMAGE_EXTS = new Set(["jpg", "jpeg", "png", "gif", "webp", "svg", "avif"]);
@@ -285,6 +301,16 @@ const ClientDetail = () => {
   const [editingPlanName, setEditingPlanName] = useState(false);
   const [editingPlanNameValue, setEditingPlanNameValue] = useState("");
 
+  // Tasks
+  const [tasks, setTasks] = useState<ProjectTask[]>([]);
+  const [newTaskTitle, setNewTaskTitle] = useState("");
+  const [newTaskAssignedTo, setNewTaskAssignedTo] = useState<"client" | "aethyx">("client");
+  const [newTaskPriority, setNewTaskPriority] = useState<"low" | "normal" | "high">("normal");
+  const [newTaskDueDate, setNewTaskDueDate] = useState("");
+  const [newTaskDescription, setNewTaskDescription] = useState("");
+  const [showTaskDescription, setShowTaskDescription] = useState(false);
+  const [addingTask, setAddingTask] = useState(false);
+
   const fetchSignedUrls = async (rows: DocRow[]) => {
     if (!rows.length) { setDocUrls({}); return; }
     const { data: signed } = await supabase.storage
@@ -361,17 +387,21 @@ const ClientDetail = () => {
       .maybeSingle();
     setPlan(planData as ProjectPlan | null);
     if (planData) {
-      const [{ data: phasesData }, { data: updatesData }] = await Promise.all([
+      const [{ data: phasesData }, { data: updatesData }, { data: tasksData }] = await Promise.all([
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (supabase as any).from("client_project_phases").select("*").eq("plan_id", planData.id).order("sort_order"),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (supabase as any).from("client_project_updates").select("*").eq("plan_id", planData.id).order("created_at", { ascending: false }),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (supabase as any).from("client_project_tasks").select("*").eq("plan_id", planData.id).order("sort_order"),
       ]);
       setPhases((phasesData as ProjectPhase[]) || []);
       setPlanUpdates((updatesData as ProjectUpdate[]) || []);
+      setTasks((tasksData as ProjectTask[]) || []);
     } else {
       setPhases([]);
       setPlanUpdates([]);
+      setTasks([]);
     }
   };
 
@@ -768,6 +798,7 @@ const ClientDetail = () => {
         plan_id: plan.id,
         content: newUpdateContent.trim(),
         author: "Kristin",
+        is_client_visible: false,
       })
       .select()
       .single();
@@ -778,6 +809,57 @@ const ClientDetail = () => {
       setPlanUpdates((prev) => [data as ProjectUpdate, ...prev]);
       setNewUpdateContent("");
     }
+  };
+
+  const toggleUpdateVisibility = async (updateId: string, val: boolean) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any).from("client_project_updates").update({ is_client_visible: val }).eq("id", updateId);
+    setPlanUpdates((prev) => prev.map((u) => u.id === updateId ? { ...u, is_client_visible: val } : u));
+  };
+
+  const addTask = async () => {
+    if (!plan || !newTaskTitle.trim()) return;
+    setAddingTask(true);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase as any)
+      .from("client_project_tasks")
+      .insert({
+        plan_id: plan.id,
+        title: newTaskTitle.trim(),
+        description: newTaskDescription.trim() || null,
+        assigned_to: newTaskAssignedTo,
+        status: "pending",
+        priority: newTaskPriority,
+        due_date: newTaskDueDate || null,
+        sort_order: tasks.length,
+      })
+      .select()
+      .single();
+    setAddingTask(false);
+    if (error) {
+      toast({ title: "Failed to add task", description: error.message, variant: "destructive" });
+    } else {
+      setTasks((prev) => [...prev, data as ProjectTask]);
+      setNewTaskTitle("");
+      setNewTaskDescription("");
+      setNewTaskDueDate("");
+      setShowTaskDescription(false);
+      setNewTaskPriority("normal");
+      setNewTaskAssignedTo("client");
+    }
+  };
+
+  const updateTaskStatus = async (taskId: string, status: ProjectTask["status"]) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any).from("client_project_tasks").update({ status, updated_at: new Date().toISOString() }).eq("id", taskId);
+    setTasks((prev) => prev.map((t) => t.id === taskId ? { ...t, status } : t));
+  };
+
+  const deleteTask = async (taskId: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any).from("client_project_tasks").delete().eq("id", taskId);
+    setTasks((prev) => prev.filter((t) => t.id !== taskId));
+    toast({ title: "Task deleted" });
   };
 
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
@@ -1313,6 +1395,43 @@ const ClientDetail = () => {
                     </div>
                   </div>
 
+                  {/* Timeline Tracker */}
+                  {(() => {
+                    if (!plan.start_date || !plan.target_date) {
+                      return (
+                        <div className="rounded-lg bg-gray-50 border border-gray-200 px-4 py-2 flex items-center gap-2 text-xs text-gray-400">
+                          <Clock className="h-3.5 w-3.5 shrink-0" />
+                          Add start and target dates to enable schedule tracking
+                        </div>
+                      );
+                    }
+                    const today = new Date();
+                    const startDate = new Date(plan.start_date);
+                    const targetDate = new Date(plan.target_date);
+                    const totalDays = Math.max(1, Math.round((targetDate.getTime() - startDate.getTime()) / 86400000));
+                    const elapsedDays = Math.round((today.getTime() - startDate.getTime()) / 86400000);
+                    const expectedPct = Math.min(100, Math.round((elapsedDays / totalDays) * 100));
+                    const delta = plan.completion_percent - expectedPct;
+                    const isAhead = delta >= 5;
+                    const isBehind = delta <= -10;
+                    const statusLabel = isAhead ? "Ahead of Schedule" : isBehind ? "Behind Schedule" : "On Track";
+                    const containerClasses = isAhead
+                      ? "bg-green-50 border-green-200 text-green-700"
+                      : isBehind
+                      ? "bg-red-50 border-red-200 text-red-700"
+                      : "bg-teal-50 border-teal-200 text-teal-700";
+                    const deltaStr = delta >= 0 ? `+${delta}%` : `${delta}%`;
+                    return (
+                      <div className={`rounded-lg border px-4 py-2 flex items-center gap-3 text-xs ${containerClasses}`}>
+                        <Clock className="h-3.5 w-3.5 shrink-0 opacity-70" />
+                        <span className="opacity-70">Expected {expectedPct}%</span>
+                        <span className="font-bold tabular-nums">{deltaStr}</span>
+                        <span className="font-semibold">{statusLabel}</span>
+                        <span className="ml-auto opacity-70">Actual {plan.completion_percent}%</span>
+                      </div>
+                    );
+                  })()}
+
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <Label className="text-xs text-muted-foreground">Start Date</Label>
@@ -1502,17 +1621,245 @@ const ClientDetail = () => {
                       <Card key={update.id}>
                         <CardContent className="pt-4">
                           <p className="text-sm whitespace-pre-wrap">{update.content}</p>
-                          <div className="flex items-center gap-2 mt-2">
-                            <span className="text-xs font-medium text-black/60">{update.author}</span>
-                            <span className="text-xs text-muted-foreground">
-                              {format(new Date(update.created_at), "MMM d, yyyy 'at' h:mm a")}
-                            </span>
+                          <div className="flex items-center justify-between gap-2 mt-2 flex-wrap">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-xs font-medium text-black/60">{update.author}</span>
+                              <span className="text-xs text-muted-foreground">
+                                {format(new Date(update.created_at), "MMM d, yyyy 'at' h:mm a")}
+                              </span>
+                              {update.is_client_visible && (
+                                <Badge className="bg-teal-50 border-teal-200 text-teal-700 hover:bg-teal-50 text-xs">
+                                  Client can see this
+                                </Badge>
+                              )}
+                            </div>
+                            <button
+                              className={`flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border transition-colors shrink-0 ${
+                                update.is_client_visible
+                                  ? "bg-teal-50 border-teal-300 text-teal-600"
+                                  : "bg-gray-50 border-gray-200 text-gray-400 hover:border-gray-300"
+                              }`}
+                              onClick={() => toggleUpdateVisibility(update.id, !update.is_client_visible)}
+                              title={update.is_client_visible ? "Hide from client" : "Make visible to client"}
+                            >
+                              {update.is_client_visible
+                                ? <Eye className="h-3 w-3" />
+                                : <EyeOff className="h-3 w-3" />}
+                              <span>Visible to client</span>
+                            </button>
                           </div>
                         </CardContent>
                       </Card>
                     ))}
                   </div>
                 )}
+              </div>
+
+              {/* Tasks */}
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <h3 className="font-display text-base tracking-wider">Tasks</h3>
+                  {tasks.length > 0 && (
+                    <Badge variant="outline" className="text-xs">{tasks.length}</Badge>
+                  )}
+                </div>
+
+                {/* For Client */}
+                <div className="mb-4">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">For Client</p>
+                  {tasks.filter((t) => t.assigned_to === "client").length === 0 ? (
+                    <p className="text-xs text-muted-foreground text-center py-2">No tasks assigned to client yet.</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {tasks.filter((t) => t.assigned_to === "client").map((task) => (
+                        <Card key={task.id} className="group">
+                          <CardContent className="pt-3 pb-3">
+                            <div className="flex items-start gap-3">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 flex-wrap mb-1">
+                                  <Badge className={
+                                    task.priority === "high"
+                                      ? "bg-red-100 text-red-700 border-red-200 hover:bg-red-100 text-xs"
+                                      : task.priority === "low"
+                                      ? "bg-gray-100 text-gray-600 border-gray-200 hover:bg-gray-100 text-xs"
+                                      : "bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-100 text-xs"
+                                  }>
+                                    {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+                                  </Badge>
+                                  <Badge className="bg-teal-50 border-teal-200 text-teal-700 hover:bg-teal-50 text-xs">Client</Badge>
+                                  <span className="font-medium text-sm">{task.title}</span>
+                                </div>
+                                {task.description && (
+                                  <p className="text-xs text-muted-foreground mb-1">{task.description}</p>
+                                )}
+                                {task.due_date && (
+                                  <p className="text-xs text-muted-foreground">Due {format(new Date(task.due_date), "MMM d, yyyy")}</p>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-2 shrink-0">
+                                <Select
+                                  value={task.status}
+                                  onValueChange={(v) => updateTaskStatus(task.id, v as ProjectTask["status"])}
+                                >
+                                  <SelectTrigger className="h-7 w-28 text-xs px-2">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent style={lightVars} className="bg-white text-black">
+                                    <SelectItem value="pending">Pending</SelectItem>
+                                    <SelectItem value="in_progress">In Progress</SelectItem>
+                                    <SelectItem value="complete">Complete</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <button
+                                  className="p-1 rounded hover:bg-red-50 text-black/20 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  onClick={() => deleteTask(task.id)}
+                                  title="Delete task"
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </button>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* For Aethyx */}
+                <div className="mb-4">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">For Aethyx</p>
+                  {tasks.filter((t) => t.assigned_to === "aethyx").length === 0 ? (
+                    <p className="text-xs text-muted-foreground text-center py-2">No tasks for Aethyx yet.</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {tasks.filter((t) => t.assigned_to === "aethyx").map((task) => (
+                        <Card key={task.id} className="group">
+                          <CardContent className="pt-3 pb-3">
+                            <div className="flex items-start gap-3">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 flex-wrap mb-1">
+                                  <Badge className={
+                                    task.priority === "high"
+                                      ? "bg-red-100 text-red-700 border-red-200 hover:bg-red-100 text-xs"
+                                      : task.priority === "low"
+                                      ? "bg-gray-100 text-gray-600 border-gray-200 hover:bg-gray-100 text-xs"
+                                      : "bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-100 text-xs"
+                                  }>
+                                    {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+                                  </Badge>
+                                  <Badge className="bg-purple-100 border-purple-200 text-purple-700 hover:bg-purple-100 text-xs">Aethyx</Badge>
+                                  <span className="font-medium text-sm">{task.title}</span>
+                                </div>
+                                {task.description && (
+                                  <p className="text-xs text-muted-foreground mb-1">{task.description}</p>
+                                )}
+                                {task.due_date && (
+                                  <p className="text-xs text-muted-foreground">Due {format(new Date(task.due_date), "MMM d, yyyy")}</p>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-2 shrink-0">
+                                <Select
+                                  value={task.status}
+                                  onValueChange={(v) => updateTaskStatus(task.id, v as ProjectTask["status"])}
+                                >
+                                  <SelectTrigger className="h-7 w-28 text-xs px-2">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent style={lightVars} className="bg-white text-black">
+                                    <SelectItem value="pending">Pending</SelectItem>
+                                    <SelectItem value="in_progress">In Progress</SelectItem>
+                                    <SelectItem value="complete">Complete</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <button
+                                  className="p-1 rounded hover:bg-red-50 text-black/20 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  onClick={() => deleteTask(task.id)}
+                                  title="Delete task"
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </button>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Add Task form */}
+                <div className="border border-black/10 rounded-xl p-4 space-y-3 bg-gray-50/50">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Add Task</p>
+                  <Input
+                    value={newTaskTitle}
+                    onChange={(e) => setNewTaskTitle(e.target.value)}
+                    placeholder="Task title..."
+                    className="bg-white"
+                    onKeyDown={(e) => { if (e.key === "Enter") addTask(); }}
+                  />
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Assigned to</Label>
+                      <Select value={newTaskAssignedTo} onValueChange={(v) => setNewTaskAssignedTo(v as "client" | "aethyx")}>
+                        <SelectTrigger className="h-8 text-xs mt-1 bg-white">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent style={lightVars} className="bg-white text-black">
+                          <SelectItem value="client">Client</SelectItem>
+                          <SelectItem value="aethyx">Aethyx</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Priority</Label>
+                      <Select value={newTaskPriority} onValueChange={(v) => setNewTaskPriority(v as "low" | "normal" | "high")}>
+                        <SelectTrigger className="h-8 text-xs mt-1 bg-white">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent style={lightVars} className="bg-white text-black">
+                          <SelectItem value="low">Low</SelectItem>
+                          <SelectItem value="normal">Normal</SelectItem>
+                          <SelectItem value="high">High</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Due date</Label>
+                      <Input
+                        type="date"
+                        value={newTaskDueDate}
+                        onChange={(e) => setNewTaskDueDate(e.target.value)}
+                        className="h-8 text-xs mt-1 bg-white"
+                      />
+                    </div>
+                  </div>
+                  {!showTaskDescription ? (
+                    <button
+                      className="text-xs text-primary hover:underline"
+                      onClick={() => setShowTaskDescription(true)}
+                    >
+                      + Add description
+                    </button>
+                  ) : (
+                    <Textarea
+                      rows={2}
+                      value={newTaskDescription}
+                      onChange={(e) => setNewTaskDescription(e.target.value)}
+                      placeholder="Task description (optional)..."
+                      className="bg-white text-sm"
+                    />
+                  )}
+                  <Button
+                    size="sm"
+                    onClick={addTask}
+                    disabled={!newTaskTitle.trim() || addingTask}
+                  >
+                    {addingTask && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                    <ListTodo className="h-4 w-4 mr-2" />
+                    Add Task
+                  </Button>
+                </div>
               </div>
             </>
           )}

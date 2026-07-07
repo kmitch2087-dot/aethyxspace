@@ -27,6 +27,7 @@ import {
   ClipboardList,
   LogOut,
   GitBranch,
+  FolderKanban,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -37,6 +38,7 @@ const baseNavItems = [
   { title: "Agreements", url: "/portal/agreements", icon: FileSignature },
   { title: "Payments", url: "/portal/payments", icon: CreditCard },
   { title: "Referrals", url: "/portal/referrals", icon: GitBranch },
+  { title: "My Project", url: "/portal/projects", icon: FolderKanban },
 ];
 
 function PortalSidebar({ showIntake }: { showIntake: boolean }) {

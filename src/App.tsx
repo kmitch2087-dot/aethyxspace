@@ -40,6 +40,7 @@ import Media from "./pages/admin/Media";
 import Intakes from "./pages/admin/Intakes";
 import IntakeFormManager from "./pages/admin/IntakeForm";
 import Invoices from "./pages/admin/Invoices";
+import Projects from "./pages/admin/Projects";
 import ReferralProgram from "./pages/admin/ReferralProgram";
 import AddOns from "./pages/admin/AddOns";
 import PortalLayout from "./pages/portal/PortalLayout";
@@ -51,6 +52,7 @@ import PortalAgreements from "./pages/portal/PortalAgreements";
 import PortalPayments from "./pages/portal/PortalPayments";
 import PortalPay from "./pages/portal/PortalPay";
 import PortalIntake from "./pages/portal/PortalIntake";
+import PortalProjects from "./pages/portal/PortalProjects";
 
 const queryClient = new QueryClient();
 
@@ -98,6 +100,7 @@ const App = () => (
               <Route path="financials" element={<Financials />} />
               <Route path="clients" element={<Clients />} />
               <Route path="clients/:id" element={<ClientDetail />} />
+              <Route path="projects" element={<Projects />} />
               <Route path="invoices" element={<Invoices />} />
               <Route path="documents" element={<Documents />} />
               <Route path="media" element={<Media />} />
@@ -120,6 +123,7 @@ const App = () => (
               <Route path="pay/:invoiceId" element={<PortalPay />} />
               <Route path="intake" element={<PortalIntake />} />
               <Route path="referrals" element={<PortalReferrals />} />
+              <Route path="projects" element={<PortalProjects />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
