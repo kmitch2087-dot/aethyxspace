@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useToast } from "@/hooks/use-toast";
 import {
   ArrowLeft, Loader2, Save, Upload, Mail, Plus, ExternalLink,
-  AlertTriangle, CheckCircle2, Trash2, RefreshCcw, FileText, Image, Bell,
+  AlertTriangle, CheckCircle2, Trash2, RefreshCcw, FileText, Bell, Pencil,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -111,6 +111,8 @@ const ClientDetail = () => {
   const [docFile, setDocFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [sendingDocNotif, setSendingDocNotif] = useState(false);
+  const [editingDocId, setEditingDocId] = useState<string | null>(null);
+  const [editingDocTitle, setEditingDocTitle] = useState("");
 
   // Invoice creation
   const [invOpen, setInvOpen] = useState(false);
@@ -210,6 +212,14 @@ const ClientDetail = () => {
     setUploading(false);
     if (insErr) toast({ title: "Save failed", description: insErr.message, variant: "destructive" });
     else { toast({ title: "Document uploaded" }); setDocOpen(false); setDocTitle(""); setDocFile(null); fetchAll(); }
+  };
+
+  const saveDocTitle = async (doc: DocRow) => {
+    const trimmed = editingDocTitle.trim();
+    setEditingDocId(null);
+    if (!trimmed || trimmed === doc.title) return;
+    await supabase.from("client_documents").update({ title: trimmed }).eq("id", doc.id);
+    setDocs((s) => s.map((d) => d.id === doc.id ? { ...d, title: trimmed } : d));
   };
 
   const handleDeleteDoc = async (doc: DocRow) => {
@@ -424,8 +434,8 @@ const ClientDetail = () => {
                   <div key={d.id} className="group relative border border-black/10 rounded-xl overflow-hidden bg-white hover:shadow-md transition-shadow">
                     <button
                       className="w-full text-left focus:outline-none"
-                      onClick={() => signedUrl && window.open(signedUrl, "_blank")}
-                      disabled={!signedUrl}
+                      onClick={() => signedUrl && editingDocId !== d.id && window.open(signedUrl, "_blank")}
+                      disabled={!signedUrl || editingDocId === d.id}
                     >
                       <div className="h-36 bg-black/5 flex items-center justify-center overflow-hidden">
                         {isImage && signedUrl ? (
@@ -435,17 +445,41 @@ const ClientDetail = () => {
                         )}
                       </div>
                       <div className="p-3">
-                        <p className="font-medium text-sm text-black truncate">{d.title}</p>
+                        {editingDocId === d.id ? (
+                          <input
+                            autoFocus
+                            className="w-full text-sm font-medium bg-white border border-black/20 rounded px-1.5 py-0.5 text-black focus:outline-none focus:border-primary"
+                            value={editingDocTitle}
+                            onChange={(e) => setEditingDocTitle(e.target.value)}
+                            onBlur={() => saveDocTitle(d)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") saveDocTitle(d);
+                              if (e.key === "Escape") setEditingDocId(null);
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        ) : (
+                          <p className="font-medium text-sm text-black truncate">{d.title}</p>
+                        )}
                         <p className="text-xs text-black/50 mt-0.5">{format(new Date(d.created_at), "MMM d, yyyy")}</p>
                       </div>
                     </button>
-                    <button
-                      className="absolute top-2 right-2 p-1 rounded-full bg-white/80 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-50 text-black/40 hover:text-red-600"
-                      onClick={(e) => { e.stopPropagation(); handleDeleteDoc(d); }}
-                      title="Delete document"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
+                    <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        className="p-1 rounded-full bg-white/80 hover:bg-blue-50 text-black/40 hover:text-blue-600"
+                        onClick={(e) => { e.stopPropagation(); setEditingDocId(d.id); setEditingDocTitle(d.title); }}
+                        title="Rename"
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        className="p-1 rounded-full bg-white/80 hover:bg-red-50 text-black/40 hover:text-red-600"
+                        onClick={(e) => { e.stopPropagation(); handleDeleteDoc(d); }}
+                        title="Delete"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
                   </div>
                 );
               })}
