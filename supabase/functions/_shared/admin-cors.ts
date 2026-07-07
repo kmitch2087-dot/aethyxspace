@@ -1,6 +1,5 @@
 // Shared CORS for admin-only edge functions
 const allowedOrigins = [
-  "https://aethyxspace.lovable.app",
   "https://aethyx.space",
   "https://www.aethyx.space",
   "http://localhost:8080",
@@ -8,11 +7,7 @@ const allowedOrigins = [
 ];
 
 export const getCors = (origin: string | null) => {
-  const ok = origin && (
-    allowedOrigins.includes(origin) ||
-    origin.endsWith(".lovable.app") ||
-    origin.endsWith(".lovableproject.com")
-  );
+  const ok = origin && allowedOrigins.includes(origin);
   return {
     "Access-Control-Allow-Origin": ok ? origin! : "",
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",

@@ -1,20 +1,15 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import Stripe from "https://esm.sh/stripe@18.5.0";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
+import Stripe from "npm:stripe@18.5.0";
+import { createClient } from "npm:@supabase/supabase-js@2.49.4";
 
 const allowedOrigins = [
-  "https://aethyxspace.lovable.app",
   "https://aethyx.space",
+  "https://www.aethyx.space",
   "http://localhost:8080",
   "http://localhost:5173",
 ];
 
 const getCorsHeaders = (origin: string | null) => {
-  const isAllowed =
-    origin &&
-    (allowedOrigins.includes(origin) ||
-      origin.endsWith(".lovable.app") ||
-      origin.endsWith(".lovableproject.com"));
+  const isAllowed = origin && allowedOrigins.includes(origin);
   return {
     "Access-Control-Allow-Origin": isAllowed ? origin : "",
     "Access-Control-Allow-Headers":
@@ -24,7 +19,7 @@ const getCorsHeaders = (origin: string | null) => {
 
 const CONSULTATION_PRICE_ID = "price_1SwQ4mCEyzqaryb8RIoTHGwM";
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   const origin = req.headers.get("origin");
   const corsHeaders = getCorsHeaders(origin);
 

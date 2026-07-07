@@ -3,14 +3,13 @@ import Stripe from "npm:stripe@18.5.0";
 import { createClient } from "npm:@supabase/supabase-js@2.49.4";
 
 const allowedOrigins = [
-  "https://aethyxspace.lovable.app",
   "https://aethyx.space",
   "https://www.aethyx.space",
   "http://localhost:8080",
   "http://localhost:5173",
 ];
 const getCors = (origin: string | null) => {
-  const ok = origin && (allowedOrigins.includes(origin) || origin.endsWith(".lovable.app") || origin.endsWith(".lovableproject.com"));
+  const ok = origin && allowedOrigins.includes(origin);
   return {
     "Access-Control-Allow-Origin": ok ? origin! : "",
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",

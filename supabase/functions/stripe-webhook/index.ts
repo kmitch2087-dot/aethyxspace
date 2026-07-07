@@ -1,7 +1,7 @@
 // Stripe webhook: keeps financial_records in sync in real time
 // Public (no JWT) — verifies signature with STRIPE_WEBHOOK_SECRET
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
-import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
+import { createClient } from "npm:@supabase/supabase-js@2";
+import Stripe from "npm:stripe@18.5.0";
 
 Deno.serve(async (req) => {
   try {
@@ -9,7 +9,7 @@ Deno.serve(async (req) => {
     const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
     if (!stripeKey || !webhookSecret) return new Response("Stripe secrets not configured", { status: 500 });
 
-    const stripe = new Stripe(stripeKey, { apiVersion: "2024-06-20" });
+    const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     const sig = req.headers.get("stripe-signature");
     if (!sig) return new Response("Missing signature", { status: 400 });
 

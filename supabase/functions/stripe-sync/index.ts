@@ -1,7 +1,7 @@
 // Manually sync charges + invoices from Stripe into financial_records
 // Admin-only: requires authenticated admin JWT
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
-import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
+import { createClient } from "npm:@supabase/supabase-js@2";
+import Stripe from "npm:stripe@18.5.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
       .maybeSingle();
     if (!roleCheck) throw new Error("Admin access required");
 
-    const stripe = new Stripe(stripeKey, { apiVersion: "2024-06-20" });
+    const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
 
     // Pull last 100 successful charges
     const charges = await stripe.charges.list({ limit: 100 });
