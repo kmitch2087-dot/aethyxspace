@@ -321,6 +321,12 @@ const ClientDetail = () => {
   const [phases, setPhases] = useState<ProjectPhase[]>([]);
   const [planUpdates, setPlanUpdates] = useState<ProjectUpdate[]>([]);
   const [creatingPlan, setCreatingPlan] = useState(false);
+  const [showCreatePlanDialog, setShowCreatePlanDialog] = useState(false);
+  const [newPlanName, setNewPlanName] = useState("Website Project");
+  const [newPlanStatus, setNewPlanStatus] = useState<"planning" | "active">("planning");
+  const [newPlanStart, setNewPlanStart] = useState("");
+  const [newPlanEnd, setNewPlanEnd] = useState("");
+  const [newPlanOverview, setNewPlanOverview] = useState("");
   const [newUpdateContent, setNewUpdateContent] = useState("");
   const [newUpdateSaving, setNewUpdateSaving] = useState(false);
   const [newPhaseName, setNewPhaseName] = useState("");
@@ -751,14 +757,23 @@ const ClientDetail = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await (supabase as any).from("client_project_plans").insert({
       client_profile_id: profile.id,
-      project_name: "Website Project",
-      status: "planning",
+      project_name: newPlanName.trim() || "Website Project",
+      status: newPlanStatus,
       completion_percent: 0,
+      ...(newPlanStart ? { start_date: newPlanStart } : {}),
+      ...(newPlanEnd ? { target_date: newPlanEnd } : {}),
+      ...(newPlanOverview.trim() ? { overview: newPlanOverview.trim() } : {}),
     });
     setCreatingPlan(false);
     if (error) {
       toast({ title: "Failed to create plan", description: error.message, variant: "destructive" });
     } else {
+      setShowCreatePlanDialog(false);
+      setNewPlanName("Website Project");
+      setNewPlanStatus("planning");
+      setNewPlanStart("");
+      setNewPlanEnd("");
+      setNewPlanOverview("");
       fetchPlan();
     }
   };
@@ -1095,7 +1110,7 @@ const ClientDetail = () => {
         <TabsList className="flex-wrap h-auto">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="invoices">Invoices ({invoices.length})</TabsTrigger>
-          <TabsTrigger value="documents">Documents ({docs.length})</TabsTrigger>
+          <TabsTrigger value="documents">Documents ({docs.length + docSlots.filter(s => s.status === 'uploaded').length})</TabsTrigger>
           <TabsTrigger value="projects">Projects ({projects.length})</TabsTrigger>
           <TabsTrigger value="addons">Add-Ons ({addOns.length})</TabsTrigger>
           <TabsTrigger value="assets">Assets</TabsTrigger>
@@ -1737,11 +1752,56 @@ const ClientDetail = () => {
 
         {/* PLAN */}
         <TabsContent value="plan" className="mt-4 space-y-4">
+          {/* Create Plan Dialog */}
+          <Dialog open={showCreatePlanDialog} onOpenChange={setShowCreatePlanDialog}>
+            <DialogContent style={lightVars}>
+              <DialogHeader>
+                <DialogTitle>Create Project Plan</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 py-2">
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Project Name</label>
+                  <Input value={newPlanName} onChange={e => setNewPlanName(e.target.value)} placeholder="Website Project" />
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Status</label>
+                  <Select value={newPlanStatus} onValueChange={(v: "planning" | "active") => setNewPlanStatus(v)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="planning">Planning</SelectItem>
+                      <SelectItem value="active">Active</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-sm font-medium mb-1 block">Start Date</label>
+                    <Input type="date" value={newPlanStart} onChange={e => setNewPlanStart(e.target.value)} />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium mb-1 block">Target / Deadline</label>
+                    <Input type="date" value={newPlanEnd} onChange={e => setNewPlanEnd(e.target.value)} />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Project Overview</label>
+                  <Textarea value={newPlanOverview} onChange={e => setNewPlanOverview(e.target.value)} placeholder="Brief description of the project scope and goals…" rows={3} />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setShowCreatePlanDialog(false)}>Cancel</Button>
+                <Button onClick={createPlan} disabled={creatingPlan}>
+                  {creatingPlan && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                  Create Plan
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
           {!plan ? (
             <div className="text-center py-12">
               <p className="text-sm text-muted-foreground mb-4">No project plan yet.</p>
-              <Button onClick={createPlan} disabled={creatingPlan}>
-                {creatingPlan && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+              <Button onClick={() => setShowCreatePlanDialog(true)}>
                 <Plus className="h-4 w-4 mr-2" /> Create Project Plan
               </Button>
             </div>
