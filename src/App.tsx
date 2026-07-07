@@ -40,7 +40,10 @@ import Media from "./pages/admin/Media";
 import Intakes from "./pages/admin/Intakes";
 import IntakeFormManager from "./pages/admin/IntakeForm";
 import Invoices from "./pages/admin/Invoices";
+import ReferralProgram from "./pages/admin/ReferralProgram";
+import AddOns from "./pages/admin/AddOns";
 import PortalLayout from "./pages/portal/PortalLayout";
+import PortalReferrals from "./pages/portal/PortalReferrals";
 import PortalOverview from "./pages/portal/PortalOverview";
 import PortalMessages from "./pages/portal/PortalMessages";
 import PortalDocuments from "./pages/portal/PortalDocuments";
@@ -98,6 +101,8 @@ const App = () => (
               <Route path="invoices" element={<Invoices />} />
               <Route path="documents" element={<Documents />} />
               <Route path="media" element={<Media />} />
+              <Route path="referral-program" element={<ReferralProgram />} />
+              <Route path="add-ons" element={<AddOns />} />
             </Route>
             <Route
               path="/portal"
@@ -114,6 +119,7 @@ const App = () => (
               <Route path="payments" element={<PortalPayments />} />
               <Route path="pay/:invoiceId" element={<PortalPay />} />
               <Route path="intake" element={<PortalIntake />} />
+              <Route path="referrals" element={<PortalReferrals />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

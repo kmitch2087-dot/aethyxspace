@@ -28,6 +28,8 @@ import {
   Image as ImageIcon,
   Receipt,
   LogOut,
+  GitBranch,
+  Puzzle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -44,6 +46,8 @@ const navItems = [
   { title: "Invoices", url: "/admin/invoices", icon: Receipt },
   { title: "Documents", url: "/admin/documents", icon: FolderOpen },
   { title: "Media", url: "/admin/media", icon: ImageIcon },
+  { title: "Referral Program", url: "/admin/referral-program", icon: GitBranch },
+  { title: "Add-Ons", url: "/admin/add-ons", icon: Puzzle },
 ];
 
 function AdminSidebar() {

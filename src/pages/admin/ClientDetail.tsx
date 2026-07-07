@@ -9,14 +9,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import {
   ArrowLeft, Loader2, Save, Upload, Mail, Plus, ExternalLink,
-  AlertTriangle, CheckCircle2, Trash2, RefreshCcw, FileText, Bell, Pencil,
+  AlertTriangle, CheckCircle2, Trash2, RefreshCcw, FileText, Bell, Pencil, XCircle,
 } from "lucide-react";
 import { format } from "date-fns";
 
-// Applied to all Dialogs (they render in a portal outside the admin light-mode wrapper)
 const lightVars = {
   "--background": "0 0% 100%",
   "--foreground": "0 0% 4%",
@@ -84,10 +84,43 @@ interface IntakeRow {
 interface MessageRow { id: string; message: string; created_at: string; }
 interface ProjectRow { id: string; name: string; status: string; notes: string | null; created_at: string; }
 
+interface CatalogItemSlim {
+  id: string;
+  name: string;
+  type: string;
+  category: string;
+  price_min: number | null;
+  display_price: string | null;
+}
+
+interface AddOnRow {
+  id: string;
+  client_profile_id: string;
+  add_on_catalog_id: string | null;
+  custom_name: string | null;
+  price: number;
+  status: string;
+  start_date: string | null;
+  end_date: string | null;
+  notes: string | null;
+  created_at: string;
+  catalog: {
+    name: string;
+    type: string;
+    category: string;
+    display_price: string | null;
+  } | null;
+}
+
 const IMAGE_EXTS = new Set(["jpg", "jpeg", "png", "gif", "webp", "svg", "avif"]);
 
 function fileExt(path: string): string {
   return (path.split(".").pop() || "").toLowerCase();
+}
+
+function formatAddonPrice(price: number, type: string): string {
+  const rounded = Number(price) % 1 === 0 ? Number(price).toFixed(0) : Number(price).toFixed(2);
+  return type === "recurring" ? `$${rounded} / mo` : `$${rounded}`;
 }
 
 const ClientDetail = () => {
@@ -104,6 +137,10 @@ const ClientDetail = () => {
   const [intakes, setIntakes] = useState<IntakeRow[]>([]);
   const [messages, setMessages] = useState<MessageRow[]>([]);
   const [projects, setProjects] = useState<ProjectRow[]>([]);
+
+  // Add-ons
+  const [addOns, setAddOns] = useState<AddOnRow[]>([]);
+  const [catalog, setCatalog] = useState<CatalogItemSlim[]>([]);
 
   // Doc upload
   const [docOpen, setDocOpen] = useState(false);
@@ -123,6 +160,26 @@ const ClientDetail = () => {
   // Project creation
   const [projOpen, setProjOpen] = useState(false);
   const [projName, setProjName] = useState("");
+
+  // Assign add-on dialog
+  const [assignOpen, setAssignOpen] = useState(false);
+  const [assignCatalogId, setAssignCatalogId] = useState("");
+  const [assignCustomName, setAssignCustomName] = useState("");
+  const [assignPrice, setAssignPrice] = useState("");
+  const [assignStartDate, setAssignStartDate] = useState("");
+  const [assignNotes, setAssignNotes] = useState("");
+  const [assignSaving, setAssignSaving] = useState(false);
+
+  // Edit add-on dialog
+  const [editAddOn, setEditAddOn] = useState<AddOnRow | null>(null);
+  const [editAddOnStatus, setEditAddOnStatus] = useState("");
+  const [editAddOnPrice, setEditAddOnPrice] = useState("");
+  const [editAddOnNotes, setEditAddOnNotes] = useState("");
+  const [editAddOnEndDate, setEditAddOnEndDate] = useState("");
+  const [editAddOnSaving, setEditAddOnSaving] = useState(false);
+
+  // Notes expand/collapse
+  const [expandedNotes, setExpandedNotes] = useState<Set<string>>(new Set());
 
   const fetchSignedUrls = async (rows: DocRow[]) => {
     if (!rows.length) { setDocUrls({}); return; }
@@ -144,7 +201,8 @@ const ClientDetail = () => {
     setProfile(p as Profile);
 
     const emailLc = p.email ? p.email.toLowerCase() : null;
-    const [inv, dc, ag, it, ms, pr] = await Promise.all([
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [inv, dc, ag, it, ms, pr, ao] = await Promise.all([
       supabase.from("client_invoices").select("*").eq("client_profile_id", id).order("created_at", { ascending: false }),
       supabase.from("client_documents").select("*").or(`client_profile_id.eq.${id},user_id.eq.${p.user_id}`).order("created_at", { ascending: false }),
       emailLc
@@ -155,6 +213,8 @@ const ClientDetail = () => {
         : supabase.from("client_intakes").select("*").eq("client_profile_id", id).order("created_at", { ascending: false }),
       supabase.from("client_messages").select("*").or(`client_profile_id.eq.${id},user_id.eq.${p.user_id}`).order("created_at", { ascending: false }),
       supabase.from("client_projects").select("*").eq("client_profile_id", id).order("created_at", { ascending: false }),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (supabase as any).from("client_add_ons").select("*, catalog:add_on_catalog_id(name, type, category, display_price)").eq("client_profile_id", id).order("created_at", { ascending: false }),
     ]);
     setInvoices((inv.data as Invoice[]) || []);
     const docRows = (dc.data as DocRow[]) || [];
@@ -163,11 +223,23 @@ const ClientDetail = () => {
     setIntakes((it.data as IntakeRow[]) || []);
     setMessages((ms.data as MessageRow[]) || []);
     setProjects((pr.data as ProjectRow[]) || []);
+    setAddOns((ao.data as AddOnRow[]) || []);
     setLoading(false);
     fetchSignedUrls(docRows);
   };
 
+  const fetchCatalog = async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data } = await (supabase as any)
+      .from("add_on_catalog")
+      .select("id, name, type, category, price_min, display_price")
+      .eq("active", true)
+      .order("sort_order");
+    setCatalog((data as CatalogItemSlim[]) || []);
+  };
+
   useEffect(() => { fetchAll(); /* eslint-disable-next-line */ }, [id]);
+  useEffect(() => { fetchCatalog(); }, []);
 
   const saveProfile = async () => {
     if (!profile) return;
@@ -281,6 +353,83 @@ const ClientDetail = () => {
     fetchAll();
   };
 
+  const openAssignDialog = () => {
+    setAssignCatalogId("");
+    setAssignCustomName("");
+    setAssignPrice("");
+    setAssignStartDate(format(new Date(), "yyyy-MM-dd"));
+    setAssignNotes("");
+    setAssignOpen(true);
+  };
+
+  const assignAddOn = async () => {
+    if (!profile || !assignCatalogId || !assignPrice) return;
+    setAssignSaving(true);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any).from("client_add_ons").insert({
+      client_profile_id: profile.id,
+      add_on_catalog_id: assignCatalogId,
+      custom_name: assignCustomName.trim() || null,
+      price: parseFloat(assignPrice),
+      status: "active",
+      start_date: assignStartDate || null,
+      notes: assignNotes.trim() || null,
+    });
+    setAssignSaving(false);
+    if (error) {
+      toast({ title: "Failed to assign", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Add-on assigned" });
+      setAssignOpen(false);
+      fetchAll();
+    }
+  };
+
+  const openEditAddOn = (addon: AddOnRow) => {
+    setEditAddOn(addon);
+    setEditAddOnStatus(addon.status);
+    setEditAddOnPrice(String(addon.price));
+    setEditAddOnNotes(addon.notes || "");
+    setEditAddOnEndDate(addon.end_date || "");
+  };
+
+  const saveEditAddOn = async () => {
+    if (!editAddOn) return;
+    setEditAddOnSaving(true);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any).from("client_add_ons").update({
+      status: editAddOnStatus,
+      price: parseFloat(editAddOnPrice),
+      notes: editAddOnNotes.trim() || null,
+      end_date: editAddOnEndDate || null,
+      updated_at: new Date().toISOString(),
+    }).eq("id", editAddOn.id);
+    setEditAddOnSaving(false);
+    if (error) {
+      toast({ title: "Save failed", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Add-on updated" });
+      setEditAddOn(null);
+      fetchAll();
+    }
+  };
+
+  const removeAddOn = async (addon: AddOnRow) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any).from("client_add_ons").update({ status: "cancelled", updated_at: new Date().toISOString() }).eq("id", addon.id);
+    setAddOns((prev) => prev.map((a) => a.id === addon.id ? { ...a, status: "cancelled" } : a));
+    toast({ title: "Add-on cancelled" });
+  };
+
+  const toggleNote = (addonId: string) => {
+    setExpandedNotes((prev) => {
+      const next = new Set(prev);
+      if (next.has(addonId)) next.delete(addonId);
+      else next.add(addonId);
+      return next;
+    });
+  };
+
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   if (!profile) return (
     <div className="py-12 text-center">
@@ -288,6 +437,9 @@ const ClientDetail = () => {
       <Button asChild variant="outline"><Link to="/admin/clients"><ArrowLeft className="h-4 w-4 mr-2" /> Back</Link></Button>
     </div>
   );
+
+  const activeRecurringAddOns = addOns.filter((a) => a.status === "active" && a.catalog?.type === "recurring");
+  const totalMonthly = activeRecurringAddOns.reduce((sum, a) => sum + Number(a.price || 0), 0);
 
   return (
     <div className="space-y-6">
@@ -318,6 +470,7 @@ const ClientDetail = () => {
           <TabsTrigger value="invoices">Invoices ({invoices.length})</TabsTrigger>
           <TabsTrigger value="documents">Documents ({docs.length})</TabsTrigger>
           <TabsTrigger value="projects">Projects ({projects.length})</TabsTrigger>
+          <TabsTrigger value="addons">Add-Ons ({addOns.length})</TabsTrigger>
           <TabsTrigger value="agreements">Agreements ({agreements.length})</TabsTrigger>
           <TabsTrigger value="intakes">Intakes ({intakes.length})</TabsTrigger>
           <TabsTrigger value="messages">Messages ({messages.length})</TabsTrigger>
@@ -502,6 +655,96 @@ const ClientDetail = () => {
           ))}
         </TabsContent>
 
+        {/* ADD-ONS */}
+        <TabsContent value="addons" className="mt-4 space-y-4">
+          {activeRecurringAddOns.length > 0 && (
+            <div className="rounded-lg bg-teal-50 border border-teal-200 px-4 py-2.5 flex items-center gap-2 text-sm text-teal-700">
+              <span className="font-medium">
+                {activeRecurringAddOns.length} active retainer{activeRecurringAddOns.length !== 1 ? "s" : ""}
+              </span>
+              <span className="text-teal-400">·</span>
+              <span>estimated ${Math.round(totalMonthly).toLocaleString()} / mo</span>
+            </div>
+          )}
+          <div className="flex justify-end">
+            <Button size="sm" onClick={openAssignDialog}>
+              <Plus className="h-4 w-4 mr-2" /> Assign Add-On
+            </Button>
+          </div>
+          {addOns.length === 0 ? (
+            <p className="text-sm text-muted-foreground py-8 text-center">No add-ons assigned yet.</p>
+          ) : (
+            <div className="space-y-2">
+              {addOns.map((addon) => {
+                const displayName = addon.custom_name || addon.catalog?.name || "Unknown service";
+                const type = addon.catalog?.type || "recurring";
+                const isExpanded = expandedNotes.has(addon.id);
+                const hasLongNotes = addon.notes && addon.notes.length > 80;
+                return (
+                  <Card key={addon.id}>
+                    <CardContent className="pt-4">
+                      <div className="flex items-start justify-between gap-3 flex-wrap">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 flex-wrap mb-1.5">
+                            <span className="font-medium text-sm">{displayName}</span>
+                            <Badge variant="outline" className="text-xs">
+                              {type === "recurring" ? "Recurring" : "One-time"}
+                            </Badge>
+                            {addon.status === "active" && (
+                              <Badge className="bg-green-100 text-green-700 border-green-200 hover:bg-green-100 text-xs">Active</Badge>
+                            )}
+                            {addon.status === "paused" && (
+                              <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200 hover:bg-yellow-100 text-xs">Paused</Badge>
+                            )}
+                            {addon.status === "cancelled" && (
+                              <Badge className="bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-100 text-xs">Cancelled</Badge>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-3 text-sm flex-wrap">
+                            <span className="font-medium">{formatAddonPrice(addon.price, type)}</span>
+                            {addon.start_date && (
+                              <span className="text-muted-foreground">from {format(new Date(addon.start_date), "MMM d, yyyy")}</span>
+                            )}
+                          </div>
+                          {addon.notes && (
+                            <p className="mt-2 text-sm text-muted-foreground">
+                              {isExpanded || !hasLongNotes ? addon.notes : `${addon.notes.slice(0, 80)}...`}
+                              {hasLongNotes && (
+                                <button
+                                  className="ml-1 text-xs text-primary hover:underline"
+                                  onClick={() => toggleNote(addon.id)}
+                                >
+                                  {isExpanded ? "less" : "more"}
+                                </button>
+                              )}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0">
+                          <Button size="sm" variant="ghost" onClick={() => openEditAddOn(addon)}>
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          {addon.status !== "cancelled" && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                              title="Cancel this add-on"
+                              onClick={() => removeAddOn(addon)}
+                            >
+                              <XCircle className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
+        </TabsContent>
+
         {/* AGREEMENTS */}
         <TabsContent value="agreements" className="mt-4 space-y-2">
           {agreements.length === 0 ? <p className="text-sm text-muted-foreground py-8 text-center">No agreements.</p> : agreements.map((a) => (
@@ -630,6 +873,144 @@ const ClientDetail = () => {
           <div className="space-y-3">
             <div><Label className="text-black">Name</Label><Input value={projName} onChange={(e) => setProjName(e.target.value)} className="bg-white text-black border-black/20" /></div>
             <Button onClick={addProject} disabled={!projName.trim()} className="w-full">Add</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Assign Add-On */}
+      <Dialog open={assignOpen} onOpenChange={setAssignOpen}>
+        <DialogContent className="sm:max-w-md bg-white text-black" style={lightVars}>
+          <DialogHeader><DialogTitle className="text-black">Assign Add-On</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label className="text-black">Service</Label>
+              <Select
+                value={assignCatalogId}
+                onValueChange={(v) => {
+                  setAssignCatalogId(v);
+                  const cat = catalog.find((c) => c.id === v);
+                  if (cat?.price_min != null) setAssignPrice(String(cat.price_min));
+                }}
+              >
+                <SelectTrigger className="bg-white text-black border-black/20">
+                  <SelectValue placeholder="Select a service" />
+                </SelectTrigger>
+                <SelectContent style={lightVars} className="bg-white text-black">
+                  {catalog.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-black">Custom name (optional)</Label>
+              <Input
+                value={assignCustomName}
+                onChange={(e) => setAssignCustomName(e.target.value)}
+                className="bg-white text-black border-black/20"
+                placeholder="Leave blank to use catalog name"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-black">Price ($)</Label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={assignPrice}
+                  onChange={(e) => setAssignPrice(e.target.value)}
+                  className="bg-white text-black border-black/20"
+                />
+              </div>
+              <div>
+                <Label className="text-black">Start date</Label>
+                <Input
+                  type="date"
+                  value={assignStartDate}
+                  onChange={(e) => setAssignStartDate(e.target.value)}
+                  className="bg-white text-black border-black/20"
+                />
+              </div>
+            </div>
+            <div>
+              <Label className="text-black">Notes</Label>
+              <Textarea
+                rows={3}
+                value={assignNotes}
+                onChange={(e) => setAssignNotes(e.target.value)}
+                className="bg-white text-black border-black/20"
+              />
+            </div>
+            <Button
+              onClick={assignAddOn}
+              disabled={assignSaving || !assignCatalogId || !assignPrice}
+              className="w-full"
+            >
+              {assignSaving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+              Assign
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Add-On */}
+      <Dialog open={!!editAddOn} onOpenChange={(open) => { if (!open) setEditAddOn(null); }}>
+        <DialogContent className="sm:max-w-md bg-white text-black" style={lightVars}>
+          <DialogHeader><DialogTitle className="text-black">Edit Add-On</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label className="text-black">Status</Label>
+              <Select value={editAddOnStatus} onValueChange={setEditAddOnStatus}>
+                <SelectTrigger className="bg-white text-black border-black/20">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent style={lightVars} className="bg-white text-black">
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="paused">Paused</SelectItem>
+                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-black">Price ($)</Label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={editAddOnPrice}
+                  onChange={(e) => setEditAddOnPrice(e.target.value)}
+                  className="bg-white text-black border-black/20"
+                />
+              </div>
+              <div>
+                <Label className="text-black">End date</Label>
+                <Input
+                  type="date"
+                  value={editAddOnEndDate}
+                  onChange={(e) => setEditAddOnEndDate(e.target.value)}
+                  className="bg-white text-black border-black/20"
+                />
+              </div>
+            </div>
+            <div>
+              <Label className="text-black">Notes</Label>
+              <Textarea
+                rows={3}
+                value={editAddOnNotes}
+                onChange={(e) => setEditAddOnNotes(e.target.value)}
+                className="bg-white text-black border-black/20"
+              />
+            </div>
+            <Button
+              onClick={saveEditAddOn}
+              disabled={editAddOnSaving || !editAddOnPrice}
+              className="w-full"
+            >
+              {editAddOnSaving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+              Save changes
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

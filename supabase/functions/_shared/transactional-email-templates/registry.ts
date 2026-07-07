@@ -5,6 +5,8 @@ export interface TemplateEntry {
   component: React.ComponentType<any>
   subject: string | ((data: Record<string, any>) => string)
   to?: string
+  /** 'personal' → "Kristin at Aethyx" | 'brand' → "Aethyx Web Design". Defaults to 'personal'. */
+  senderType?: 'personal' | 'brand'
   displayName?: string
   previewData?: Record<string, any>
 }
@@ -21,6 +23,10 @@ import { template as invoiceDelivery } from './invoice-delivery.tsx'
 import { template as intakeRequired } from './intake-required.tsx'
 import { template as newDocuments } from './new-documents.tsx'
 import { template as feeWaived } from './fee-waived.tsx'
+import { template as marketingServicesSpotlight } from './marketing-services-spotlight.tsx'
+import { template as referralSigned } from './referral-signed.tsx'
+import { template as referralPayout } from './referral-payout.tsx'
+import { template as addOnActivated } from './add-on-activated.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'inquiry-notification': inquiryNotification,
@@ -35,4 +41,8 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'intake-required': intakeRequired,
   'new-documents': newDocuments,
   'fee-waived': feeWaived,
+  'marketing-services-spotlight': marketingServicesSpotlight,
+  'referral-signed': referralSigned,
+  'referral-payout': referralPayout,
+  'add-on-activated': addOnActivated,
 }
