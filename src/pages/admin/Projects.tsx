@@ -126,11 +126,11 @@ export default function Projects() {
     async function fetchData() {
       setLoading(true)
 
-      const [{ data: projectData, error: projectError }, { data: phaseData, error: phaseError }] =
+      const [{ data: planData, error: planError }, { data: phaseData, error: phaseError }] =
         await Promise.all([
           (supabase as any)
             .from("client_project_plans")
-            .select("*, client_profiles(id, full_name, company_name, email)")
+            .select("*")
             .order("updated_at", { ascending: false }),
           (supabase as any)
             .from("client_project_phases")
@@ -138,11 +138,24 @@ export default function Projects() {
             .order("sort_order"),
         ])
 
-      if (projectError) {
+      if (planError) {
         toast({ title: "Error loading projects", variant: "destructive" })
-      } else {
-        setProjects(projectData ?? [])
+        setLoading(false)
+        return
       }
+
+      const plans = planData ?? []
+      const profileIds = [...new Set(plans.map((p: any) => p.client_profile_id as string))]
+      let profileMap = new Map<string, any>()
+      if (profileIds.length > 0) {
+        const { data: profileData } = await (supabase as any)
+          .from("client_profiles")
+          .select("id, full_name, company_name, email")
+          .in("id", profileIds)
+        profileMap = new Map((profileData ?? []).map((p: any) => [p.id, p]))
+      }
+
+      setProjects(plans.map((p: any) => ({ ...p, client_profiles: profileMap.get(p.client_profile_id) })))
 
       if (!phaseError) {
         setPhases(phaseData ?? [])
