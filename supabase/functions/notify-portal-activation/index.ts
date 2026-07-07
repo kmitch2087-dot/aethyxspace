@@ -1,5 +1,4 @@
-// Called by the client portal when an invited user signs in for the first time.
-// Marks `client_profiles.portal_activated_at` and emails the admin once.
+// Fires on every client portal sign-in, rate-limited to once per NOTIFY_WINDOW_HOURS per client.
 import { createClient } from "npm:@supabase/supabase-js@2.49.4";
 
 const corsHeaders = {
@@ -8,7 +7,8 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const ADMIN_EMAIL = "aethyxspace@protonmail.com";
+const ADMIN_EMAIL = "kristinmitchell@aethyx.space";
+const NOTIFY_WINDOW_HOURS = 4;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -28,10 +28,9 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Look up the client profile for this user
     const { data: profile } = await admin
       .from("client_profiles")
-      .select("id, full_name, first_name, last_name, business_name, email, portal_activated_at")
+      .select("id, full_name, first_name, last_name, business_name, email, portal_activated_at, portal_last_login_notified_at")
       .eq("user_id", user.id)
       .maybeSingle();
 
@@ -40,33 +39,41 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    if (profile.portal_activated_at) {
-      return new Response(JSON.stringify({ ok: true, skipped: "already_activated" }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+
+    // Rate limit: skip if we already notified within the window
+    if (profile.portal_last_login_notified_at) {
+      const lastNotified = new Date(profile.portal_last_login_notified_at).getTime();
+      const windowMs = NOTIFY_WINDOW_HOURS * 60 * 60 * 1000;
+      if (Date.now() - lastNotified < windowMs) {
+        return new Response(JSON.stringify({ ok: true, skipped: "rate_limited" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
     }
 
-    const activatedAt = new Date().toISOString();
-    await admin.from("client_profiles")
-      .update({ portal_activated_at: activatedAt })
-      .eq("id", profile.id);
+    const now = new Date().toISOString();
+
+    // Mark first activation if not already set, always update last notified timestamp
+    const updates: Record<string, string> = { portal_last_login_notified_at: now };
+    if (!profile.portal_activated_at) updates.portal_activated_at = now;
+    await admin.from("client_profiles").update(updates).eq("id", profile.id);
 
     const origin = req.headers.get("origin") || "https://aethyx.space";
     const clientName = profile.full_name
       || [profile.first_name, profile.last_name].filter(Boolean).join(" ")
       || profile.email
-      || "Client";
+      || "A client";
 
     await admin.functions.invoke("send-transactional-email", {
       body: {
         templateName: "portal-activation-notification",
         recipientEmail: ADMIN_EMAIL,
-        idempotencyKey: `portal-activation-${profile.id}`,
+        idempotencyKey: `portal-login-${profile.id}-${Math.floor(Date.now() / (NOTIFY_WINDOW_HOURS * 3600000))}`,
         templateData: {
           clientName,
           clientEmail: profile.email || user.email || "",
           businessName: profile.business_name || "",
-          activatedAt: new Date(activatedAt).toLocaleString("en-US", {
+          activatedAt: new Date(now).toLocaleString("en-US", {
             dateStyle: "medium", timeStyle: "short",
           }),
           adminClientUrl: `${origin}/admin/clients/${profile.id}`,
