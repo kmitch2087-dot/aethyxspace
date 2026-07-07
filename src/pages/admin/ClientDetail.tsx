@@ -86,6 +86,17 @@ interface IntakeRow {
 interface MessageRow { id: string; message: string; created_at: string; }
 interface ProjectRow { id: string; name: string; status: string; notes: string | null; created_at: string; }
 
+interface DocumentSlot {
+  id: string;
+  client_profile_id: string;
+  slot_type: 'site_audit' | 'market_research' | 'service_tier' | 'plan' | 'agreement';
+  status: 'pending' | 'in_progress' | 'uploaded' | 'na';
+  storage_path?: string;
+  file_name?: string;
+  file_size?: number;
+  uploaded_at?: string;
+}
+
 interface CatalogItemSlim {
   id: string;
   name: string;
@@ -174,6 +185,24 @@ interface ProjectTask {
   created_at: string;
   updated_at: string;
 }
+
+const SLOT_TYPES = ['site_audit', 'market_research', 'service_tier', 'plan', 'agreement'];
+
+const SLOT_LABELS: Record<string, string> = {
+  site_audit: 'Site Audit',
+  market_research: 'Market Research',
+  service_tier: 'Service Tier Information',
+  plan: 'Project Plan',
+  agreement: 'Agreement',
+};
+
+const SLOT_PHASE_NAMES: Record<string, string> = {
+  site_audit: 'Site Audit',
+  market_research: 'Market Research',
+  service_tier: 'Service Tier',
+  plan: 'Project Planning',
+  agreement: 'Contract & Agreement',
+};
 
 const IMAGE_EXTS = new Set(["jpg", "jpeg", "png", "gif", "webp", "svg", "avif"]);
 
@@ -311,6 +340,16 @@ const ClientDetail = () => {
   const [showTaskDescription, setShowTaskDescription] = useState(false);
   const [addingTask, setAddingTask] = useState(false);
 
+  // Document slots
+  const [docSlots, setDocSlots] = useState<DocumentSlot[]>([]);
+  const [expandedSlot, setExpandedSlot] = useState<string | null>(null);
+  const [slotSignedUrls, setSlotSignedUrls] = useState<Record<string, string>>({});
+  const [uploadingSlot, setUploadingSlot] = useState<string | null>(null);
+  const [agreementDialogOpen, setAgreementDialogOpen] = useState(false);
+
+  // Logo upload
+  const [logoUploading, setLogoUploading] = useState(false);
+
   const fetchSignedUrls = async (rows: DocRow[]) => {
     if (!rows.length) { setDocUrls({}); return; }
     const { data: signed } = await supabase.storage
@@ -417,6 +456,31 @@ const ClientDetail = () => {
 
   useEffect(() => { fetchAll(); fetchPlan(); /* eslint-disable-next-line */ }, [id]);
   useEffect(() => { fetchCatalog(); }, []);
+
+  useEffect(() => {
+    if (!id) return;
+    const initSlots = async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase as any).from('client_document_slots').upsert(
+        SLOT_TYPES.map((t) => ({ client_profile_id: id, slot_type: t })),
+        { onConflict: 'client_profile_id,slot_type', ignoreDuplicates: true },
+      );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const [{ data: slotsData }, { data: agreementRec }] = await Promise.all([
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (supabase as any).from('client_document_slots').select('*').eq('client_profile_id', id),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (supabase as any).from('client_agreement_records').select('id, is_locked, submitted_at').eq('client_profile_id', id).maybeSingle(),
+      ]);
+      let slots: DocumentSlot[] = slotsData || [];
+      if (agreementRec?.submitted_at) {
+        slots = slots.map((s) => s.slot_type === 'agreement' ? { ...s, status: 'uploaded' as const } : s);
+      }
+      setDocSlots(slots);
+    };
+    initSlots();
+    /* eslint-disable-next-line */
+  }, [id]);
 
   const saveProfile = async () => {
     if (!profile) return;
@@ -862,6 +926,135 @@ const ClientDetail = () => {
     toast({ title: "Task deleted" });
   };
 
+  const updateProjectPhaseForSlot = async (slotType: string) => {
+    if (!id) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: planData } = await (supabase as any).from('client_project_plans')
+      .select('id').eq('client_profile_id', id).maybeSingle();
+    if (!planData) return;
+    const phaseName = SLOT_PHASE_NAMES[slotType];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: existing } = await (supabase as any).from('client_project_phases')
+      .select('id').eq('plan_id', planData.id).ilike('name', phaseName).maybeSingle();
+    if (existing) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase as any).from('client_project_phases')
+        .update({ completion_percent: 100, status: 'complete', updated_at: new Date().toISOString() })
+        .eq('id', existing.id);
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: phaseCount } = await (supabase as any).from('client_project_phases')
+        .select('id').eq('plan_id', planData.id);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase as any).from('client_project_phases').insert({
+        plan_id: planData.id, name: phaseName, completion_percent: 100,
+        status: 'complete', sort_order: (phaseCount?.length || 0),
+      });
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: allPhases } = await (supabase as any).from('client_project_phases')
+      .select('completion_percent').eq('plan_id', planData.id);
+    if (allPhases?.length) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const avg = Math.round(allPhases.reduce((s: number, p: any) => s + p.completion_percent, 0) / allPhases.length);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase as any).from('client_project_plans')
+        .update({ completion_percent: avg, updated_at: new Date().toISOString() }).eq('id', planData.id);
+    }
+  };
+
+  const handleSlotUpload = async (slotType: string, file: File) => {
+    if (!id) return;
+    setUploadingSlot(slotType);
+    try {
+      const path = `${id}/${slotType}/${Date.now()}_${file.name}`;
+      const { error: uploadError } = await supabase.storage.from('client-slot-docs').upload(path, file);
+      if (uploadError) throw uploadError;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase as any).from('client_document_slots').upsert({
+        client_profile_id: id,
+        slot_type: slotType,
+        status: 'uploaded',
+        storage_path: path,
+        file_name: file.name,
+        file_size: file.size,
+        uploaded_at: new Date().toISOString(),
+      }, { onConflict: 'client_profile_id,slot_type' });
+      await updateProjectPhaseForSlot(slotType);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data } = await (supabase as any).from('client_document_slots')
+        .select('*').eq('client_profile_id', id);
+      setDocSlots(data || []);
+      toast({ title: `${SLOT_LABELS[slotType]} uploaded` });
+    } catch {
+      toast({ title: 'Upload failed', variant: 'destructive' });
+    } finally {
+      setUploadingSlot(null);
+    }
+  };
+
+  const updateSlotStatus = async (slotType: string, status: DocumentSlot['status']) => {
+    if (!id) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any).from('client_document_slots').upsert({
+      client_profile_id: id, slot_type: slotType, status,
+    }, { onConflict: 'client_profile_id,slot_type' });
+    setDocSlots((prev) => prev.map((s) => s.slot_type === slotType ? { ...s, status } : s));
+  };
+
+  const toggleSlotView = async (slotType: string) => {
+    if (expandedSlot === slotType) {
+      setExpandedSlot(null);
+      return;
+    }
+    setExpandedSlot(slotType);
+    const slot = docSlots.find((s) => s.slot_type === slotType);
+    if (slot?.storage_path && !slotSignedUrls[slotType]) {
+      const { data } = await supabase.storage.from('client-slot-docs')
+        .createSignedUrl(slot.storage_path, 60 * 60 * 24 * 7);
+      if (data?.signedUrl) {
+        setSlotSignedUrls((prev) => ({ ...prev, [slotType]: data.signedUrl }));
+      }
+    }
+  };
+
+  const handleLogoUpload = async (file: File) => {
+    if (!profile) return;
+    setLogoUploading(true);
+    const existingLogo = assets.find((a) => a.category === 'logo' && a.type === 'file');
+    if (existingLogo) {
+      if (existingLogo.file_name) {
+        await supabase.storage.from('client-assets').remove([existingLogo.file_name]);
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase as any).from('client_assets').delete().eq('id', existingLogo.id);
+    }
+    const storagePath = `${profile.id}/${Date.now()}_${file.name}`;
+    const { error: upErr } = await supabase.storage.from('client-assets').upload(storagePath, file);
+    if (upErr) {
+      setLogoUploading(false);
+      toast({ title: 'Logo upload failed', description: upErr.message, variant: 'destructive' });
+      return;
+    }
+    const { data: urlData } = await supabase.storage
+      .from('client-assets')
+      .createSignedUrl(storagePath, 60 * 60 * 24 * 7);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any).from('client_assets').insert({
+      client_profile_id: profile.id,
+      type: 'file',
+      category: 'logo',
+      label: 'Primary Logo',
+      file_name: storagePath,
+      file_url: urlData?.signedUrl || '',
+      file_size: file.size,
+      sort_order: 0,
+    });
+    setLogoUploading(false);
+    toast({ title: 'Logo uploaded' });
+    fetchAll();
+  };
+
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   if (!profile) return (
     <div className="py-12 text-center">
@@ -993,6 +1186,152 @@ const ClientDetail = () => {
 
         {/* DOCUMENTS */}
         <TabsContent value="documents" className="mt-4 space-y-4">
+          {/* Project Documents */}
+          <div className="border border-black/10 rounded-xl overflow-hidden">
+            <div className="px-4 py-3 border-b border-black/10 bg-gray-50/50">
+              <h3 className="font-display text-sm tracking-wider">Project Documents</h3>
+            </div>
+            <div className="divide-y divide-black/5">
+              {SLOT_TYPES.map((slotType) => {
+                const slot = docSlots.find((s) => s.slot_type === slotType);
+                const status = slot?.status || 'pending';
+                const isUploading = uploadingSlot === slotType;
+                const isAgreement = slotType === 'agreement';
+                return (
+                  <div key={slotType} className="flex items-center gap-3 px-4 py-3 flex-wrap">
+                    <span className="text-sm font-medium w-48 shrink-0">{SLOT_LABELS[slotType]}</span>
+
+                    {status === 'pending' && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">Pending</span>
+                    )}
+                    {status === 'in_progress' && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700 border border-blue-200">In Progress</span>
+                    )}
+                    {status === 'uploaded' && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700 border border-green-200">Uploaded ✓</span>
+                    )}
+                    {status === 'na' && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-400 border border-gray-200">N/A</span>
+                    )}
+
+                    <div className="flex gap-2 ml-auto flex-wrap items-center">
+                      {isUploading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+
+                      {status === 'pending' && !isUploading && (
+                        <>
+                          <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => updateSlotStatus(slotType, 'in_progress')}>
+                            In Progress
+                          </Button>
+                          <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => updateSlotStatus(slotType, 'na')}>
+                            N/A
+                          </Button>
+                          {isAgreement ? (
+                            <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setAgreementDialogOpen(true)}>
+                              Edit Agreement
+                            </Button>
+                          ) : (
+                            <label className="inline-flex items-center gap-1 h-7 px-3 text-xs border border-black/20 rounded-md cursor-pointer hover:bg-black/5 transition-colors">
+                              <input
+                                type="file"
+                                className="hidden"
+                                onChange={(e) => { const f = e.target.files?.[0]; if (f) handleSlotUpload(slotType, f); e.target.value = ''; }}
+                              />
+                              <Upload className="h-3 w-3" /> Upload
+                            </label>
+                          )}
+                        </>
+                      )}
+
+                      {status === 'in_progress' && !isUploading && (
+                        <>
+                          <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => updateSlotStatus(slotType, 'na')}>
+                            N/A
+                          </Button>
+                          {isAgreement ? (
+                            <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setAgreementDialogOpen(true)}>
+                              Edit Agreement
+                            </Button>
+                          ) : (
+                            <label className="inline-flex items-center gap-1 h-7 px-3 text-xs border border-black/20 rounded-md cursor-pointer hover:bg-black/5 transition-colors">
+                              <input
+                                type="file"
+                                className="hidden"
+                                onChange={(e) => { const f = e.target.files?.[0]; if (f) handleSlotUpload(slotType, f); e.target.value = ''; }}
+                              />
+                              <Upload className="h-3 w-3" /> Upload
+                            </label>
+                          )}
+                        </>
+                      )}
+
+                      {status === 'uploaded' && !isUploading && (
+                        <>
+                          {!isAgreement && slot?.storage_path && (
+                            <Button
+                              size="sm"
+                              variant={expandedSlot === slotType ? "default" : "outline"}
+                              className="h-7 text-xs"
+                              onClick={() => toggleSlotView(slotType)}
+                            >
+                              {expandedSlot === slotType ? 'Close' : 'View'}
+                            </Button>
+                          )}
+                          {!isAgreement && (
+                            <label className="inline-flex items-center h-7 px-3 text-xs rounded-md cursor-pointer hover:bg-black/5 transition-colors text-muted-foreground">
+                              <input
+                                type="file"
+                                className="hidden"
+                                onChange={(e) => { const f = e.target.files?.[0]; if (f) handleSlotUpload(slotType, f); e.target.value = ''; }}
+                              />
+                              Re-upload
+                            </label>
+                          )}
+                        </>
+                      )}
+
+                      {status === 'na' && !isUploading && (
+                        <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => updateSlotStatus(slotType, 'pending')}>
+                          Undo N/A
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {expandedSlot && (() => {
+              const slot = docSlots.find((s) => s.slot_type === expandedSlot);
+              if (!slot || slot.status !== 'uploaded') return null;
+              const url = slotSignedUrls[expandedSlot];
+              const isImage = /\.(png|jpg|jpeg|gif|webp|svg)$/i.test(slot.file_name || '');
+              return (
+                <div className="border-t border-black/10 overflow-hidden">
+                  <div className="flex items-center justify-between px-4 py-2 border-b border-black/5 bg-muted/30">
+                    <span className="text-sm font-medium">{SLOT_LABELS[expandedSlot]}</span>
+                    <div className="flex gap-3">
+                      {url && (
+                        <a href={url} download={slot.file_name} className="text-xs text-primary underline">
+                          Download
+                        </a>
+                      )}
+                      <button onClick={() => setExpandedSlot(null)} className="text-xs text-muted-foreground hover:text-black">
+                        Close
+                      </button>
+                    </div>
+                  </div>
+                  {url ? (
+                    isImage
+                      ? <img src={url} alt={slot.file_name} className="max-w-full" />
+                      : <iframe src={url} title={slot.file_name} className="w-full h-[700px] border-0" />
+                  ) : (
+                    <div className="p-8 text-center text-sm text-muted-foreground">Loading document...</div>
+                  )}
+                </div>
+              );
+            })()}
+          </div>
+
           <div className="flex items-center justify-between gap-2 flex-wrap">
             <div className="flex gap-2">
               {profile.email && (
@@ -1227,6 +1566,77 @@ const ClientDetail = () => {
 
         {/* ASSETS */}
         <TabsContent value="assets" className="mt-4 space-y-6">
+          {/* Primary Logo */}
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-display text-base tracking-wider">Primary Logo</h3>
+            </div>
+            {(() => {
+              const logoAsset = assets.find((a) => a.category === 'logo' && a.type === 'file');
+              const logoUrl = logoAsset ? assetSignedUrls[logoAsset.id] : null;
+              if (logoAsset) {
+                return (
+                  <div className="border border-black/10 rounded-xl p-4 flex items-start gap-4">
+                    <div className="h-24 w-32 bg-gray-50 rounded-lg border border-black/5 flex items-center justify-center overflow-hidden shrink-0">
+                      {logoUrl ? (
+                        <img src={logoUrl} alt="Primary Logo" className="max-h-full max-w-full object-contain" />
+                      ) : (
+                        <Loader2 className="h-6 w-6 animate-spin text-black/20" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium">Primary Logo</p>
+                      {logoAsset.file_name && (
+                        <p className="text-xs text-muted-foreground truncate mt-0.5">{logoAsset.file_name.split('/').pop()}</p>
+                      )}
+                      <div className="flex gap-2 mt-3">
+                        <label className="cursor-pointer">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => { const f = e.target.files?.[0]; if (f) handleLogoUpload(f); e.target.value = ''; }}
+                          />
+                          <div className={`inline-flex items-center gap-2 h-9 px-3 text-sm border border-black/20 rounded-md hover:bg-black/5 transition-colors ${logoUploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                            {logoUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCcw className="h-4 w-4" />}
+                            Replace Logo
+                          </div>
+                        </label>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                          onClick={() => deleteAsset(logoAsset)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+              return (
+                <label className="cursor-pointer block">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => { const f = e.target.files?.[0]; if (f) handleLogoUpload(f); e.target.value = ''; }}
+                  />
+                  <div className="border-2 border-dashed border-black/15 rounded-xl py-10 px-6 text-center hover:border-primary/40 hover:bg-primary/5 transition-colors">
+                    {logoUploading ? (
+                      <Loader2 className="h-8 w-8 animate-spin text-muted-foreground mx-auto mb-2" />
+                    ) : (
+                      <Upload className="h-8 w-8 text-black/20 mx-auto mb-2" />
+                    )}
+                    <p className="text-sm font-medium text-black/60">Upload Client Logo</p>
+                    <p className="text-xs text-muted-foreground mt-1">Used in agreement header and branding</p>
+                  </div>
+                </label>
+              );
+            })()}
+          </div>
+
           {/* Text Assets */}
           <div>
             <div className="flex items-center justify-between mb-3">
@@ -2116,6 +2526,16 @@ const ClientDetail = () => {
               {textAssetSaving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
               Add Asset
             </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Agreement */}
+      <Dialog open={agreementDialogOpen} onOpenChange={setAgreementDialogOpen}>
+        <DialogContent className="sm:max-w-lg bg-white text-black" style={lightVars}>
+          <DialogHeader><DialogTitle className="text-black">Edit Agreement</DialogTitle></DialogHeader>
+          <div className="p-6 border border-black/10 rounded-xl bg-gray-50 text-center">
+            <p className="text-sm text-muted-foreground">Agreement builder — use the AgreementDocument component</p>
           </div>
         </DialogContent>
       </Dialog>

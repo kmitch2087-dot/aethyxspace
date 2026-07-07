@@ -1,12 +1,23 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { FileText, Download, Loader2, MessageSquare, Send } from "lucide-react";
+import {
+  FileText, Download, Loader2, MessageSquare, Send,
+  CheckCircle, ChevronDown, ChevronUp, Printer,
+} from "lucide-react";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+
+const SLOT_LABELS: Record<string, string> = {
+  site_audit: "Site Audit",
+  market_research: "Market Research",
+  service_tier: "Service Tier Information",
+  plan: "Project Plan",
+  agreement: "Agreement",
+};
 
 const PortalDocuments = () => {
   const { user } = useAuth();
@@ -19,17 +30,75 @@ const PortalDocuments = () => {
   const [sending, setSending] = useState(false);
   const { toast } = useToast();
 
+  // Project Documents state
+  const [docSlots, setDocSlots] = useState<any[]>([]);
+  const [expandedSlot, setExpandedSlot] = useState<string | null>(null);
+  const [slotSignedUrls, setSlotSignedUrls] = useState<Record<string, string>>({});
+  const [slotsLoading, setSlotsLoading] = useState(true);
+  const [agreementRecord, setAgreementRecord] = useState<any>(null);
+
   const load = async () => {
     if (!user) return;
-    const { data: p } = await supabase.from("client_profiles").select("id").eq("user_id", user.id).maybeSingle();
+    const { data: p } = await supabase
+      .from("client_profiles")
+      .select("id")
+      .eq("user_id", user.id)
+      .maybeSingle();
     setProfile(p);
-    const filter = p?.id ? `client_profile_id.eq.${p.id},user_id.eq.${user.id}` : `user_id.eq.${user.id}`;
-    const { data } = await supabase.from("client_documents").select("*").or(filter).order("created_at", { ascending: false });
+
+    const profileId = p?.id;
+
+    if (profileId) {
+      // Fetch document slots
+      const { data: slots } = await (supabase as any)
+        .from("client_document_slots")
+        .select("*")
+        .eq("client_profile_id", profileId);
+      setDocSlots(slots || []);
+
+      // Fetch agreement record if exists
+      const { data: agr } = await (supabase as any)
+        .from("client_agreement_records")
+        .select("*")
+        .eq("client_profile_id", profileId)
+        .maybeSingle();
+      setAgreementRecord(agr);
+    }
+    setSlotsLoading(false);
+
+    // Fetch shared documents
+    const filter = profileId
+      ? `client_profile_id.eq.${profileId},user_id.eq.${user.id}`
+      : `user_id.eq.${user.id}`;
+    const { data } = await supabase
+      .from("client_documents")
+      .select("*")
+      .or(filter)
+      .order("created_at", { ascending: false });
     setDocuments(data || []);
     setLoading(false);
   };
 
   useEffect(() => { load(); }, [user]);
+
+  // Expand/collapse a slot; generate signed URL on first expand for uploaded slots
+  const handleExpandSlot = async (slot: any) => {
+    if (expandedSlot === slot.id) {
+      setExpandedSlot(null);
+      return;
+    }
+    setExpandedSlot(slot.id);
+    if (slot.storage_path && !slotSignedUrls[slot.id]) {
+      const { data, error } = await supabase.storage
+        .from("client-slot-docs")
+        .createSignedUrl(slot.storage_path, 3600);
+      if (!error && data?.signedUrl) {
+        setSlotSignedUrls((prev) => ({ ...prev, [slot.id]: data.signedUrl }));
+      } else {
+        toast({ title: "Unable to load document preview", variant: "destructive" });
+      }
+    }
+  };
 
   const handleDownload = async (doc: any) => {
     setDownloadingId(doc.id);
@@ -51,33 +120,273 @@ const PortalDocuments = () => {
 
   const openThread = async (doc: any) => {
     if (!user) return;
-    const { data } = await supabase.from("client_messages")
-      .select("*").eq("document_id", doc.id).order("created_at", { ascending: true });
+    const { data } = await supabase
+      .from("client_messages")
+      .select("*")
+      .eq("document_id", doc.id)
+      .order("created_at", { ascending: true });
     setThread({ doc, messages: data || [] });
   };
 
   const sendMessage = async () => {
     if (!user || !profile || !thread || !newMsg.trim()) return;
     setSending(true);
-    const { data, error } = await supabase.from("client_messages").insert({
-      user_id: user.id,
-      client_profile_id: profile.id,
-      document_id: thread.doc.id,
-      message: newMsg.trim().slice(0, 4000),
-      sender: "client",
-    }).select().single();
+    const { data, error } = await supabase
+      .from("client_messages")
+      .insert({
+        user_id: user.id,
+        client_profile_id: profile.id,
+        document_id: thread.doc.id,
+        message: newMsg.trim().slice(0, 4000),
+        sender: "client",
+      })
+      .select()
+      .single();
     setSending(false);
     if (error) { toast({ title: "Send failed", description: error.message, variant: "destructive" }); return; }
     setThread({ ...thread, messages: [...thread.messages, data] });
     setNewMsg("");
   };
 
-  if (loading) return <div className="flex justify-center py-20"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
+  // Hide slots where status === 'na'
+  const visibleSlots = docSlots.filter((s) => s.status !== "na");
+
+  // Block render until at least slot data is ready (documents can load after)
+  if (loading && slotsLoading) {
+    return (
+      <div className="flex justify-center py-20">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div>
       <h1 className="text-2xl font-display tracking-wider mb-6">Documents</h1>
-      {documents.length === 0 ? (
+
+      {/* ── Project Documents ── */}
+      <div className="bg-white/5 border border-white/10 rounded-xl p-6 mb-6">
+        <h2 className="text-lg font-semibold text-white mb-4">Project Documents</h2>
+
+        {slotsLoading ? (
+          <div className="flex justify-center py-6">
+            <Loader2 className="h-5 w-5 animate-spin text-white/50" />
+          </div>
+        ) : visibleSlots.length === 0 ? (
+          <p className="text-white/70 text-sm">No project documents have been prepared yet.</p>
+        ) : (
+          <div className="space-y-3">
+            {visibleSlots.map((slot) => {
+              const label = SLOT_LABELS[slot.slot_key] || slot.slot_key;
+              const isExpanded = expandedSlot === slot.id;
+              const signedUrl = slotSignedUrls[slot.id];
+              const isAgreement = slot.slot_key === "agreement";
+
+              // ── Agreement slot ──
+              if (isAgreement) {
+                const isSigned = !!agreementRecord?.submitted_at;
+                const hasRecord = !!agreementRecord;
+
+                return (
+                  <div key={slot.id} className="border border-white/10 rounded-lg overflow-hidden">
+                    <div className="flex items-center gap-3 p-4 flex-wrap">
+                      <FileText className="h-5 w-5 text-white/50 shrink-0" />
+                      <span className="flex-1 text-sm font-medium text-white">{label}</span>
+
+                      {isSigned ? (
+                        <>
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30">
+                            <CheckCircle className="h-3 w-3" /> Signed ✓
+                          </span>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="text-white/70 hover:text-white"
+                            onClick={() => setExpandedSlot(isExpanded ? null : slot.id)}
+                          >
+                            View Agreement
+                            {isExpanded
+                              ? <ChevronUp className="h-3 w-3 ml-1" />
+                              : <ChevronDown className="h-3 w-3 ml-1" />}
+                          </Button>
+                        </>
+                      ) : hasRecord ? (
+                        <>
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                            Needs Your Signature
+                          </span>
+                          <Button
+                            size="sm"
+                            className="bg-amber-500 hover:bg-amber-600 text-black text-xs"
+                            onClick={() => {
+                              // TODO: navigate to /portal/agreement
+                              console.warn("TODO: navigate to /portal/agreement");
+                            }}
+                          >
+                            Sign Agreement
+                          </Button>
+                        </>
+                      ) : (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-white/10 text-white/50 border border-white/10">
+                          Pending
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Signed — expanded view */}
+                    {isExpanded && isSigned && (
+                      <div className="border-t border-white/10 p-4 bg-white/5">
+                        <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4 mb-4">
+                          <p className="text-sm text-green-400">
+                            Your agreement was signed on{" "}
+                            {agreementRecord?.submitted_at
+                              ? format(new Date(agreementRecord.submitted_at), "MMMM d, yyyy 'at' h:mm a")
+                              : "—"}
+                          </p>
+                        </div>
+                        <div className="flex gap-2 flex-wrap">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="border-white/20 text-white/70 hover:text-white"
+                            onClick={() => {
+                              // TODO: navigate to /portal/agreement for full view
+                              console.warn("TODO: navigate to /portal/agreement");
+                            }}
+                          >
+                            View Full Agreement
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="border-white/20 text-white/70 hover:text-white"
+                            onClick={() => window.print()}
+                          >
+                            <Printer className="h-3.5 w-3.5 mr-1" /> Print
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Record exists but unsigned — expanded prompt */}
+                    {isExpanded && !isSigned && hasRecord && (
+                      <div className="border-t border-white/10 p-4 bg-white/5">
+                        <p className="text-sm text-white/70 mb-3">
+                          Please sign your service agreement to proceed.
+                        </p>
+                        <Button
+                          size="sm"
+                          className="bg-amber-500 hover:bg-amber-600 text-black"
+                          onClick={() => {
+                            // TODO: navigate to /portal/agreement
+                            console.warn("TODO: navigate to /portal/agreement");
+                          }}
+                        >
+                          Sign Agreement
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+
+              // ── Standard (non-agreement) slots ──
+              return (
+                <div key={slot.id} className="border border-white/10 rounded-lg overflow-hidden">
+                  <div className="flex items-center gap-3 p-4 flex-wrap">
+                    <FileText className="h-5 w-5 text-white/50 shrink-0" />
+                    <span className="flex-1 text-sm font-medium text-white">{label}</span>
+
+                    {slot.status === "pending" && (
+                      <>
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-white/10 text-white/50 border border-white/10">
+                          Pending
+                        </span>
+                        <span className="text-xs text-white/40">Document not yet started</span>
+                      </>
+                    )}
+
+                    {slot.status === "in_progress" && (
+                      <>
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                          In Progress
+                        </span>
+                        <span className="text-xs text-white/40 italic">In progress — check back soon</span>
+                      </>
+                    )}
+
+                    {slot.status === "uploaded" && (
+                      <>
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30">
+                          <CheckCircle className="h-3 w-3" /> Ready
+                        </span>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-white/70 hover:text-white"
+                          onClick={() => handleExpandSlot(slot)}
+                        >
+                          {isExpanded
+                            ? <><ChevronUp className="h-3 w-3 mr-1" /> Hide</>
+                            : <><ChevronDown className="h-3 w-3 mr-1" /> View</>}
+                        </Button>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Embedded viewer for uploaded slots */}
+                  {isExpanded && slot.status === "uploaded" && (
+                    <div className="border-t border-white/10 p-4 bg-white/5">
+                      {!signedUrl ? (
+                        <div className="flex justify-center py-6">
+                          <Loader2 className="h-5 w-5 animate-spin text-white/50" />
+                        </div>
+                      ) : (
+                        <>
+                          {/\.(png|jpg|jpeg|gif|webp|svg)$/i.test(slot.file_name || "") ? (
+                            <img
+                              src={signedUrl}
+                              alt={label}
+                              className="max-w-full rounded-lg mb-3"
+                            />
+                          ) : (
+                            <iframe
+                              src={signedUrl}
+                              title={label}
+                              className="w-full h-[600px] border-0 rounded-lg mb-3"
+                            />
+                          )}
+                          <a
+                            href={signedUrl}
+                            download={slot.file_name || label}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="border-white/20 text-white/70 hover:text-white"
+                            >
+                              <Download className="h-3.5 w-3.5 mr-1" /> Download
+                            </Button>
+                          </a>
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* ── Existing shared documents ── */}
+      {loading ? (
+        <div className="flex justify-center py-10">
+          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+        </div>
+      ) : documents.length === 0 ? (
         <p className="text-muted-foreground text-sm">No documents have been shared with you yet.</p>
       ) : (
         <div className="space-y-3">
