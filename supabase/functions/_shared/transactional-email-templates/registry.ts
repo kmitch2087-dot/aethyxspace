@@ -19,6 +19,7 @@ import { template as paymentReceived } from './payment-received.tsx'
 import { template as documentShare } from './document-share.tsx'
 import { template as invoiceDelivery } from './invoice-delivery.tsx'
 import { template as intakeRequired } from './intake-required.tsx'
+import { template as newDocuments } from './new-documents.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'inquiry-notification': inquiryNotification,
@@ -31,4 +32,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'document-share': documentShare,
   'invoice-delivery': invoiceDelivery,
   'intake-required': intakeRequired,
+  'new-documents': newDocuments,
 }

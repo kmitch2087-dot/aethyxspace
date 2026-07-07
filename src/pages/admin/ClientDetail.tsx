@@ -12,9 +12,27 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useToast } from "@/hooks/use-toast";
 import {
   ArrowLeft, Loader2, Save, Upload, Mail, Plus, ExternalLink,
-  AlertTriangle, CheckCircle2, Trash2, RefreshCcw,
+  AlertTriangle, CheckCircle2, Trash2, RefreshCcw, FileText, Image, Bell,
 } from "lucide-react";
 import { format } from "date-fns";
+
+// Applied to all Dialogs (they render in a portal outside the admin light-mode wrapper)
+const lightVars = {
+  "--background": "0 0% 100%",
+  "--foreground": "0 0% 4%",
+  "--card": "0 0% 98%",
+  "--card-foreground": "0 0% 4%",
+  "--popover": "0 0% 100%",
+  "--popover-foreground": "0 0% 4%",
+  "--muted": "0 0% 96%",
+  "--muted-foreground": "0 0% 45%",
+  "--input": "0 0% 93%",
+  "--border": "0 0% 88%",
+  "--secondary": "0 0% 96%",
+  "--secondary-foreground": "0 0% 9%",
+  "--accent": "0 0% 96%",
+  "--accent-foreground": "0 0% 9%",
+} as React.CSSProperties;
 
 interface Profile {
   id: string;
@@ -52,9 +70,25 @@ interface Invoice {
 
 interface DocRow { id: string; title: string; file_url: string; created_at: string; }
 interface AgreementRow { id: string; service_name: string | null; status: string; amount: number | null; agreement_url: string | null; created_at: string; }
-interface IntakeRow { id: string; status: string; created_at: string; notes: string | null; }
+interface IntakeRow {
+  id: string;
+  status: string;
+  created_at: string;
+  notes: string | null;
+  full_name: string | null;
+  email: string | null;
+  phone: string | null;
+  business_name: string | null;
+  responses: Record<string, { label: string; section: string; value: string }> | null;
+}
 interface MessageRow { id: string; message: string; created_at: string; }
 interface ProjectRow { id: string; name: string; status: string; notes: string | null; created_at: string; }
+
+const IMAGE_EXTS = new Set(["jpg", "jpeg", "png", "gif", "webp", "svg", "avif"]);
+
+function fileExt(path: string): string {
+  return (path.split(".").pop() || "").toLowerCase();
+}
 
 const ClientDetail = () => {
   const { id } = useParams();
@@ -65,6 +99,7 @@ const ClientDetail = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [docs, setDocs] = useState<DocRow[]>([]);
+  const [docUrls, setDocUrls] = useState<Record<string, string>>({});
   const [agreements, setAgreements] = useState<AgreementRow[]>([]);
   const [intakes, setIntakes] = useState<IntakeRow[]>([]);
   const [messages, setMessages] = useState<MessageRow[]>([]);
@@ -75,6 +110,7 @@ const ClientDetail = () => {
   const [docTitle, setDocTitle] = useState("");
   const [docFile, setDocFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [sendingDocNotif, setSendingDocNotif] = useState(false);
 
   // Invoice creation
   const [invOpen, setInvOpen] = useState(false);
@@ -86,13 +122,25 @@ const ClientDetail = () => {
   const [projOpen, setProjOpen] = useState(false);
   const [projName, setProjName] = useState("");
 
+  const fetchSignedUrls = async (rows: DocRow[]) => {
+    if (!rows.length) { setDocUrls({}); return; }
+    const { data: signed } = await supabase.storage
+      .from("client-documents")
+      .createSignedUrls(rows.map((d) => d.file_url), 3600);
+    const map: Record<string, string> = {};
+    (signed || []).forEach((item) => {
+      const doc = rows.find((d) => d.file_url === item.path);
+      if (doc && item.signedUrl) map[doc.id] = item.signedUrl;
+    });
+    setDocUrls(map);
+  };
+
   const fetchAll = async () => {
     if (!id) return;
     const { data: p } = await supabase.from("client_profiles").select("*").eq("id", id).maybeSingle();
     if (!p) { setLoading(false); return; }
     setProfile(p as Profile);
 
-    // Primary linkage: client_profile_id. Fall back to legacy keys (user_id, email) so older rows still appear.
     const emailLc = p.email ? p.email.toLowerCase() : null;
     const [inv, dc, ag, it, ms, pr] = await Promise.all([
       supabase.from("client_invoices").select("*").eq("client_profile_id", id).order("created_at", { ascending: false }),
@@ -107,12 +155,14 @@ const ClientDetail = () => {
       supabase.from("client_projects").select("*").eq("client_profile_id", id).order("created_at", { ascending: false }),
     ]);
     setInvoices((inv.data as Invoice[]) || []);
-    setDocs((dc.data as DocRow[]) || []);
+    const docRows = (dc.data as DocRow[]) || [];
+    setDocs(docRows);
     setAgreements((ag.data as AgreementRow[]) || []);
     setIntakes((it.data as IntakeRow[]) || []);
     setMessages((ms.data as MessageRow[]) || []);
     setProjects((pr.data as ProjectRow[]) || []);
     setLoading(false);
+    fetchSignedUrls(docRows);
   };
 
   useEffect(() => { fetchAll(); /* eslint-disable-next-line */ }, [id]);
@@ -147,7 +197,6 @@ const ClientDetail = () => {
   const handleUploadDoc = async () => {
     if (!profile || !docFile || !docTitle.trim()) return;
     setUploading(true);
-    // Store under the stable profile.id folder so it survives auth user re-linking.
     const filePath = `${profile.id}/${Date.now()}_${docFile.name}`;
     const { error: upErr } = await supabase.storage.from("client-documents").upload(filePath, docFile);
     if (upErr) { setUploading(false); toast({ title: "Upload failed", description: upErr.message, variant: "destructive" }); return; }
@@ -161,6 +210,33 @@ const ClientDetail = () => {
     setUploading(false);
     if (insErr) toast({ title: "Save failed", description: insErr.message, variant: "destructive" });
     else { toast({ title: "Document uploaded" }); setDocOpen(false); setDocTitle(""); setDocFile(null); fetchAll(); }
+  };
+
+  const handleDeleteDoc = async (doc: DocRow) => {
+    await supabase.storage.from("client-documents").remove([doc.file_url]);
+    await supabase.from("client_documents").delete().eq("id", doc.id);
+    setDocs((s) => s.filter((d) => d.id !== doc.id));
+    setDocUrls((s) => { const n = { ...s }; delete n[doc.id]; return n; });
+    toast({ title: "Document deleted" });
+  };
+
+  const handleNotifyDocs = async () => {
+    if (!profile?.email) return;
+    setSendingDocNotif(true);
+    const { error } = await supabase.functions.invoke("send-transactional-email", {
+      body: {
+        templateName: "new-documents",
+        recipientEmail: profile.email,
+        idempotencyKey: `new-docs-${profile.id}-${Date.now()}`,
+        templateData: {
+          firstName: profile.first_name || "",
+          portalDocsUrl: "https://aethyx.space/portal/documents",
+        },
+      },
+    });
+    setSendingDocNotif(false);
+    if (error) toast({ title: "Email failed", description: error.message, variant: "destructive" });
+    else toast({ title: "Notification sent", description: `${profile.email} will get an email to check their documents.` });
   };
 
   const handleCreateInvoice = async () => {
@@ -186,10 +262,7 @@ const ClientDetail = () => {
 
   const addProject = async () => {
     if (!profile || !projName.trim()) return;
-    await supabase.from("client_projects").insert({
-      client_profile_id: profile.id,
-      name: projName.trim(),
-    });
+    await supabase.from("client_projects").insert({ client_profile_id: profile.id, name: projName.trim() });
     setProjOpen(false); setProjName(""); fetchAll();
   };
 
@@ -321,18 +394,63 @@ const ClientDetail = () => {
         </TabsContent>
 
         {/* DOCUMENTS */}
-        <TabsContent value="documents" className="mt-4 space-y-2">
-          <div className="flex justify-end">
+        <TabsContent value="documents" className="mt-4 space-y-4">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <div className="flex gap-2">
+              {profile.email && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleNotifyDocs}
+                  disabled={sendingDocNotif || docs.length === 0}
+                  title="Email client about new documents"
+                >
+                  {sendingDocNotif ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Bell className="h-4 w-4 mr-2" />}
+                  Notify client
+                </Button>
+              )}
+            </div>
             <Button size="sm" onClick={() => setDocOpen(true)}><Upload className="h-4 w-4 mr-2" /> Upload</Button>
           </div>
-          {docs.length === 0 ? <p className="text-sm text-muted-foreground py-8 text-center">No documents uploaded.</p> : docs.map((d) => (
-            <Card key={d.id}><CardContent className="pt-4 flex items-center justify-between gap-3">
-              <div>
-                <p className="font-medium text-sm">{d.title}</p>
-                <p className="text-xs text-muted-foreground">{format(new Date(d.created_at), "MMM d, yyyy")}</p>
-              </div>
-            </CardContent></Card>
-          ))}
+          {docs.length === 0 ? (
+            <p className="text-sm text-muted-foreground py-8 text-center">No documents uploaded.</p>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {docs.map((d) => {
+                const ext = fileExt(d.file_url);
+                const isImage = IMAGE_EXTS.has(ext);
+                const signedUrl = docUrls[d.id];
+                return (
+                  <div key={d.id} className="group relative border border-black/10 rounded-xl overflow-hidden bg-white hover:shadow-md transition-shadow">
+                    <button
+                      className="w-full text-left focus:outline-none"
+                      onClick={() => signedUrl && window.open(signedUrl, "_blank")}
+                      disabled={!signedUrl}
+                    >
+                      <div className="h-36 bg-black/5 flex items-center justify-center overflow-hidden">
+                        {isImage && signedUrl ? (
+                          <img src={signedUrl} alt={d.title} className="w-full h-full object-cover" />
+                        ) : (
+                          <FileText className="h-14 w-14 text-black/20" />
+                        )}
+                      </div>
+                      <div className="p-3">
+                        <p className="font-medium text-sm text-black truncate">{d.title}</p>
+                        <p className="text-xs text-black/50 mt-0.5">{format(new Date(d.created_at), "MMM d, yyyy")}</p>
+                      </div>
+                    </button>
+                    <button
+                      className="absolute top-2 right-2 p-1 rounded-full bg-white/80 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-50 text-black/40 hover:text-red-600"
+                      onClick={(e) => { e.stopPropagation(); handleDeleteDoc(d); }}
+                      title="Delete document"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </TabsContent>
 
         {/* PROJECTS */}
@@ -364,13 +482,69 @@ const ClientDetail = () => {
         </TabsContent>
 
         {/* INTAKES */}
-        <TabsContent value="intakes" className="mt-4 space-y-2">
-          {intakes.length === 0 ? <p className="text-sm text-muted-foreground py-8 text-center">No intake submissions.</p> : intakes.map((i) => (
-            <Card key={i.id}><CardContent className="pt-4">
-              <p className="text-sm">{format(new Date(i.created_at), "MMM d, yyyy")} · <Badge variant="outline" className="text-xs capitalize">{i.status}</Badge></p>
-              {i.notes && <p className="text-xs text-muted-foreground mt-1">{i.notes}</p>}
-            </CardContent></Card>
-          ))}
+        <TabsContent value="intakes" className="mt-4 space-y-6">
+          {intakes.length === 0 ? (
+            <p className="text-sm text-muted-foreground py-8 text-center">No intake submissions.</p>
+          ) : intakes.map((intake) => {
+            const grouped: Record<string, Array<{ label: string; value: string }>> = { about: [], project: [], market: [], extra: [] };
+            for (const r of Object.values(intake.responses || {})) {
+              (grouped[r.section] ||= []).push({ label: r.label, value: r.value });
+            }
+            const hasResponses = Object.values(grouped).some((g) => g.length > 0);
+            return (
+              <Card key={intake.id}>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <div>
+                      <CardTitle className="text-base font-display">{intake.full_name || profile.full_name}</CardTitle>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Submitted {format(new Date(intake.created_at), "MMM d, yyyy 'at' h:mm a")}
+                      </p>
+                    </div>
+                    <Badge variant="outline" className="text-xs capitalize">{intake.status}</Badge>
+                  </div>
+                  {(intake.phone || intake.business_name) && (
+                    <div className="text-xs text-muted-foreground flex gap-4 mt-1">
+                      {intake.phone && <span>{intake.phone}</span>}
+                      {intake.business_name && <span>{intake.business_name}</span>}
+                    </div>
+                  )}
+                </CardHeader>
+                <CardContent className="space-y-5">
+                  {!hasResponses && (
+                    <p className="text-sm text-muted-foreground italic">No detailed responses recorded.</p>
+                  )}
+                  {(["about", "project", "market", "extra"] as const).map((section) => {
+                    const items = grouped[section] || [];
+                    if (!items.length) return null;
+                    return (
+                      <div key={section}>
+                        <h4 className="font-display text-sm tracking-wider text-black/50 uppercase mb-3">
+                          {section === "extra" ? "Anything else" : `The ${section}`}
+                        </h4>
+                        <dl className="space-y-3">
+                          {items.map((it, idx) => (
+                            <div key={idx} className="border-l-2 border-black/10 pl-4">
+                              <dt className="text-xs uppercase tracking-wider text-black/40">{it.label}</dt>
+                              <dd className="text-sm text-black/80 whitespace-pre-wrap mt-1">
+                                {it.value || <span className="italic text-black/30">— blank —</span>}
+                              </dd>
+                            </div>
+                          ))}
+                        </dl>
+                      </div>
+                    );
+                  })}
+                  {intake.notes && (
+                    <div className="border-t border-black/10 pt-4">
+                      <p className="text-xs uppercase tracking-wider text-black/40 mb-1">Notes</p>
+                      <p className="text-sm text-black/70">{intake.notes}</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })}
         </TabsContent>
 
         {/* MESSAGES */}
@@ -386,11 +560,11 @@ const ClientDetail = () => {
 
       {/* Upload Document */}
       <Dialog open={docOpen} onOpenChange={setDocOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader><DialogTitle>Upload Document</DialogTitle></DialogHeader>
+        <DialogContent className="sm:max-w-md bg-white text-black" style={lightVars}>
+          <DialogHeader><DialogTitle className="text-black">Upload Document</DialogTitle></DialogHeader>
           <div className="space-y-3">
-            <div><Label>Title</Label><Input value={docTitle} onChange={(e) => setDocTitle(e.target.value)} /></div>
-            <div><Label>File</Label><Input type="file" onChange={(e) => setDocFile(e.target.files?.[0] || null)} /></div>
+            <div><Label className="text-black">Title</Label><Input value={docTitle} onChange={(e) => setDocTitle(e.target.value)} className="bg-white text-black border-black/20" /></div>
+            <div><Label className="text-black">File</Label><Input type="file" onChange={(e) => setDocFile(e.target.files?.[0] || null)} className="bg-white text-black border-black/20" /></div>
             <Button onClick={handleUploadDoc} disabled={uploading || !docTitle.trim() || !docFile} className="w-full">
               {uploading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Upload className="h-4 w-4 mr-2" />} Upload
             </Button>
@@ -400,13 +574,13 @@ const ClientDetail = () => {
 
       {/* Create Invoice */}
       <Dialog open={invOpen} onOpenChange={setInvOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader><DialogTitle>New Invoice</DialogTitle></DialogHeader>
+        <DialogContent className="sm:max-w-md bg-white text-black" style={lightVars}>
+          <DialogHeader><DialogTitle className="text-black">New Invoice</DialogTitle></DialogHeader>
           <div className="space-y-3">
-            <div><Label>Description</Label><Textarea rows={3} value={invDesc} onChange={(e) => setInvDesc(e.target.value)} maxLength={500} /></div>
+            <div><Label className="text-black">Description</Label><Textarea rows={3} value={invDesc} onChange={(e) => setInvDesc(e.target.value)} maxLength={500} className="bg-white text-black border-black/20" /></div>
             <div className="grid grid-cols-2 gap-3">
-              <div><Label>Amount (USD)</Label><Input type="number" step="0.01" min="1" value={invAmount} onChange={(e) => setInvAmount(e.target.value)} /></div>
-              <div><Label>Due in (days)</Label><Input type="number" min="1" value={invDays} onChange={(e) => setInvDays(e.target.value)} /></div>
+              <div><Label className="text-black">Amount (USD)</Label><Input type="number" step="0.01" min="1" value={invAmount} onChange={(e) => setInvAmount(e.target.value)} className="bg-white text-black border-black/20" /></div>
+              <div><Label className="text-black">Due in (days)</Label><Input type="number" min="1" value={invDays} onChange={(e) => setInvDays(e.target.value)} className="bg-white text-black border-black/20" /></div>
             </div>
             <Button onClick={handleCreateInvoice} disabled={saving || !invDesc.trim() || !invAmount} className="w-full">
               {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null} Create & send
@@ -417,10 +591,10 @@ const ClientDetail = () => {
 
       {/* Add Project */}
       <Dialog open={projOpen} onOpenChange={setProjOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader><DialogTitle>Add Project</DialogTitle></DialogHeader>
+        <DialogContent className="sm:max-w-md bg-white text-black" style={lightVars}>
+          <DialogHeader><DialogTitle className="text-black">Add Project</DialogTitle></DialogHeader>
           <div className="space-y-3">
-            <div><Label>Name</Label><Input value={projName} onChange={(e) => setProjName(e.target.value)} /></div>
+            <div><Label className="text-black">Name</Label><Input value={projName} onChange={(e) => setProjName(e.target.value)} className="bg-white text-black border-black/20" /></div>
             <Button onClick={addProject} disabled={!projName.trim()} className="w-full">Add</Button>
           </div>
         </DialogContent>
