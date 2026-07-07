@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Loader2, Mail, Phone, Building2, ExternalLink, FileText } from "lucide-react";
+import { Loader2, Mail, Phone, Building2, ExternalLink, FileText, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -51,6 +51,7 @@ const Intakes = () => {
   const [filter, setFilter] = useState<IntakeStatus | "all">("all");
   const [selected, setSelected] = useState<Intake | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -86,6 +87,20 @@ const Intakes = () => {
     toast({ title: `Marked as ${STATUS_LABEL[status]}` });
     setIntakes((s) => s.map((i) => (i.id === id ? { ...i, status } : i)));
     setSelected((s) => (s && s.id === id ? { ...s, status } : s));
+  };
+
+  const deleteIntake = async (id: string) => {
+    setActionLoading(true);
+    const { error } = await supabase.from("client_intakes").delete().eq("id", id);
+    setActionLoading(false);
+    if (error) {
+      toast({ title: "Delete failed", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({ title: "Intake deleted" });
+    setIntakes((s) => s.filter((i) => i.id !== id));
+    setSelected(null);
+    setConfirmDelete(false);
   };
 
   const sendInvoice = async (intake: Intake) => {
@@ -192,7 +207,7 @@ const Intakes = () => {
         </div>
       )}
 
-      <Sheet open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
+      <Sheet open={!!selected} onOpenChange={(o) => { if (!o) { setSelected(null); setConfirmDelete(false); } }}>
         <SheetContent className="w-full sm:max-w-2xl overflow-y-auto">
           {selected && (
             <>
@@ -256,6 +271,27 @@ const Intakes = () => {
                 >
                   Archive
                 </Button>
+                {!confirmDelete ? (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    disabled={actionLoading}
+                    className="text-destructive hover:text-destructive ml-auto"
+                    onClick={() => setConfirmDelete(true)}
+                  >
+                    <Trash2 className="h-4 w-4 mr-1" /> Delete
+                  </Button>
+                ) : (
+                  <div className="ml-auto flex items-center gap-2">
+                    <span className="text-xs text-destructive">Permanently delete?</span>
+                    <Button size="sm" variant="destructive" disabled={actionLoading} onClick={() => deleteIntake(selected.id)}>
+                      Yes, delete
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => setConfirmDelete(false)}>
+                      Cancel
+                    </Button>
+                  </div>
+                )}
               </div>
 
               <div className="mt-8 space-y-6">

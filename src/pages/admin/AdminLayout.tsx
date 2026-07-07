@@ -108,7 +108,25 @@ const AdminLayout = () => {
       <Seo title="Admin | Aethyx" description="Aethyx admin dashboard." noindex />
       <div className="min-h-screen flex w-full bg-transparent">
         <AdminSidebar />
-        <div className="flex-1 flex flex-col bg-white text-black">
+        <div
+          className="flex-1 flex flex-col bg-white text-black"
+          style={{
+            "--background": "0 0% 100%",
+            "--foreground": "0 0% 4%",
+            "--card": "0 0% 98%",
+            "--card-foreground": "0 0% 4%",
+            "--popover": "0 0% 100%",
+            "--popover-foreground": "0 0% 4%",
+            "--muted": "0 0% 96%",
+            "--muted-foreground": "0 0% 45%",
+            "--input": "0 0% 93%",
+            "--border": "0 0% 88%",
+            "--secondary": "0 0% 96%",
+            "--secondary-foreground": "0 0% 9%",
+            "--accent": "0 0% 96%",
+            "--accent-foreground": "0 0% 9%",
+          } as React.CSSProperties}
+        >
           <header className="h-12 flex items-center border-b border-black/10 px-4 bg-white">
             <SidebarTrigger className="text-black hover:bg-black/5" />
             <span className="ml-4 font-display text-sm tracking-wider text-black/60">
