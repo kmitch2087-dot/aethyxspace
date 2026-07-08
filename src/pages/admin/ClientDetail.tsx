@@ -146,7 +146,7 @@ interface ProjectPlan {
   project_name: string;
   overview?: string | null;
   completion_percent: number;
-  status: "planning" | "active" | "review" | "complete" | "paused";
+  status: "planning" | "active" | "review" | "complete" | "paused" | "abandoned";
   start_date?: string | null;
   target_date?: string | null;
   github_url?: string | null;
@@ -239,6 +239,7 @@ function planStatusInfo(status: ProjectPlan["status"]): { classes: string; label
     review: { classes: "bg-purple-100 text-purple-700 border-purple-200", label: "In Review" },
     complete: { classes: "bg-green-100 text-green-700 border-green-200", label: "Complete" },
     paused: { classes: "bg-yellow-100 text-yellow-700 border-yellow-200", label: "Paused" },
+    abandoned: { classes: "bg-red-100 text-red-700 border-red-200", label: "Archived" },
   };
   return map[status] ?? map.planning;
 }
@@ -1970,8 +1971,29 @@ const ClientDetail = () => {
                         <SelectItem value="review">In Review</SelectItem>
                         <SelectItem value="complete">Complete</SelectItem>
                         <SelectItem value="paused">Paused</SelectItem>
+                        <SelectItem value="abandoned">Archived</SelectItem>
                       </SelectContent>
                     </Select>
+
+                    {plan.status !== "abandoned" ? (
+                      <button
+                        className="text-xs text-red-400 hover:text-red-600 transition-colors underline-offset-2 hover:underline"
+                        onClick={() => {
+                          if (confirm("Abandon this project? It will be paused and archived. You can restore it anytime by changing the status.")) {
+                            savePlan({ status: "abandoned" });
+                          }
+                        }}
+                      >
+                        Abandon / Did Not Accept
+                      </button>
+                    ) : (
+                      <button
+                        className="text-xs text-teal-600 hover:text-teal-800 transition-colors underline-offset-2 hover:underline"
+                        onClick={() => savePlan({ status: "planning" })}
+                      >
+                        Restore Project
+                      </button>
+                    )}
 
                     <div className="flex items-center gap-3 flex-1 min-w-[200px]">
                       <span className="text-2xl font-display font-semibold text-teal-600 tabular-nums w-16 shrink-0">

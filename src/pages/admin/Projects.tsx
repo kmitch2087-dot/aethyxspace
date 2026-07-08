@@ -12,7 +12,7 @@ interface ProjectPlan {
   project_name: string
   overview?: string
   completion_percent: number
-  status: "planning" | "active" | "review" | "complete" | "paused"
+  status: "planning" | "active" | "review" | "complete" | "paused" | "abandoned"
   start_date?: string
   target_date?: string
   github_url?: string | null
@@ -35,8 +35,8 @@ interface ProjectPhase {
   sort_order: number
 }
 
-type ScheduleStatus = "ahead" | "on_track" | "behind" | "no_date" | "complete" | "paused"
-type StatusFilter = "all" | "planning" | "active" | "review" | "complete" | "paused"
+type ScheduleStatus = "ahead" | "on_track" | "behind" | "no_date" | "complete" | "paused" | "abandoned"
+type StatusFilter = "all" | "planning" | "active" | "review" | "complete" | "paused" | "abandoned"
 
 function daysBetween(a: string, b: string): number {
   const msPerDay = 1000 * 60 * 60 * 24
@@ -46,6 +46,7 @@ function daysBetween(a: string, b: string): number {
 function getScheduleStatus(project: ProjectPlan): ScheduleStatus {
   if (project.status === "complete") return "complete"
   if (project.status === "paused") return "paused"
+  if (project.status === "abandoned") return "abandoned"
   if (!project.start_date || !project.target_date) return "no_date"
 
   const today = new Date().toISOString().split("T")[0]
@@ -69,6 +70,7 @@ const scheduleBadgeConfig: Record<ScheduleStatus, { label: string; className: st
   no_date: { label: "No Date", className: "bg-gray-100 text-gray-500" },
   complete: { label: "Complete", className: "bg-gray-100 text-gray-500" },
   paused: { label: "Paused", className: "bg-amber-100 text-amber-800" },
+  abandoned: { label: "Archived", className: "bg-red-100 text-red-700" },
 }
 
 const statusBadgeConfig: Record<ProjectPlan["status"], { label: string; className: string }> = {
@@ -77,6 +79,7 @@ const statusBadgeConfig: Record<ProjectPlan["status"], { label: string; classNam
   review: { label: "Review", className: "bg-purple-100 text-purple-800" },
   complete: { label: "Complete", className: "bg-green-100 text-green-800" },
   paused: { label: "Paused", className: "bg-amber-100 text-amber-800" },
+  abandoned: { label: "Archived", className: "bg-red-100 text-red-700" },
 }
 
 function ScheduleBadge({ status }: { status: ScheduleStatus }) {
@@ -112,6 +115,7 @@ const filterButtons: { label: string; value: StatusFilter }[] = [
   { label: "Review", value: "review" },
   { label: "Complete", value: "complete" },
   { label: "Paused", value: "paused" },
+  { label: "Archived", value: "abandoned" },
 ]
 
 export default function Projects() {
@@ -180,7 +184,7 @@ export default function Projects() {
   const filteredProjects = useMemo(() => {
     if (statusFilter !== "all") return projects.filter((p) => p.status === statusFilter)
     if (showComplete) return projects
-    return projects.filter((p) => p.status !== "complete")
+    return projects.filter((p) => p.status !== "complete" && p.status !== "abandoned")
   }, [projects, statusFilter, showComplete])
 
   const activeCount = projects.filter((p) => p.status === "active").length
@@ -217,7 +221,7 @@ export default function Projects() {
             onClick={() => setShowComplete((v) => !v)}
             className="text-gray-400 hover:text-gray-600 ml-2"
           >
-            {showComplete ? "Hide completed" : "+ Show completed"}
+            {showComplete ? "Hide completed & archived" : "+ Show completed & archived"}
           </Button>
         )}
       </div>
