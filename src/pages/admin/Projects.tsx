@@ -293,7 +293,7 @@ export default function Projects() {
                 )}
 
                 <button
-                  onClick={() => navigate(`/admin/clients/${project.client_profile_id}`)}
+                  onClick={() => navigate(`/admin/clients/${project.client_profile_id}?tab=plan`)}
                   className="text-xs text-teal-700 hover:text-teal-900 font-medium flex items-center gap-1 mt-auto pt-1"
                 >
                   View Plan <ArrowRight className="h-3 w-3" />

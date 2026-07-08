@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -246,6 +246,8 @@ function planStatusInfo(status: ProjectPlan["status"]): { classes: string; label
 const ClientDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const initialTab = searchParams.get("tab") || "profile";
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -1135,7 +1137,7 @@ const ClientDetail = () => {
         </div>
       </div>
 
-      <Tabs defaultValue="profile">
+      <Tabs defaultValue={initialTab}>
         <TabsList className="flex-wrap h-auto">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="invoices">Invoices ({invoices.length})</TabsTrigger>
@@ -1499,10 +1501,51 @@ const ClientDetail = () => {
           <div className="flex justify-end">
             <Button size="sm" onClick={() => setProjOpen(true)}><Plus className="h-4 w-4 mr-2" /> Add project</Button>
           </div>
-          {projects.length === 0 ? <p className="text-sm text-muted-foreground py-8 text-center">No projects yet.</p> : projects.map((p) => (
+          {/* Project plan summary — click through to Plan tab */}
+          {plan ? (
+            <Card
+              className="cursor-pointer hover:border-teal-400 transition-colors group"
+              onClick={() => navigate(`/admin/clients/${id}?tab=plan`)}
+            >
+              <CardContent className="pt-4">
+                <div className="flex items-start justify-between gap-3 flex-wrap">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-sm group-hover:text-teal-700 transition-colors">{plan.project_name}</p>
+                    {plan.overview && (
+                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{plan.overview}</p>
+                    )}
+                    <div className="flex items-center gap-3 mt-3">
+                      <div className="flex-1 bg-gray-100 rounded-full h-1.5">
+                        <div className="bg-teal-500 h-1.5 rounded-full transition-all" style={{ width: `${plan.completion_percent}%` }} />
+                      </div>
+                      <span className="text-xs font-semibold text-teal-700 tabular-nums shrink-0">{plan.completion_percent}%</span>
+                    </div>
+                    <div className="flex items-center gap-3 mt-2 flex-wrap">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                        plan.status === 'active' ? 'bg-teal-100 text-teal-700' :
+                        plan.status === 'complete' ? 'bg-green-100 text-green-700' :
+                        plan.status === 'paused' ? 'bg-amber-100 text-amber-700' :
+                        'bg-gray-100 text-gray-600'
+                      }`}>{plan.status.charAt(0).toUpperCase() + plan.status.slice(1)}</span>
+                      {phases.length > 0 && (
+                        <span className="text-xs text-muted-foreground">{phases.filter(p => p.status === 'complete').length} of {phases.length} phases complete</span>
+                      )}
+                      {plan.target_date && (
+                        <span className="text-xs text-muted-foreground">Due {new Date(plan.target_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
+                      )}
+                    </div>
+                  </div>
+                  <span className="text-xs text-teal-600 font-medium group-hover:underline shrink-0 mt-1">View Plan →</span>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <p className="text-sm text-muted-foreground py-8 text-center">No project plan yet — go to the Plan tab to create one.</p>
+          )}
+          {projects.length > 0 && projects.map((p) => (
             <Card key={p.id}><CardContent className="pt-4 flex items-center justify-between gap-3 flex-wrap">
               <div className="min-w-0 flex-1">
-                <p className="font-medium text-sm">{p.name}</p>
+                <p className="font-medium text-sm text-muted-foreground">{p.name}</p>
               </div>
               <Button size="sm" variant="ghost" onClick={() => deleteProject(p.id)}><Trash2 className="h-4 w-4" /></Button>
             </CardContent></Card>
