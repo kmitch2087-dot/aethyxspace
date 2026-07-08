@@ -1776,7 +1776,7 @@ const ClientDetail = () => {
                   return (
                     <div key={asset.id} className="group relative rounded-lg border border-black/10 bg-white overflow-hidden flex flex-col">
                       {/* Thumbnail */}
-                      <div className="relative aspect-square bg-gray-50 flex items-center justify-center overflow-hidden">
+                      <div className="relative aspect-square bg-black flex items-center justify-center overflow-hidden">
                         {isImage && signedUrl ? (
                           <img
                             src={signedUrl}
