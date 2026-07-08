@@ -1877,28 +1877,41 @@ const ClientDetail = () => {
                         </div>
                       </div>
                     </div>
-                    {/* Editable label */}
-                    <div className="px-2 py-1.5 border-t border-black/5">
-                      {isEditing ? (
-                        <input
-                          autoFocus
-                          className="w-full text-xs font-medium text-black/80 bg-transparent border-b border-teal-400 outline-none"
-                          value={editingLabelValue}
-                          onChange={(e) => setEditingLabelValue(e.target.value)}
-                          onBlur={() => saveAssetLabel(asset, editingLabelValue)}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") saveAssetLabel(asset, editingLabelValue);
-                            if (e.key === "Escape") setEditingLabelId(null);
-                          }}
-                        />
-                      ) : (
-                        <p
-                          className="text-xs font-medium truncate text-black/80 cursor-pointer hover:text-teal-700 transition-colors"
-                          title="Click to rename"
-                          onClick={() => { setEditingLabelId(asset.id); setEditingLabelValue(asset.label); }}
+                    {/* Editable label + download */}
+                    <div className="px-2 py-1.5 border-t border-black/5 flex items-center gap-1">
+                      <div className="flex-1 min-w-0">
+                        {isEditing ? (
+                          <input
+                            autoFocus
+                            className="w-full text-xs font-medium text-black/80 bg-transparent border-b border-teal-400 outline-none"
+                            value={editingLabelValue}
+                            onChange={(e) => setEditingLabelValue(e.target.value)}
+                            onBlur={() => saveAssetLabel(asset, editingLabelValue)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") saveAssetLabel(asset, editingLabelValue);
+                              if (e.key === "Escape") setEditingLabelId(null);
+                            }}
+                          />
+                        ) : (
+                          <p
+                            className="text-xs font-medium truncate text-black/80 cursor-pointer hover:text-teal-700 transition-colors"
+                            title="Click to rename"
+                            onClick={() => { setEditingLabelId(asset.id); setEditingLabelValue(asset.label); }}
+                          >
+                            {asset.label}
+                          </p>
+                        )}
+                      </div>
+                      {signedUrl && (
+                        <a
+                          href={signedUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          title="Download"
+                          className="shrink-0 p-1 rounded text-black/30 hover:text-blue-600 hover:bg-blue-50 transition-colors"
                         >
-                          {asset.label}
-                        </p>
+                          <Download className="h-3 w-3" />
+                        </a>
                       )}
                     </div>
                   </div>
