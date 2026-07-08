@@ -1766,60 +1766,104 @@ const ClientDetail = () => {
             </div>
             {fileAssets.length === 0 ? (
               <p className="text-sm text-muted-foreground py-6 text-center">No brand files uploaded yet.</p>
-            ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                {fileAssets.map((asset) => {
-                  const { classes, label: catLabel } = assetCategoryInfo(asset.category);
-                  const signedUrl = assetSignedUrls[asset.id];
-                  const fileName = asset.file_name ? asset.file_name.split("/").pop() ?? "" : "";
-                  const isImage = /\.(png|jpe?g|webp|gif|svg)$/i.test(fileName);
-                  const isWhiteGraphic = /_white[._]/i.test(fileName) || /_WHITE_INK/i.test(fileName);
-                  const thumbBg = isWhiteGraphic ? "bg-black" : "bg-gray-50";
-                  return (
-                    <div key={asset.id} className="group relative rounded-lg border border-black/10 bg-white overflow-hidden flex flex-col">
-                      {/* Thumbnail */}
-                      <div className={`relative aspect-square ${thumbBg} flex items-center justify-center overflow-hidden`}>
-                        {isImage && signedUrl ? (
-                          <img
-                            src={signedUrl}
-                            alt={asset.label}
-                            className="w-full h-full object-contain p-1"
-                          />
-                        ) : (
-                          <div className="text-xs text-muted-foreground text-center px-2">{fileName}</div>
+            ) : (() => {
+              const assetCats = [
+                {
+                  id: "logos",
+                  label: "Logos & Brand Marks",
+                  match: (f: string) =>
+                    /^logo_/i.test(f) ||
+                    /pournogravyicon/i.test(f) ||
+                    /pournogravylogo/i.test(f) ||
+                    /back_logo_full/i.test(f) ||
+                    /atheist_transparent/i.test(f) ||
+                    /tagline_without_logo/i.test(f),
+                },
+                {
+                  id: "print",
+                  label: "Print Graphics",
+                  match: (f: string) =>
+                    /_(black|white)\.(png|svg)$/i.test(f) ||
+                    /transparentflyerimg/i.test(f),
+                },
+                {
+                  id: "photos",
+                  label: "Photos",
+                  match: (f: string) => /\.(jpe?g)$/i.test(f),
+                },
+                {
+                  id: "social",
+                  label: "Social & Web",
+                  match: (f: string) =>
+                    /fbprofilepic|blog.shots|flyer|pournogravylogo/i.test(f) ||
+                    /\.webp$/i.test(f),
+                },
+                {
+                  id: "mockups",
+                  label: "Mockups & Tests",
+                  match: (f: string) => /mockup|_test\.|atheist_test/i.test(f),
+                },
+              ];
+
+              const renderThumb = (asset: ClientAsset, keyPrefix: string) => {
+                const signedUrl = assetSignedUrls[asset.id];
+                const fileName = asset.file_name ? asset.file_name.split("/").pop() ?? "" : "";
+                const isImage = /\.(png|jpe?g|webp|gif|svg)$/i.test(fileName);
+                const isWhiteGraphic = /_white[._]/i.test(fileName) || /_WHITE_INK/i.test(fileName);
+                const thumbBg = isWhiteGraphic ? "bg-black" : "bg-gray-50";
+                return (
+                  <div key={`${keyPrefix}-${asset.id}`} className="group relative rounded-lg border border-black/10 bg-white overflow-hidden flex flex-col">
+                    <div className={`relative aspect-square ${thumbBg} flex items-center justify-center overflow-hidden`}>
+                      {isImage && signedUrl ? (
+                        <img src={signedUrl} alt={asset.label} className="w-full h-full object-contain p-1" />
+                      ) : (
+                        <div className="text-xs text-muted-foreground text-center px-2">{fileName}</div>
+                      )}
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                        {signedUrl && (
+                          <a href={signedUrl} target="_blank" rel="noreferrer"
+                            className="p-1.5 rounded-full bg-white/90 text-black/70 hover:text-blue-600 transition-colors"
+                            title="Download">
+                            <Download className="h-3.5 w-3.5" />
+                          </a>
                         )}
-                        {/* Hover overlay with actions */}
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                          {signedUrl && (
-                            <a
-                              href={signedUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="p-1.5 rounded-full bg-white/90 text-black/70 hover:text-blue-600 transition-colors"
-                              title="Download"
-                            >
-                              <Download className="h-3.5 w-3.5" />
-                            </a>
-                          )}
-                          <button
-                            className="p-1.5 rounded-full bg-white/90 text-black/70 hover:text-red-500 transition-colors"
-                            onClick={() => deleteAsset(asset)}
-                            title="Delete"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-                      </div>
-                      {/* Label */}
-                      <div className="px-2 py-1.5 border-t border-black/5">
-                        <p className="text-xs font-medium truncate text-black/80">{asset.label}</p>
-                        <Badge className={`${classes} hover:${classes} text-[10px] mt-0.5`}>{catLabel}</Badge>
+                        <button
+                          className="p-1.5 rounded-full bg-white/90 text-black/70 hover:text-red-500 transition-colors"
+                          onClick={() => deleteAsset(asset)}
+                          title="Delete">
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-            )}
+                    <div className="px-2 py-1.5 border-t border-black/5">
+                      <p className="text-xs font-medium truncate text-black/80">{asset.label}</p>
+                    </div>
+                  </div>
+                );
+              };
+
+              return (
+                <div className="space-y-8">
+                  {assetCats.map((cat) => {
+                    const catAssets = fileAssets.filter((a) => {
+                      const fn = (a.file_name ?? "").split("/").pop() ?? "";
+                      return cat.match(fn);
+                    });
+                    if (catAssets.length === 0) return null;
+                    return (
+                      <div key={cat.id}>
+                        <p className="text-xs font-semibold text-black/40 uppercase tracking-widest mb-3">
+                          {cat.label} <span className="font-normal">({catAssets.length})</span>
+                        </p>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                          {catAssets.map((a) => renderThumb(a, cat.id))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })()}
           </div>
         </TabsContent>
 
