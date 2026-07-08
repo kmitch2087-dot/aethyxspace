@@ -1767,45 +1767,53 @@ const ClientDetail = () => {
             {fileAssets.length === 0 ? (
               <p className="text-sm text-muted-foreground py-6 text-center">No brand files uploaded yet.</p>
             ) : (
-              <div className="space-y-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                 {fileAssets.map((asset) => {
                   const { classes, label: catLabel } = assetCategoryInfo(asset.category);
                   const signedUrl = assetSignedUrls[asset.id];
-                  const displayName = asset.file_name ? asset.file_name.split("/").pop() : "";
+                  const fileName = asset.file_name ? asset.file_name.split("/").pop() ?? "" : "";
+                  const isImage = /\.(png|jpe?g|webp|gif|svg)$/i.test(fileName);
                   return (
-                    <Card key={asset.id}>
-                      <CardContent className="pt-4 group flex items-center justify-between gap-3">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <Badge className={`${classes} hover:${classes} text-xs`}>{catLabel}</Badge>
-                            <span className="font-medium text-sm">{asset.label}</span>
-                            {displayName && (
-                              <span className="text-xs text-muted-foreground truncate max-w-[180px]">{displayName}</span>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-1 shrink-0">
+                    <div key={asset.id} className="group relative rounded-lg border border-black/10 bg-white overflow-hidden flex flex-col">
+                      {/* Thumbnail */}
+                      <div className="relative aspect-square bg-gray-50 flex items-center justify-center overflow-hidden">
+                        {isImage && signedUrl ? (
+                          <img
+                            src={signedUrl}
+                            alt={asset.label}
+                            className="w-full h-full object-contain p-1"
+                          />
+                        ) : (
+                          <div className="text-xs text-muted-foreground text-center px-2">{fileName}</div>
+                        )}
+                        {/* Hover overlay with actions */}
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                           {signedUrl && (
                             <a
                               href={signedUrl}
                               target="_blank"
                               rel="noreferrer"
-                              className="p-1 rounded hover:bg-blue-50 text-black/40 hover:text-blue-600 transition-colors"
+                              className="p-1.5 rounded-full bg-white/90 text-black/70 hover:text-blue-600 transition-colors"
                               title="Download"
                             >
                               <Download className="h-3.5 w-3.5" />
                             </a>
                           )}
                           <button
-                            className="p-1 rounded hover:bg-red-50 text-black/30 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="p-1.5 rounded-full bg-white/90 text-black/70 hover:text-red-500 transition-colors"
                             onClick={() => deleteAsset(asset)}
                             title="Delete"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                           </button>
                         </div>
-                      </CardContent>
-                    </Card>
+                      </div>
+                      {/* Label */}
+                      <div className="px-2 py-1.5 border-t border-black/5">
+                        <p className="text-xs font-medium truncate text-black/80">{asset.label}</p>
+                        <Badge className={`${classes} hover:${classes} text-[10px] mt-0.5`}>{catLabel}</Badge>
+                      </div>
+                    </div>
                   );
                 })}
               </div>
