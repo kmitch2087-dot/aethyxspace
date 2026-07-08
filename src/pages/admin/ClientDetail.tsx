@@ -1655,7 +1655,7 @@ const ClientDetail = () => {
               if (logoAsset) {
                 return (
                   <div className="border border-black/10 rounded-xl p-4 flex items-start gap-4">
-                    <div className="h-24 w-32 bg-gray-50 rounded-lg border border-black/5 flex items-center justify-center overflow-hidden shrink-0">
+                    <div className="h-24 w-32 bg-black rounded-lg border border-black/5 flex items-center justify-center overflow-hidden shrink-0">
                       {logoUrl ? (
                         <img src={logoUrl} alt="Primary Logo" className="max-h-full max-w-full object-contain" />
                       ) : (
