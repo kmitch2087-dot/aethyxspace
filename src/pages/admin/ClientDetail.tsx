@@ -149,6 +149,7 @@ interface ProjectPlan {
   status: "planning" | "active" | "review" | "complete" | "paused";
   start_date?: string | null;
   target_date?: string | null;
+  github_url?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -327,6 +328,7 @@ const ClientDetail = () => {
   const [newPlanStart, setNewPlanStart] = useState("");
   const [newPlanEnd, setNewPlanEnd] = useState("");
   const [newPlanOverview, setNewPlanOverview] = useState("");
+  const [newPlanGithub, setNewPlanGithub] = useState("");
   const [newUpdateContent, setNewUpdateContent] = useState("");
   const [newUpdateSaving, setNewUpdateSaving] = useState(false);
   const [newPhaseName, setNewPhaseName] = useState("");
@@ -763,6 +765,7 @@ const ClientDetail = () => {
       ...(newPlanStart ? { start_date: newPlanStart } : {}),
       ...(newPlanEnd ? { target_date: newPlanEnd } : {}),
       ...(newPlanOverview.trim() ? { overview: newPlanOverview.trim() } : {}),
+      ...(newPlanGithub.trim() ? { github_url: newPlanGithub.trim() } : {}),
     });
     setCreatingPlan(false);
     if (error) {
@@ -774,6 +777,7 @@ const ClientDetail = () => {
       setNewPlanStart("");
       setNewPlanEnd("");
       setNewPlanOverview("");
+      setNewPlanGithub("");
       fetchPlan();
     }
   };
@@ -1787,6 +1791,10 @@ const ClientDetail = () => {
                   <label className="text-sm font-medium mb-1 block">Project Overview</label>
                   <Textarea value={newPlanOverview} onChange={e => setNewPlanOverview(e.target.value)} placeholder="Brief description of the project scope and goals…" rows={3} />
                 </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">GitHub Repository <span className="text-muted-foreground font-normal">(optional)</span></label>
+                  <Input value={newPlanGithub} onChange={e => setNewPlanGithub(e.target.value)} placeholder="https://github.com/username/repo" />
+                </div>
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setShowCreatePlanDialog(false)}>Cancel</Button>
@@ -1935,6 +1943,23 @@ const ClientDetail = () => {
                       placeholder="Brief project overview..."
                       className="mt-1"
                     />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-muted-foreground">GitHub Repository</Label>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Input
+                        value={plan.github_url || ""}
+                        onChange={(e) => setPlan((prev) => prev ? { ...prev, github_url: e.target.value } : null)}
+                        onBlur={(e) => savePlan({ github_url: e.target.value || null })}
+                        placeholder="https://github.com/username/repo"
+                        className="flex-1"
+                      />
+                      {plan.github_url && (
+                        <a href={plan.github_url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary underline whitespace-nowrap">
+                          Open ↗
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </CardContent>
               </Card>

@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
-import { ArrowRight, Calendar } from "lucide-react"
+import { ArrowRight, Calendar, Github } from "lucide-react"
 
 interface ProjectPlan {
   id: string
@@ -15,6 +15,7 @@ interface ProjectPlan {
   status: "planning" | "active" | "review" | "complete" | "paused"
   start_date?: string
   target_date?: string
+  github_url?: string | null
   created_at: string
   updated_at: string
   client_profiles?: {
@@ -277,6 +278,19 @@ export default function Projects() {
                     ? `${completePhases} of ${projectPhases.length} phase${projectPhases.length !== 1 ? "s" : ""} complete`
                     : "No phases defined"}
                 </div>
+
+                {project.github_url && (
+                  <a
+                    href={project.github_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-800 truncate"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Github className="h-3 w-3 shrink-0" />
+                    <span className="truncate">{project.github_url.replace(/^https?:\/\/(www\.)?github\.com\//, "")}</span>
+                  </a>
+                )}
 
                 <button
                   onClick={() => navigate(`/admin/clients/${project.client_profile_id}`)}
