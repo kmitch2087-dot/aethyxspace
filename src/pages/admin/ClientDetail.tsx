@@ -1773,10 +1773,12 @@ const ClientDetail = () => {
                   const signedUrl = assetSignedUrls[asset.id];
                   const fileName = asset.file_name ? asset.file_name.split("/").pop() ?? "" : "";
                   const isImage = /\.(png|jpe?g|webp|gif|svg)$/i.test(fileName);
+                  const isWhiteGraphic = /_white[._]/i.test(fileName) || /_WHITE_INK/i.test(fileName);
+                  const thumbBg = isWhiteGraphic ? "bg-black" : "bg-gray-50";
                   return (
                     <div key={asset.id} className="group relative rounded-lg border border-black/10 bg-white overflow-hidden flex flex-col">
                       {/* Thumbnail */}
-                      <div className="relative aspect-square bg-black flex items-center justify-center overflow-hidden">
+                      <div className={`relative aspect-square ${thumbBg} flex items-center justify-center overflow-hidden`}>
                         {isImage && signedUrl ? (
                           <img
                             src={signedUrl}
