@@ -376,14 +376,14 @@ const ClientDetail = () => {
 
   const fetchAssetSignedUrls = async (fileAssets: ClientAsset[]) => {
     if (!fileAssets.length) return;
+    const withPath = fileAssets.filter((a) => a.file_name);
+    const paths = withPath.map((a) => a.file_name!);
+    const { data } = await supabase.storage.from("client-assets").createSignedUrls(paths, 60 * 60 * 24 * 7);
+    if (!data) return;
     const map: Record<string, string> = {};
-    for (const asset of fileAssets) {
-      if (asset.file_name) {
-        const { data: urlData } = await supabase.storage
-          .from("client-assets")
-          .createSignedUrl(asset.file_name, 60 * 60 * 24 * 7);
-        if (urlData?.signedUrl) map[asset.id] = urlData.signedUrl;
-      }
+    for (const item of data) {
+      const asset = withPath.find((a) => a.file_name === item.path);
+      if (asset && item.signedUrl) map[asset.id] = item.signedUrl;
     }
     setAssetSignedUrls(map);
   };
