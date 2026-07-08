@@ -16,7 +16,7 @@ const SLOT_LABELS: Record<string, string> = {
   market_research: "Market Research",
   service_tier: "Service Tier Information",
   plan: "Project Plan",
-  agreement: "Agreement",
+  agreement: "Proposal & Agreement",
 };
 
 const PortalDocuments = () => {
@@ -177,113 +177,77 @@ const PortalDocuments = () => {
         ) : (
           <div className="space-y-3">
             {visibleSlots.map((slot) => {
-              const label = SLOT_LABELS[slot.slot_key] || slot.slot_key;
+              const label = SLOT_LABELS[slot.slot_type] || slot.slot_type;
               const isExpanded = expandedSlot === slot.id;
               const signedUrl = slotSignedUrls[slot.id];
-              const isAgreement = slot.slot_key === "agreement";
+              const isAgreement = slot.slot_type === "agreement";
 
               // ── Agreement slot ──
               if (isAgreement) {
-                const isSigned = !!agreementRecord?.submitted_at;
-                const hasRecord = !!agreementRecord;
-
+                const agreementStatus = slot.status as string;
                 return (
                   <div key={slot.id} className="border border-white/10 rounded-lg overflow-hidden">
                     <div className="flex items-center gap-3 p-4 flex-wrap">
                       <FileText className="h-5 w-5 text-white/50 shrink-0" />
                       <span className="flex-1 text-sm font-medium text-white">{label}</span>
 
-                      {isSigned ? (
-                        <>
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30">
-                            <CheckCircle className="h-3 w-3" /> Signed ✓
-                          </span>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="text-white/70 hover:text-white"
-                            onClick={() => setExpandedSlot(isExpanded ? null : slot.id)}
-                          >
-                            View Agreement
-                            {isExpanded
-                              ? <ChevronUp className="h-3 w-3 ml-1" />
-                              : <ChevronDown className="h-3 w-3 ml-1" />}
-                          </Button>
-                        </>
-                      ) : hasRecord ? (
-                        <>
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-500/20 text-amber-400 border border-amber-500/30">
-                            Needs Your Signature
-                          </span>
-                          <Button
-                            size="sm"
-                            className="bg-amber-500 hover:bg-amber-600 text-black text-xs"
-                            onClick={() => {
-                              // TODO: navigate to /portal/agreement
-                              console.warn("TODO: navigate to /portal/agreement");
-                            }}
-                          >
-                            Sign Agreement
-                          </Button>
-                        </>
-                      ) : (
+                      {(agreementStatus === 'pending' || agreementStatus === 'in_progress') && (
                         <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-white/10 text-white/50 border border-white/10">
                           Pending
                         </span>
                       )}
+                      {agreementStatus === 'in_preparation' && (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                          Being Prepared
+                        </span>
+                      )}
+                      {agreementStatus === 'awaiting_signature' && (
+                        <>
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                            Ready for Your Signature
+                          </span>
+                          {slot.storage_path && (
+                            <Button size="sm" variant="ghost" className="text-white/70 hover:text-white" onClick={() => handleExpandSlot(slot)}>
+                              View
+                              {isExpanded ? <ChevronUp className="h-3 w-3 ml-1" /> : <ChevronDown className="h-3 w-3 ml-1" />}
+                            </Button>
+                          )}
+                        </>
+                      )}
+                      {(agreementStatus === 'completed' || agreementStatus === 'uploaded') && (
+                        <>
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30">
+                            <CheckCircle className="h-3 w-3" /> Signed ✓
+                          </span>
+                          {slot.storage_path && (
+                            <Button size="sm" variant="ghost" className="text-white/70 hover:text-white" onClick={() => handleExpandSlot(slot)}>
+                              View
+                              {isExpanded ? <ChevronUp className="h-3 w-3 ml-1" /> : <ChevronDown className="h-3 w-3 ml-1" />}
+                            </Button>
+                          )}
+                        </>
+                      )}
                     </div>
 
-                    {/* Signed — expanded view */}
-                    {isExpanded && isSigned && (
-                      <div className="border-t border-white/10 p-4 bg-white/5">
-                        <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4 mb-4">
-                          <p className="text-sm text-green-400">
-                            Your agreement was signed on{" "}
-                            {agreementRecord?.submitted_at
-                              ? format(new Date(agreementRecord.submitted_at), "MMMM d, yyyy 'at' h:mm a")
-                              : "—"}
-                          </p>
-                        </div>
-                        <div className="flex gap-2 flex-wrap">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="border-white/20 text-white/70 hover:text-white"
-                            onClick={() => {
-                              // TODO: navigate to /portal/agreement for full view
-                              console.warn("TODO: navigate to /portal/agreement");
-                            }}
-                          >
-                            View Full Agreement
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="border-white/20 text-white/70 hover:text-white"
-                            onClick={() => window.print()}
-                          >
-                            <Printer className="h-3.5 w-3.5 mr-1" /> Print
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Record exists but unsigned — expanded prompt */}
-                    {isExpanded && !isSigned && hasRecord && (
-                      <div className="border-t border-white/10 p-4 bg-white/5">
-                        <p className="text-sm text-white/70 mb-3">
-                          Please sign your service agreement to proceed.
-                        </p>
-                        <Button
-                          size="sm"
-                          className="bg-amber-500 hover:bg-amber-600 text-black"
-                          onClick={() => {
-                            // TODO: navigate to /portal/agreement
-                            console.warn("TODO: navigate to /portal/agreement");
-                          }}
-                        >
-                          Sign Agreement
-                        </Button>
+                    {/* Expanded — show the uploaded proposal PDF */}
+                    {isExpanded && slot.storage_path && (
+                      <div className="border-t border-white/10">
+                        {signedUrl ? (
+                          /\.(png|jpg|jpeg|gif|webp|svg)$/i.test(slot.file_name || '') ? (
+                            <img src={signedUrl} alt={slot.file_name} className="w-full max-h-[600px] object-contain bg-black/30" />
+                          ) : (
+                            <iframe src={signedUrl} title={slot.file_name} className="w-full h-[600px] border-0" />
+                          )
+                        ) : (
+                          <div className="flex justify-center py-8"><Loader2 className="h-5 w-5 animate-spin text-white/40" /></div>
+                        )}
+                        {signedUrl && (
+                          <div className="p-4 flex gap-2">
+                            <a href={signedUrl} download={slot.file_name} className="inline-flex items-center gap-1 text-xs text-white/60 hover:text-white underline">
+                              <Download className="h-3 w-3" /> Download
+                            </a>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
