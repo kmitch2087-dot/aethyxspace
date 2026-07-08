@@ -138,6 +138,7 @@ interface ClientAsset {
   file_size?: number;
   sort_order: number;
   created_at: string;
+  bg_color?: string | null;
 }
 
 interface ProjectPlan {
@@ -320,6 +321,8 @@ const ClientDetail = () => {
   const [fileAssetLabel, setFileAssetLabel] = useState("");
   const [fileAssetFile, setFileAssetFile] = useState<File | null>(null);
   const [fileAssetUploading, setFileAssetUploading] = useState(false);
+  const [editingLabelId, setEditingLabelId] = useState<string | null>(null);
+  const [editingLabelValue, setEditingLabelValue] = useState("");
 
   // Plan
   const [plan, setPlan] = useState<ProjectPlan | null>(null);
@@ -757,6 +760,19 @@ const ClientDetail = () => {
     await (supabase as any).from("client_assets").delete().eq("id", asset.id);
     setAssets((prev) => prev.filter((a) => a.id !== asset.id));
     toast({ title: "Asset deleted" });
+  };
+
+  const saveAssetLabel = async (asset: ClientAsset, newLabel: string) => {
+    setEditingLabelId(null);
+    const trimmed = newLabel.trim();
+    if (!trimmed || trimmed === asset.label) return;
+    await (supabase as any).from("client_assets").update({ label: trimmed }).eq("id", asset.id);
+    setAssets((prev) => prev.map((a) => a.id === asset.id ? { ...a, label: trimmed } : a));
+  };
+
+  const saveAssetBgColor = async (asset: ClientAsset, color: string | null) => {
+    await (supabase as any).from("client_assets").update({ bg_color: color }).eq("id", asset.id);
+    setAssets((prev) => prev.map((a) => a.id === asset.id ? { ...a, bg_color: color } : a));
   };
 
   // Plan handlers
@@ -1806,12 +1822,22 @@ const ClientDetail = () => {
                 },
               ];
 
+              const BG_OPTIONS: { value: string | null; title: string; cls: string; swatch: string }[] = [
+                { value: null,    title: "Auto",  cls: "bg-gray-50",  swatch: "bg-gradient-to-br from-gray-100 to-gray-300" },
+                { value: "black", title: "Black", cls: "bg-black",    swatch: "bg-black" },
+                { value: "white", title: "White", cls: "bg-white",    swatch: "bg-white border border-gray-300" },
+                { value: "gray",  title: "Gray",  cls: "bg-gray-400", swatch: "bg-gray-400" },
+              ];
+
               const renderThumb = (asset: ClientAsset, keyPrefix: string) => {
                 const signedUrl = assetSignedUrls[asset.id];
                 const fileName = asset.file_name ? asset.file_name.split("/").pop() ?? "" : "";
                 const isImage = /\.(png|jpe?g|webp|gif|svg)$/i.test(fileName);
                 const isWhiteGraphic = /_white[._]/i.test(fileName) || /_WHITE_INK/i.test(fileName);
-                const thumbBg = isWhiteGraphic ? "bg-black" : "bg-gray-50";
+                const autoBg = isWhiteGraphic ? "bg-black" : "bg-gray-50";
+                const storedBg = BG_OPTIONS.find((o) => o.value === (asset.bg_color ?? null));
+                const thumbBg = storedBg ? storedBg.cls : autoBg;
+                const isEditing = editingLabelId === asset.id;
                 return (
                   <div key={`${keyPrefix}-${asset.id}`} className="group relative rounded-lg border border-black/10 bg-white overflow-hidden flex flex-col">
                     <div className={`relative aspect-square ${thumbBg} flex items-center justify-center overflow-hidden`}>
@@ -1820,24 +1846,60 @@ const ClientDetail = () => {
                       ) : (
                         <div className="text-xs text-muted-foreground text-center px-2">{fileName}</div>
                       )}
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                        {signedUrl && (
-                          <a href={signedUrl} target="_blank" rel="noreferrer"
-                            className="p-1.5 rounded-full bg-white/90 text-black/70 hover:text-blue-600 transition-colors"
-                            title="Download">
-                            <Download className="h-3.5 w-3.5" />
-                          </a>
-                        )}
-                        <button
-                          className="p-1.5 rounded-full bg-white/90 text-black/70 hover:text-red-500 transition-colors"
-                          onClick={() => deleteAsset(asset)}
-                          title="Delete">
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
+                      {/* Hover overlay */}
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
+                        {/* Action row */}
+                        <div className="flex items-center gap-1.5">
+                          {signedUrl && (
+                            <a href={signedUrl} target="_blank" rel="noreferrer"
+                              className="p-1.5 rounded-full bg-white/90 text-black/70 hover:text-blue-600 transition-colors"
+                              title="Download">
+                              <Download className="h-3.5 w-3.5" />
+                            </a>
+                          )}
+                          <button
+                            className="p-1.5 rounded-full bg-white/90 text-black/70 hover:text-red-500 transition-colors"
+                            onClick={() => deleteAsset(asset)}
+                            title="Delete">
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                        {/* Background color swatches */}
+                        <div className="flex items-center gap-1">
+                          {BG_OPTIONS.map((opt) => (
+                            <button
+                              key={String(opt.value)}
+                              title={opt.title}
+                              onClick={() => saveAssetBgColor(asset, opt.value)}
+                              className={`w-4 h-4 rounded-full ${opt.swatch} ring-2 ring-white/60 hover:ring-white transition-all ${(asset.bg_color ?? null) === opt.value ? "ring-white scale-110" : ""}`}
+                            />
+                          ))}
+                        </div>
                       </div>
                     </div>
+                    {/* Editable label */}
                     <div className="px-2 py-1.5 border-t border-black/5">
-                      <p className="text-xs font-medium truncate text-black/80">{asset.label}</p>
+                      {isEditing ? (
+                        <input
+                          autoFocus
+                          className="w-full text-xs font-medium text-black/80 bg-transparent border-b border-teal-400 outline-none"
+                          value={editingLabelValue}
+                          onChange={(e) => setEditingLabelValue(e.target.value)}
+                          onBlur={() => saveAssetLabel(asset, editingLabelValue)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") saveAssetLabel(asset, editingLabelValue);
+                            if (e.key === "Escape") setEditingLabelId(null);
+                          }}
+                        />
+                      ) : (
+                        <p
+                          className="text-xs font-medium truncate text-black/80 cursor-pointer hover:text-teal-700 transition-colors"
+                          title="Click to rename"
+                          onClick={() => { setEditingLabelId(asset.id); setEditingLabelValue(asset.label); }}
+                        >
+                          {asset.label}
+                        </p>
+                      )}
                     </div>
                   </div>
                 );
