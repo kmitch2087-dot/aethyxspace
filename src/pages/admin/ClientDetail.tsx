@@ -2108,7 +2108,7 @@ const ClientDetail = () => {
                                     const v = Math.max(0, Math.min(100, Number(e.target.value)));
                                     updatePhase(phase.id, { completion_percent: v });
                                   }}
-                                  className="w-16 text-xs border border-black/10 rounded px-2 py-1 text-center focus:outline-none focus:border-teal-400"
+                                  className="w-16 text-xs border border-black/10 rounded px-2 py-1 text-center focus:outline-none focus:border-teal-400 bg-white text-gray-900"
                                 />
                                 <span className="text-xs text-muted-foreground w-6">%</span>
                               </div>
