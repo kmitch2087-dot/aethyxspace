@@ -25,6 +25,7 @@ import Intake from "./pages/Intake";
 import IntakeSuccess from "./pages/IntakeSuccess";
 import NotFound from "./pages/NotFound";
 import Unsubscribe from "./pages/Unsubscribe";
+import ResetPassword from "./pages/ResetPassword";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminLayout from "./pages/admin/AdminLayout";
 import Dashboard from "./pages/admin/Dashboard";
@@ -81,6 +82,7 @@ const App = () => (
             <Route path="/terms" element={<TermsOfService />} />
             <Route path="/medspa" element={<MedSpa />} />
             <Route path="/unsubscribe" element={<Unsubscribe />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route
               path="/admin"
