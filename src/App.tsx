@@ -45,6 +45,7 @@ import ReferralProgram from "./pages/admin/ReferralProgram";
 import AddOns from "./pages/admin/AddOns";
 import PortalLayout from "./pages/portal/PortalLayout";
 import PortalReferrals from "./pages/portal/PortalReferrals";
+import PortalAddOns from "./pages/portal/PortalAddOns";
 import PortalOverview from "./pages/portal/PortalOverview";
 import PortalMessages from "./pages/portal/PortalMessages";
 import PortalDocuments from "./pages/portal/PortalDocuments";
@@ -123,6 +124,7 @@ const App = () => (
               <Route path="pay/:invoiceId" element={<PortalPay />} />
               <Route path="intake" element={<PortalIntake />} />
               <Route path="referrals" element={<PortalReferrals />} />
+              <Route path="add-ons" element={<PortalAddOns />} />
               <Route path="projects" element={<PortalProjects />} />
             </Route>
             <Route path="*" element={<NotFound />} />

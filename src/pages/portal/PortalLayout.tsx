@@ -28,6 +28,7 @@ import {
   LogOut,
   GitBranch,
   FolderKanban,
+  Package,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -38,6 +39,7 @@ const baseNavItems = [
   { title: "Agreements", url: "/portal/agreements", icon: FileSignature },
   { title: "Payments", url: "/portal/payments", icon: CreditCard },
   { title: "Referrals", url: "/portal/referrals", icon: GitBranch },
+  { title: "Add-Ons", url: "/portal/add-ons", icon: Package },
   { title: "My Project", url: "/portal/projects", icon: FolderKanban },
 ];
 
