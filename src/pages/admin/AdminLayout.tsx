@@ -21,6 +21,7 @@ import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
+  Inbox as InboxIcon,
   FileText,
   MessageSquare,
   Star,
@@ -39,6 +40,7 @@ import { Button } from "@/components/ui/button";
 
 const navItems = [
   { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
+  { title: "Inbox", url: "/admin/inbox", icon: InboxIcon },
   { title: "Intakes", url: "/admin/intakes", icon: MessageSquare },
   { title: "Intake Form", url: "/admin/intake-form", icon: FileSignature },
   { title: "Inquiries", url: "/admin/inquiries", icon: MessageSquare },
