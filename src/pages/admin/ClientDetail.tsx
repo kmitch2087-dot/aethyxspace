@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { PROJECT_TYPES, DEFAULT_PROJECT_TYPE, getProjectTypeTemplate, type ProjectTypeKey } from "@/lib/projectTemplates";
+import AgreementDocument from "@/components/AgreementDocument";
 
 const lightVars = {
   "--background": "0 0% 100%",
@@ -370,6 +371,9 @@ const ClientDetail = () => {
   const [slotSignedUrls, setSlotSignedUrls] = useState<Record<string, string>>({});
   const [uploadingSlot, setUploadingSlot] = useState<string | null>(null);
   const [agreementDialogOpen, setAgreementDialogOpen] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [agreementRecord, setAgreementRecord] = useState<any | null>(null);
+  const [agreementRecordLoading, setAgreementRecordLoading] = useState(false);
 
   // Logo upload
   const [logoUploading, setLogoUploading] = useState(false);
@@ -493,7 +497,18 @@ const ClientDetail = () => {
     setCatalog((data as CatalogItemSlim[]) || []);
   };
 
-  useEffect(() => { fetchAll(); fetchPlan(); /* eslint-disable-next-line */ }, [id]);
+  const fetchAgreementRecord = async () => {
+    if (!id) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data } = await (supabase as any)
+      .from("client_agreement_records")
+      .select("*")
+      .eq("client_profile_id", id)
+      .maybeSingle();
+    setAgreementRecord(data);
+  };
+
+  useEffect(() => { fetchAll(); fetchPlan(); fetchAgreementRecord(); /* eslint-disable-next-line */ }, [id]);
   useEffect(() => { fetchCatalog(); }, []);
 
   useEffect(() => {
@@ -2710,8 +2725,44 @@ const ClientDetail = () => {
         </TabsContent>
 
         {/* AGREEMENTS */}
-        <TabsContent value="agreements" className="mt-4 space-y-2">
-          {agreements.length === 0 ? <p className="text-sm text-muted-foreground py-8 text-center">No agreements.</p> : agreements.map((a) => (
+        <TabsContent value="agreements" className="mt-4 space-y-4">
+          <div className="rounded-lg border border-border/30 p-4 flex items-center justify-between gap-3 flex-wrap">
+            <div>
+              <p className="font-medium text-sm">Service Agreement</p>
+              <p className="text-xs text-muted-foreground">
+                {!agreementRecord
+                  ? "No agreement started yet."
+                  : !agreementRecord.sent_at
+                  ? "Draft — not yet sent to client."
+                  : agreementRecord.is_locked
+                  ? "Signed and locked."
+                  : "Sent — awaiting client signature."}
+              </p>
+            </div>
+            <Button
+              size="sm"
+              onClick={async () => {
+                if (!agreementRecord) {
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  const { data, error } = await (supabase as any)
+                    .from("client_agreement_records")
+                    .insert({ client_profile_id: id })
+                    .select("*")
+                    .single();
+                  if (error) {
+                    toast({ title: "Could not create agreement", description: error.message, variant: "destructive" });
+                    return;
+                  }
+                  setAgreementRecord(data);
+                }
+                setAgreementDialogOpen(true);
+              }}
+            >
+              {agreementRecord ? "Open Agreement" : "Create Agreement"}
+            </Button>
+          </div>
+
+          {agreements.length === 0 ? <p className="text-sm text-muted-foreground py-8 text-center">No legacy agreements.</p> : agreements.map((a) => (
             <Card key={a.id}><CardContent className="pt-4 flex items-center justify-between">
               <div>
                 <p className="font-medium text-sm">{a.service_name || "Agreement"}</p>
@@ -2967,11 +3018,27 @@ const ClientDetail = () => {
 
       {/* Agreement */}
       <Dialog open={agreementDialogOpen} onOpenChange={setAgreementDialogOpen}>
-        <DialogContent className="sm:max-w-lg bg-white text-black" style={lightVars}>
-          <DialogHeader><DialogTitle className="text-black">Edit Agreement</DialogTitle></DialogHeader>
-          <div className="p-6 border border-black/10 rounded-xl bg-gray-50 text-center">
-            <p className="text-sm text-muted-foreground">Agreement builder — use the AgreementDocument component</p>
-          </div>
+        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto bg-white text-black" style={lightVars}>
+          <DialogHeader><DialogTitle className="text-black">Service Agreement</DialogTitle></DialogHeader>
+          {agreementRecord && (
+            <AgreementDocument
+              record={agreementRecord}
+              clientProfileId={profile.id}
+              clientName={profile.full_name}
+              clientEmail={profile.email || ""}
+              mode="admin"
+              onSave={async (updates) => {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const { error } = await (supabase as any)
+                  .from("client_agreement_records")
+                  .update(updates)
+                  .eq("id", agreementRecord.id);
+                if (error) throw error;
+                setAgreementRecord((prev: typeof agreementRecord) => prev ? { ...prev, ...updates } : prev);
+              }}
+              onSubmit={() => {}}
+            />
+          )}
         </DialogContent>
       </Dialog>
 
