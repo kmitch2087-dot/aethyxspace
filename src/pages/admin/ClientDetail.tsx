@@ -16,7 +16,7 @@ import {
   ArrowLeft, Loader2, Save, Upload, Mail, Plus, ExternalLink,
   AlertTriangle, CheckCircle2, Trash2, RefreshCcw, FileText, Bell, Pencil, XCircle,
   ChevronDown, ChevronUp, Download, ArrowUp, ArrowDown,
-  Eye, EyeOff, Clock, ListTodo, FolderInput,
+  Eye, EyeOff, Clock, ListTodo, FolderInput, Sparkles,
 } from "lucide-react";
 import { format } from "date-fns";
 import { PROJECT_TYPES, DEFAULT_PROJECT_TYPE, getProjectTypeTemplate, type ProjectTypeKey } from "@/lib/projectTemplates";
@@ -333,6 +333,9 @@ const ClientDetail = () => {
   const [fileAssetUploading, setFileAssetUploading] = useState(false);
   const [editingLabelId, setEditingLabelId] = useState<string | null>(null);
   const [editingLabelValue, setEditingLabelValue] = useState("");
+  const [scrapeDialogOpen, setScrapeDialogOpen] = useState(false);
+  const [scrapeUrl, setScrapeUrl] = useState("");
+  const [scraping, setScraping] = useState(false);
 
   // Plan
   // A client can have multiple project plans (one per engagement type — website build,
@@ -826,6 +829,30 @@ const ClientDetail = () => {
       setFileAssetCategory("logo");
       fetchAll();
     }
+  };
+
+  // TODO(Task 4): placeholder until the review-panel fetch is implemented; replace with the real
+  // fetchPendingScrapeItems() that loads pending client_asset_scrape_items for review.
+  const fetchPendingScrapeItems = () => {};
+
+  const handleScrape = async () => {
+    if (!profile || !scrapeUrl.trim()) return;
+    setScraping(true);
+    const { data, error } = await supabase.functions.invoke("scrape-client-assets", {
+      body: { clientProfileId: profile.id, url: scrapeUrl.trim() },
+    });
+    setScraping(false);
+    if (error || !data?.ok) {
+      toast({ title: "Scrape failed", description: error?.message || data?.error, variant: "destructive" });
+      return;
+    }
+    toast({
+      title: "Scrape complete",
+      description: `Found ${data.imageCount} image(s) and ${data.textCount} text item(s) for review.`,
+    });
+    setScrapeDialogOpen(false);
+    setScrapeUrl("");
+    fetchPendingScrapeItems();
   };
 
   const deleteAsset = async (asset: ClientAsset) => {
@@ -1873,6 +1900,14 @@ const ClientDetail = () => {
                 </label>
               );
             })()}
+          </div>
+
+          {/* AI Asset Scraping */}
+          <div className="flex items-center justify-between">
+            <h3 className="font-display text-base tracking-wider">Scrape Website</h3>
+            <Button size="sm" variant="outline" onClick={() => setScrapeDialogOpen(true)}>
+              <Sparkles className="h-4 w-4 mr-2" /> Scrape from URL
+            </Button>
           </div>
 
           {/* Text Assets */}
@@ -3039,6 +3074,31 @@ const ClientDetail = () => {
             >
               {editAddOnSaving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
               Save changes
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Scrape from URL */}
+      <Dialog open={scrapeDialogOpen} onOpenChange={setScrapeDialogOpen}>
+        <DialogContent className="sm:max-w-md bg-white text-black" style={lightVars}>
+          <DialogHeader><DialogTitle className="text-black">Scrape from URL</DialogTitle></DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label className="text-black">Client website URL</Label>
+              <Input
+                value={scrapeUrl}
+                onChange={(e) => setScrapeUrl(e.target.value)}
+                placeholder="https://example.com"
+                className="bg-white text-black border-black/20"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Extracts images and brand copy for your review — nothing goes live until you approve it below.
+              </p>
+            </div>
+            <Button onClick={handleScrape} disabled={scraping || !scrapeUrl.trim()} className="w-full">
+              {scraping && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+              {scraping ? "Scraping…" : "Scrape"}
             </Button>
           </div>
         </DialogContent>
