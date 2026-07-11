@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import DocumentViewer from "@/components/DocumentViewer";
 
 const SLOT_LABELS: Record<string, string> = {
   site_audit: "Site Audit",
@@ -231,23 +232,8 @@ const PortalDocuments = () => {
 
                     {/* Expanded — show the uploaded proposal PDF */}
                     {isExpanded && slot.storage_path && (
-                      <div className="border-t border-white/10">
-                        {signedUrl ? (
-                          /\.(png|jpg|jpeg|gif|webp|svg)$/i.test(slot.file_name || '') ? (
-                            <img src={signedUrl} alt={slot.file_name} className="w-full max-h-[600px] object-contain bg-black/30" />
-                          ) : (
-                            <iframe src={signedUrl} title={slot.file_name} className="w-full h-[600px] border-0" />
-                          )
-                        ) : (
-                          <div className="flex justify-center py-8"><Loader2 className="h-5 w-5 animate-spin text-white/40" /></div>
-                        )}
-                        {signedUrl && (
-                          <div className="p-4 flex gap-2">
-                            <a href={signedUrl} download={slot.file_name} className="inline-flex items-center gap-1 text-xs text-white/60 hover:text-white underline">
-                              <Download className="h-3 w-3" /> Download
-                            </a>
-                          </div>
-                        )}
+                      <div className="border-t border-white/10 p-4">
+                        <DocumentViewer url={signedUrl || null} fileName={slot.file_name || ""} />
                       </div>
                     )}
                   </div>
@@ -301,41 +287,7 @@ const PortalDocuments = () => {
                   {/* Embedded viewer for uploaded slots */}
                   {isExpanded && slot.status === "uploaded" && (
                     <div className="border-t border-white/10 p-4 bg-white/5">
-                      {!signedUrl ? (
-                        <div className="flex justify-center py-6">
-                          <Loader2 className="h-5 w-5 animate-spin text-white/50" />
-                        </div>
-                      ) : (
-                        <>
-                          {/\.(png|jpg|jpeg|gif|webp|svg)$/i.test(slot.file_name || "") ? (
-                            <img
-                              src={signedUrl}
-                              alt={label}
-                              className="max-w-full rounded-lg mb-3"
-                            />
-                          ) : (
-                            <iframe
-                              src={signedUrl}
-                              title={label}
-                              className="w-full h-[600px] border-0 rounded-lg mb-3"
-                            />
-                          )}
-                          <a
-                            href={signedUrl}
-                            download={slot.file_name || label}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="border-white/20 text-white/70 hover:text-white"
-                            >
-                              <Download className="h-3.5 w-3.5 mr-1" /> Download
-                            </Button>
-                          </a>
-                        </>
-                      )}
+                      <DocumentViewer url={signedUrl || null} fileName={slot.file_name || label} />
                     </div>
                   )}
                 </div>

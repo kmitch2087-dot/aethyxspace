@@ -21,6 +21,7 @@ import {
 import { format } from "date-fns";
 import { PROJECT_TYPES, DEFAULT_PROJECT_TYPE, getProjectTypeTemplate, type ProjectTypeKey } from "@/lib/projectTemplates";
 import AgreementDocument from "@/components/AgreementDocument";
+import DocumentViewer from "@/components/DocumentViewer";
 
 const lightVars = {
   "--background": "0 0% 100%",
@@ -1455,29 +1456,17 @@ const ClientDetail = () => {
               const hasFile = ['uploaded', 'awaiting_signature', 'completed'].includes(slot?.status || '');
               if (!slot || !hasFile) return null;
               const url = slotSignedUrls[expandedSlot];
-              const isImage = /\.(png|jpg|jpeg|gif|webp|svg)$/i.test(slot.file_name || '');
               return (
                 <div className="border-t border-black/10 overflow-hidden">
                   <div className="flex items-center justify-between px-4 py-2 border-b border-black/5 bg-muted/30">
                     <span className="text-sm font-medium">{SLOT_LABELS[expandedSlot]}</span>
-                    <div className="flex gap-3">
-                      {url && (
-                        <a href={url} download={slot.file_name} className="text-xs text-primary underline">
-                          Download
-                        </a>
-                      )}
-                      <button onClick={() => setExpandedSlot(null)} className="text-xs text-muted-foreground hover:text-black">
-                        Close
-                      </button>
-                    </div>
+                    <button onClick={() => setExpandedSlot(null)} className="text-xs text-muted-foreground hover:text-black">
+                      Close
+                    </button>
                   </div>
-                  {url ? (
-                    isImage
-                      ? <img src={url} alt={slot.file_name} className="max-w-full" />
-                      : <iframe src={url} title={slot.file_name} className="w-full h-[700px] border-0" />
-                  ) : (
-                    <div className="p-8 text-center text-sm text-muted-foreground">Loading document...</div>
-                  )}
+                  <div className="p-4">
+                    <DocumentViewer url={url || null} fileName={slot.file_name || ""} />
+                  </div>
                 </div>
               );
             })()}
