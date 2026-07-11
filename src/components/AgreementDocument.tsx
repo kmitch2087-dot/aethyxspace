@@ -262,6 +262,7 @@ export default function AgreementDocument({
         client_signature_data: signatureData,
         client_signed_at: new Date().toISOString(),
         is_locked: true,
+        submitted_at: new Date().toISOString(),
       })
       onSubmit()
     } catch {
