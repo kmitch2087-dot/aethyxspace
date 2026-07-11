@@ -207,8 +207,13 @@ Deno.serve(async (req: Request) => {
       }
 
       let textCount = 0;
+      let geminiError: string | null = null;
       const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-      if (GEMINI_API_KEY && visibleText.length > 40) {
+      if (!GEMINI_API_KEY) {
+        geminiError = "GEMINI_API_KEY is not configured";
+      } else if (visibleText.length <= 40) {
+        geminiError = `Not enough visible text to extract from (${visibleText.length} chars found, need >40) — the page likely renders its content via client-side JavaScript, which this scraper doesn't execute`;
+      } else {
         const prompt = `You are helping tag brand content scraped from a client's website for a design agency. Given the extracted page text and any OpenGraph metadata below, identify up to 5 distinct, meaningful brand-relevant blurbs (e.g. a tagline, mission statement, brand voice sample, "about" copy). For each, suggest a category from exactly this list: brand_voice, tagline, motto, mission, values, other. Respond with ONLY a JSON array, no other text, in this shape: [{"category": "...", "label": "...", "content": "..."}].
 
 OpenGraph title: ${ogTags.title || "(none)"}
@@ -238,36 +243,53 @@ ${visibleText}`;
           } finally {
             clearTimeout(geminiTimeout);
           }
-          if (geminiResp.ok) {
+          if (!geminiResp.ok) {
+            const bodyText = await geminiResp.text().catch(() => "");
+            geminiError = `Gemini API returned ${geminiResp.status}: ${bodyText.slice(0, 300)}`;
+            console.warn("[scrape-client-assets] Gemini call failed:", geminiResp.status, bodyText.slice(0, 500));
+          } else {
             const geminiJson = await geminiResp.json();
             const text = geminiJson?.choices?.[0]?.message?.content || "";
             const jsonMatch = text.match(/\[[\s\S]*\]/);
-            const items = jsonMatch ? JSON.parse(jsonMatch[0]) : [];
-            const validCategories = new Set(["brand_voice", "tagline", "motto", "mission", "values", "other"]);
-            for (const item of items) {
-              if (!item?.content || typeof item.content !== "string") continue;
-              const category = validCategories.has(item.category) ? item.category : "other";
-              await admin.from("client_asset_scrape_items").insert({
-                scrape_id: scrapeId,
-                kind: "text",
-                suggested_category: category,
-                suggested_label: String(item.label || "Scraped content").slice(0, 200),
-                content: String(item.content).slice(0, 5000),
-                status: "pending",
-              });
-              textCount++;
+            if (!jsonMatch) {
+              geminiError = "Gemini response did not contain a parseable JSON array";
+              console.warn("[scrape-client-assets] Gemini response had no JSON array. Raw text:", text.slice(0, 500));
+            } else {
+              const items = JSON.parse(jsonMatch[0]);
+              const validCategories = new Set(["brand_voice", "tagline", "motto", "mission", "values", "other"]);
+              for (const item of items) {
+                if (!item?.content || typeof item.content !== "string") continue;
+                const category = validCategories.has(item.category) ? item.category : "other";
+                await admin.from("client_asset_scrape_items").insert({
+                  scrape_id: scrapeId,
+                  kind: "text",
+                  suggested_category: category,
+                  suggested_label: String(item.label || "Scraped content").slice(0, 200),
+                  content: String(item.content).slice(0, 5000),
+                  status: "pending",
+                });
+                textCount++;
+              }
+              if (textCount === 0) {
+                geminiError = "Gemini returned a valid response but suggested zero text items";
+              }
             }
           }
         } catch (err) {
-          console.warn("Gemini extraction failed, continuing without text items:", err);
+          geminiError = err instanceof Error ? err.message : "Gemini call threw an unexpected error";
+          console.warn("[scrape-client-assets] Gemini extraction failed, continuing without text items:", err);
         }
       }
 
       await admin
         .from("client_asset_scrapes")
-        .update({ status: "complete", completed_at: new Date().toISOString() })
+        .update({
+          status: "complete",
+          completed_at: new Date().toISOString(),
+          error_message: geminiError, // non-fatal note: the scrape still completed; this only covers the text-extraction step
+        })
         .eq("id", scrapeId);
-      return json({ ok: true, scrapeId, imageCount, textCount }, 200, cors);
+      return json({ ok: true, scrapeId, imageCount, textCount, geminiError }, 200, cors);
     } catch (err) {
       await admin
         .from("client_asset_scrapes")

@@ -907,10 +907,17 @@ const ClientDetail = () => {
       toast({ title: "Scrape failed", description: error?.message || data?.error, variant: "destructive" });
       return;
     }
-    toast({
-      title: "Scrape complete",
-      description: `Found ${data.imageCount} image(s) and ${data.textCount} text item(s) for review.`,
-    });
+    if (data.textCount === 0 && data.geminiError) {
+      toast({
+        title: "Scrape partially complete",
+        description: `Found ${data.imageCount} image(s), but text extraction failed: ${data.geminiError}`,
+      });
+    } else {
+      toast({
+        title: "Scrape complete",
+        description: `Found ${data.imageCount} image(s) and ${data.textCount} text item(s) for review.`,
+      });
+    }
     setScrapeDialogOpen(false);
     setScrapeUrl("");
     fetchPendingScrapeItems();
