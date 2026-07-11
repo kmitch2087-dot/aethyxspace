@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import DocumentViewer from "@/components/DocumentViewer"
+import aethyxLogo from "@/assets/aethyx-web-design-studio-logo.png"
 
 interface AgreementRecord {
   id?: string
@@ -378,7 +379,7 @@ export default function AgreementDocument({
           )}
           <span className="text-2xl font-light text-gray-400">+</span>
           <img
-            src="/aethyx-web-design-studio-logo-B8RGRc5H.png"
+            src={aethyxLogo}
             className="h-16 object-contain"
             alt="Aethyx"
           />
