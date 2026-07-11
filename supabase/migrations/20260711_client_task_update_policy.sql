@@ -16,6 +16,7 @@
 -- PortalTasks.tsx already applies when loading tasks for display (.eq
 -- ("assigned_to", "client")), as defense-in-depth so a client can never mark
 -- an admin-assigned task complete via a crafted request.
+DROP POLICY IF EXISTS "cpt_client_update" ON client_project_tasks;
 CREATE POLICY "cpt_client_update" ON client_project_tasks FOR UPDATE USING (
   plan_id IN (
     SELECT id FROM client_project_plans WHERE client_profile_id IN (

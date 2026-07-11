@@ -1224,6 +1224,15 @@ const ClientDetail = () => {
       await (supabase as any).from('client_project_phases')
         .update({ completion_percent: 100, status: 'complete', updated_at: new Date().toISOString() })
         .eq('id', existing.id);
+    } else if (owningPlan.project_type === 'google_ads') {
+      // Google Ads' defaultSlots phaseNames (e.g. "Market Research") don't correspond to
+      // any of its defaultPhases (e.g. "Week 1: Access, Setup + Strategy") at all — unlike
+      // Website Build, where "no match" can legitimately mean an older plan instance just
+      // hasn't had its phases auto-seeded yet (its slot/phase names DO correspond 1:1).
+      // So for Google Ads specifically, skip phase-linking for this slot entirely instead
+      // of inserting a spurious, unrelated phase that would pollute completion_percent.
+      // The slot's own status/upload is unaffected — that's handled by the caller.
+      return;
     } else {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data: phaseCount } = await (supabase as any).from('client_project_phases')
@@ -1423,7 +1432,7 @@ const ClientDetail = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => window.open(`/portal/overview?viewAs=${profile.id}`, "_blank", "noopener,noreferrer")}
+            onClick={() => window.open(`/portal?viewAs=${profile.id}`, "_blank", "noopener,noreferrer")}
           >
             <Eye className="h-4 w-4 mr-2" /> View as {profile.first_name || profile.full_name.split(" ")[0]}
           </Button>

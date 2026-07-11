@@ -12,14 +12,20 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import DocumentViewer from "@/components/DocumentViewer";
+import { getProjectTypeTemplate } from "@/lib/projectTemplates";
 
-const SLOT_LABELS: Record<string, string> = {
-  site_audit: "Site Audit",
-  market_research: "Market Research",
-  service_tier: "Service Tier Information",
-  plan: "Project Plan",
-  agreement: "Proposal & Agreement",
-};
+// Mirrors ClientDetail.tsx's getSlotLabel/getAgreementSlotKey pattern: a slot's label and
+// whether it's the agreement slot depend on which of the client's plans (by project_type)
+// actually defines that slot key — e.g. "market_research" (Website Build) vs "ga_market_research"
+// (Google Ads) live in different plans' defaultSlots. Falls back to the raw key / non-agreement
+// when no plan defines the slot, matching the previous graceful-degradation behavior.
+function getSlotTemplateFor(plans: { project_type: string }[], slotType: string) {
+  for (const plan of plans) {
+    const match = getProjectTypeTemplate(plan.project_type).defaultSlots?.find((s) => s.key === slotType);
+    if (match) return match;
+  }
+  return null;
+}
 
 const PortalDocuments = () => {
   const { user } = useAuth();
@@ -41,6 +47,7 @@ const PortalDocuments = () => {
   const [slotSignedUrls, setSlotSignedUrls] = useState<Record<string, string>>({});
   const [slotsLoading, setSlotsLoading] = useState(true);
   const [agreementRecord, setAgreementRecord] = useState<any>(null);
+  const [plans, setPlans] = useState<any[]>([]);
 
   const load = async () => {
     if (!user || profileLoading) return;
@@ -64,6 +71,14 @@ const PortalDocuments = () => {
         .eq("client_profile_id", profileId)
         .maybeSingle();
       setAgreementRecord(agr);
+
+      // Fetch the client's project plans so slot labels/agreement-ness can be resolved
+      // per project type (Website Build vs Google Ads use different slot keys).
+      const { data: plansData } = await (supabase as any)
+        .from("client_project_plans")
+        .select("id, project_type")
+        .eq("client_profile_id", profileId);
+      setPlans(plansData || []);
     }
     setSlotsLoading(false);
 
@@ -79,7 +94,7 @@ const PortalDocuments = () => {
     setDocuments(data || []);
     setLoading(false);
 
-    if (profileId) {
+    if (profileId && !isViewingAsAdmin) {
       (supabase as any)
         .from("client_portal_seen_at")
         .upsert(
@@ -205,10 +220,11 @@ const PortalDocuments = () => {
         ) : (
           <div className="space-y-3">
             {visibleSlots.map((slot) => {
-              const label = SLOT_LABELS[slot.slot_type] || slot.slot_type;
+              const slotTemplate = getSlotTemplateFor(plans, slot.slot_type);
+              const label = slotTemplate?.label ?? slot.slot_type;
               const isExpanded = expandedSlot === slot.id;
               const signedUrl = slotSignedUrls[slot.id];
-              const isAgreement = slot.slot_type === "agreement";
+              const isAgreement = slotTemplate?.isAgreement ?? false;
 
               // ── Agreement slot ──
               if (isAgreement) {

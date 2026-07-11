@@ -50,10 +50,14 @@ function PortalSidebar({
   showIntake,
   showReferrals,
   badgeCounts,
+  isViewingAsAdmin,
+  viewAsProfileId,
 }: {
   showIntake: boolean;
   showReferrals: boolean;
   badgeCounts: Record<string, number>;
+  isViewingAsAdmin: boolean;
+  viewAsProfileId: string | null;
 }) {
   const filteredBase = showReferrals
     ? baseNavItems
@@ -65,6 +69,13 @@ function PortalSidebar({
   const collapsed = state === "collapsed";
   const { signOut } = useAuth();
   const navigate = useNavigate();
+
+  // Preserve ?viewAs=<id> across in-portal navigation while an admin is
+  // previewing a client's portal — without this, every sidebar click drops
+  // the param and usePortalClientProfile() silently falls back to the
+  // admin's own (likely nonexistent) client_profiles row.
+  const withViewAs = (url: string) =>
+    isViewingAsAdmin && viewAsProfileId ? `${url}?viewAs=${viewAsProfileId}` : url;
 
   const handleSignOut = async () => {
     await signOut();
@@ -90,7 +101,7 @@ function PortalSidebar({
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild>
                       <NavLink
-                        to={item.url}
+                        to={withViewAs(item.url)}
                         end={item.url === "/portal"}
                         className="hover:bg-muted/50"
                         activeClassName="bg-muted text-primary font-medium"
@@ -237,7 +248,13 @@ const PortalLayout = () => {
             <a href={`/admin/clients/${profile.id}`} className="font-medium underline">Exit</a>
           </div>
         )}
-        <PortalSidebar showIntake={needsIntake} showReferrals={referralEnabled} badgeCounts={badgeCounts} />
+        <PortalSidebar
+          showIntake={needsIntake}
+          showReferrals={referralEnabled}
+          badgeCounts={badgeCounts}
+          isViewingAsAdmin={isViewingAsAdmin}
+          viewAsProfileId={isViewingAsAdmin ? profile?.id ?? null : null}
+        />
         <div className="flex-1 flex flex-col">
           <header className="h-12 flex items-center border-b border-border/30 px-4">
             <SidebarTrigger />
