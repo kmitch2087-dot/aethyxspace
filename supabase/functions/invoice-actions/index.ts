@@ -4,7 +4,8 @@ import { createClient } from "npm:@supabase/supabase-js@2.49.4";
 import { getCors } from "../_shared/admin-cors.ts";
 
 Deno.serve(async (req) => {
-  const cors = getCors(req.headers.get("origin"));
+  const origin = req.headers.get("origin");
+  const cors = getCors(origin);
   if (req.method === "OPTIONS") return new Response(null, { headers: cors });
 
   try {
@@ -104,6 +105,38 @@ Deno.serve(async (req) => {
         },
       });
       if (inv.error) return j({ error: inv.error.message }, 500, cors);
+      return j({ success: true }, 200, cors);
+    }
+
+    if (action === "finalize_and_send") {
+      if (!sid) return j({ error: "Not a Stripe invoice" }, 400, cors);
+      if (row.status !== "draft") return j({ error: "Invoice is not a draft" }, 400, cors);
+
+      const finalized = await stripe.invoices.finalizeInvoice(sid);
+      await syncRow(admin, row.id, finalized);
+
+      if (row.email) {
+        let recipientName = "";
+        if (row.client_profile_id) {
+          const { data: p } = await admin.from("client_profiles").select("first_name").eq("id", row.client_profile_id).maybeSingle();
+          recipientName = p?.first_name || "";
+        }
+        const portalPaymentUrl = `${origin}/portal/pay/${row.id}`;
+        await admin.functions.invoke("send-transactional-email", {
+          body: {
+            templateName: "new-invoice",
+            recipientEmail: row.email,
+            idempotencyKey: `new-invoice-${finalized.id}`,
+            templateData: {
+              firstName: recipientName,
+              invoiceNumber: finalized.number,
+              amount: Number(row.amount_due || 0).toFixed(2),
+              description: row.description || "",
+              payUrl: portalPaymentUrl,
+            },
+          },
+        });
+      }
       return j({ success: true }, 200, cors);
     }
 

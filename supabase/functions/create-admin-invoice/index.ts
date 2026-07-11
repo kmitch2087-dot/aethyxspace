@@ -29,7 +29,8 @@ Deno.serve(async (req) => {
     const { data: roleRow } = await admin.from("user_roles").select("role").eq("user_id", userData.user.id).eq("role", "admin").maybeSingle();
     if (!roleRow) return new Response(JSON.stringify({ error: "Admin only" }), { status: 403, headers: { ...cors, "Content-Type": "application/json" } });
 
-    const { profileId, description, amount, daysUntilDue } = await req.json();
+    const { profileId, description, amount, daysUntilDue, finalize } = await req.json();
+    const shouldFinalize = finalize !== false; // default true — preserves existing "Create & send" behavior exactly
     if (!profileId || !description || !amount) {
       return new Response(JSON.stringify({ error: "profileId, description, amount required" }), { status: 400, headers: { ...cors, "Content-Type": "application/json" } });
     }
@@ -70,7 +71,7 @@ Deno.serve(async (req) => {
       currency: "usd",
       description: description.slice(0, 200),
     });
-    const finalized = await stripe.invoices.finalizeInvoice(invoice.id);
+    const finalized = shouldFinalize ? await stripe.invoices.finalizeInvoice(invoice.id) : invoice;
 
     // Store locally
     const { data: localInv } = await admin.from("client_invoices").upsert({
@@ -82,36 +83,39 @@ Deno.serve(async (req) => {
       amount_due: amt,
       amount_paid: 0,
       currency: "usd",
-      status: finalized.status || "open",
+      status: finalized.status || (shouldFinalize ? "open" : "draft"),
       description,
-      hosted_invoice_url: finalized.hosted_invoice_url,
-      invoice_pdf: finalized.invoice_pdf,
+      hosted_invoice_url: finalized.hosted_invoice_url ?? null,
+      invoice_pdf: finalized.invoice_pdf ?? null,
       due_date: finalized.due_date ? new Date(finalized.due_date * 1000).toISOString() : null,
       email: profile.email,
     }, { onConflict: "stripe_invoice_id" }).select().single();
 
-    // Notify client (branded email — link to portal payment page, not Stripe)
-    const portalPaymentUrl = `${origin}/portal/pay/${localInv?.id || ""}`;
-    await admin.functions.invoke("send-transactional-email", {
-      body: {
-        templateName: "new-invoice",
-        recipientEmail: profile.email,
-        idempotencyKey: `new-invoice-${finalized.id}`,
-        templateData: {
-          firstName: profile.first_name || "",
-          invoiceNumber: finalized.number,
-          amount: amt.toFixed(2),
-          description,
-          payUrl: portalPaymentUrl,
+    // Notify client (branded email — link to portal payment page, not Stripe) — only
+    // when actually finalizing. A draft save has nothing to notify the client about yet.
+    if (shouldFinalize) {
+      const portalPaymentUrl = `${origin}/portal/pay/${localInv?.id || ""}`;
+      await admin.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "new-invoice",
+          recipientEmail: profile.email,
+          idempotencyKey: `new-invoice-${finalized.id}`,
+          templateData: {
+            firstName: profile.first_name || "",
+            invoiceNumber: finalized.number,
+            amount: amt.toFixed(2),
+            description,
+            payUrl: portalPaymentUrl,
+          },
         },
-      },
-    });
+      });
+    }
 
     return new Response(JSON.stringify({
       success: true,
       invoiceId: localInv?.id,
       stripeInvoiceId: finalized.id,
-      hostedUrl: finalized.hosted_invoice_url,
+      hostedUrl: finalized.hosted_invoice_url ?? null,
     }), { headers: { ...cors, "Content-Type": "application/json" } });
   } catch (err) {
     console.error("[create-admin-invoice]", err);

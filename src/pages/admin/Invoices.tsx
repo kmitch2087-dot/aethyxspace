@@ -12,7 +12,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useToast } from "@/hooks/use-toast";
 import {
   FileText, Plus, Loader2, RefreshCcw, ExternalLink, MoreHorizontal,
-  Mail, Link as LinkIcon, CheckCircle2, XCircle, Bell, RotateCcw, Download,
+  Mail, Link as LinkIcon, CheckCircle2, XCircle, Bell, RotateCcw, Download, Send,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -81,17 +81,20 @@ const Invoices = () => {
 
   useEffect(() => { fetchAll(); }, []);
 
-  const handleCreate = async () => {
+  const handleCreate = async (finalize: boolean) => {
     if (!profileId || !description.trim() || !amount) return;
     setSubmitting(true);
     const { data, error } = await supabase.functions.invoke("create-admin-invoice", {
-      body: { profileId, description: description.trim(), amount: Number(amount), daysUntilDue: Number(daysUntilDue) || 14 },
+      body: { profileId, description: description.trim(), amount: Number(amount), daysUntilDue: Number(daysUntilDue) || 14, finalize },
     });
     setSubmitting(false);
     if (error || !data?.success) {
       toast({ title: "Failed to create invoice", description: data?.error || error?.message, variant: "destructive" }); return;
     }
-    toast({ title: "Invoice created", description: "Client has been notified by email." });
+    toast({
+      title: finalize ? "Invoice created" : "Draft saved",
+      description: finalize ? "Client has been notified by email." : "Not sent yet — finalize and send when ready.",
+    });
     setCreateOpen(false); setDescription(""); setAmount(""); setProfileId("");
     fetchAll();
   };
@@ -217,7 +220,12 @@ const Invoices = () => {
                             <LinkIcon className="h-4 w-4 mr-2" /> Copy payment link
                           </DropdownMenuItem>
                         )}
-                        {isStripe && inv.status !== "paid" && (
+                        {isStripe && inv.status === "draft" && (
+                          <DropdownMenuItem onClick={() => runAction(inv, "finalize_and_send")}>
+                            <Send className="h-4 w-4 mr-2" /> Finalize &amp; send
+                          </DropdownMenuItem>
+                        )}
+                        {isStripe && inv.status !== "paid" && inv.status !== "draft" && (
                           <>
                             <DropdownMenuItem onClick={() => runAction(inv, "send_reminder")}><Bell className="h-4 w-4 mr-2" /> Send Stripe reminder</DropdownMenuItem>
                             <DropdownMenuItem onClick={() => runAction(inv, "mark_paid")}><CheckCircle2 className="h-4 w-4 mr-2" /> Mark as paid</DropdownMenuItem>
@@ -263,9 +271,19 @@ const Invoices = () => {
               <div><Label>Amount (USD)</Label><Input type="number" step="0.01" min="1" value={amount} onChange={(e) => setAmount(e.target.value)} /></div>
               <div><Label>Due in (days)</Label><Input type="number" min="1" value={daysUntilDue} onChange={(e) => setDaysUntilDue(e.target.value)} /></div>
             </div>
-            <Button onClick={handleCreate} disabled={submitting || !profileId || !description.trim() || !amount} className="w-full">
-              {submitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null} Create & send
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => handleCreate(false)}
+                disabled={submitting || !profileId || !description.trim() || !amount}
+                variant="outline"
+                className="flex-1"
+              >
+                {submitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null} Save as draft
+              </Button>
+              <Button onClick={() => handleCreate(true)} disabled={submitting || !profileId || !description.trim() || !amount} className="flex-1">
+                {submitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null} Create & send
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
