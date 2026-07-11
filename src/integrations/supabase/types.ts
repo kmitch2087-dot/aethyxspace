@@ -182,6 +182,60 @@ export type Database = {
         }
         Relationships: []
       }
+      bounty_applicants: {
+        Row: {
+          applied_at: string
+          code: string | null
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          phone: string | null
+          relationship_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          tax_ack: boolean
+          updated_at: string
+          w9_file_path: string | null
+          w9_uploaded_at: string | null
+        }
+        Insert: {
+          applied_at?: string
+          code?: string | null
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          phone?: string | null
+          relationship_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          tax_ack?: boolean
+          updated_at?: string
+          w9_file_path?: string | null
+          w9_uploaded_at?: string | null
+        }
+        Update: {
+          applied_at?: string
+          code?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          phone?: string | null
+          relationship_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          tax_ack?: boolean
+          updated_at?: string
+          w9_file_path?: string | null
+          w9_uploaded_at?: string | null
+        }
+        Relationships: []
+      }
       client_add_ons: {
         Row: {
           add_on_catalog_id: string | null
@@ -1573,7 +1627,8 @@ export type Database = {
           referred_email: string
           referred_name: string | null
           referred_profile_id: string | null
-          referrer_profile_id: string
+          referrer_bounty_applicant_id: string | null
+          referrer_profile_id: string | null
           status: string
           updated_at: string
         }
@@ -1587,7 +1642,8 @@ export type Database = {
           referred_email: string
           referred_name?: string | null
           referred_profile_id?: string | null
-          referrer_profile_id: string
+          referrer_bounty_applicant_id?: string | null
+          referrer_profile_id?: string | null
           status?: string
           updated_at?: string
         }
@@ -1601,7 +1657,8 @@ export type Database = {
           referred_email?: string
           referred_name?: string | null
           referred_profile_id?: string | null
-          referrer_profile_id?: string
+          referrer_bounty_applicant_id?: string | null
+          referrer_profile_id?: string | null
           status?: string
           updated_at?: string
         }
@@ -1611,6 +1668,13 @@ export type Database = {
             columns: ["referred_profile_id"]
             isOneToOne: false
             referencedRelation: "client_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referrals_referrer_bounty_applicant_id_fkey"
+            columns: ["referrer_bounty_applicant_id"]
+            isOneToOne: false
+            referencedRelation: "bounty_applicants"
             referencedColumns: ["id"]
           },
           {
@@ -1930,4 +1994,3 @@ export const Constants = {
     },
   },
 } as const
-
