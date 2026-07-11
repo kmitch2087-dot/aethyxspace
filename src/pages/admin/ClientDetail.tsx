@@ -336,6 +336,11 @@ const ClientDetail = () => {
   const [scrapeDialogOpen, setScrapeDialogOpen] = useState(false);
   const [scrapeUrl, setScrapeUrl] = useState("");
   const [scraping, setScraping] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [pendingScrapeItems, setPendingScrapeItems] = useState<any[]>([]);
+  const [scrapeItemUrls, setScrapeItemUrls] = useState<Record<string, string>>({});
+  const [scrapeItemsLoading, setScrapeItemsLoading] = useState(false);
+  const [promotingItemId, setPromotingItemId] = useState<string | null>(null);
 
   // Plan
   // A client can have multiple project plans (one per engagement type — website build,
@@ -528,7 +533,7 @@ const ClientDetail = () => {
     setAgreementRecord(data);
   };
 
-  useEffect(() => { fetchAll(); fetchPlan(); fetchAgreementRecord(); /* eslint-disable-next-line */ }, [id]);
+  useEffect(() => { fetchAll(); fetchPlan(); fetchAgreementRecord(); fetchPendingScrapeItems(); /* eslint-disable-next-line */ }, [id]);
   useEffect(() => { fetchCatalog(); }, []);
 
   useEffect(() => {
@@ -831,9 +836,46 @@ const ClientDetail = () => {
     }
   };
 
-  // TODO(Task 4): placeholder until the review-panel fetch is implemented; replace with the real
-  // fetchPendingScrapeItems() that loads pending client_asset_scrape_items for review.
-  const fetchPendingScrapeItems = () => {};
+  const fetchPendingScrapeItems = async () => {
+    if (!id) return;
+    setScrapeItemsLoading(true);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: scrapes } = await (supabase as any)
+      .from("client_asset_scrapes")
+      .select("id")
+      .eq("client_profile_id", id);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const scrapeIds = (scrapes || []).map((s: any) => s.id);
+    if (!scrapeIds.length) {
+      setPendingScrapeItems([]);
+      setScrapeItemsLoading(false);
+      return;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: items } = await (supabase as any)
+      .from("client_asset_scrape_items")
+      .select("*")
+      .in("scrape_id", scrapeIds)
+      .eq("status", "pending")
+      .order("created_at");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rows = (items || []) as any[];
+    setPendingScrapeItems(rows);
+    setScrapeItemsLoading(false);
+
+    const imageItems = rows.filter((r) => r.kind === "image");
+    if (imageItems.length) {
+      const { data: signed } = await supabase.storage
+        .from("client-assets")
+        .createSignedUrls(imageItems.map((r) => r.content), 3600);
+      const map: Record<string, string> = {};
+      (signed || []).forEach((s) => {
+        const match = imageItems.find((r) => r.content === s.path);
+        if (match && s.signedUrl) map[match.id] = s.signedUrl;
+      });
+      setScrapeItemUrls(map);
+    }
+  };
 
   const handleScrape = async () => {
     if (!profile || !scrapeUrl.trim()) return;
@@ -853,6 +895,58 @@ const ClientDetail = () => {
     setScrapeDialogOpen(false);
     setScrapeUrl("");
     fetchPendingScrapeItems();
+  };
+
+  const approveScrapeItem = async (item: { id: string; kind: string; suggested_category: string; suggested_label: string; content: string | null }) => {
+    if (!profile) return;
+    setPromotingItemId(item.id);
+    if (item.kind === "text") {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase as any).from("client_assets").insert({
+        client_profile_id: profile.id,
+        type: "text",
+        category: item.suggested_category,
+        label: item.suggested_label,
+        content: item.content,
+        sort_order: assets.filter((a) => a.type === "text").length,
+      });
+      if (error) {
+        toast({ title: "Failed to approve", description: error.message, variant: "destructive" });
+        setPromotingItemId(null);
+        return;
+      }
+    } else {
+      const { data: urlData } = await supabase.storage
+        .from("client-assets")
+        .createSignedUrl(item.content!, 60 * 60 * 24 * 7);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase as any).from("client_assets").insert({
+        client_profile_id: profile.id,
+        type: "file",
+        category: item.suggested_category,
+        label: item.suggested_label,
+        file_name: item.content,
+        file_url: urlData?.signedUrl || "",
+        sort_order: assets.filter((a) => a.type === "file").length,
+      });
+      if (error) {
+        toast({ title: "Failed to approve", description: error.message, variant: "destructive" });
+        setPromotingItemId(null);
+        return;
+      }
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any).from("client_asset_scrape_items").update({ status: "approved" }).eq("id", item.id);
+    setPendingScrapeItems((prev) => prev.filter((i) => i.id !== item.id));
+    setPromotingItemId(null);
+    toast({ title: "Asset added" });
+    fetchAll();
+  };
+
+  const rejectScrapeItem = async (itemId: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any).from("client_asset_scrape_items").update({ status: "rejected" }).eq("id", itemId);
+    setPendingScrapeItems((prev) => prev.filter((i) => i.id !== itemId));
   };
 
   const deleteAsset = async (asset: ClientAsset) => {
@@ -1909,6 +2003,50 @@ const ClientDetail = () => {
               <Sparkles className="h-4 w-4 mr-2" /> Scrape from URL
             </Button>
           </div>
+
+          {scrapeItemsLoading ? (
+            <div className="flex justify-center py-4"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
+          ) : pendingScrapeItems.length > 0 && (
+            <div className="mt-4 space-y-2">
+              <p className="text-xs text-muted-foreground uppercase tracking-wider">Pending review ({pendingScrapeItems.length})</p>
+              {pendingScrapeItems.map((item) => (
+                <Card key={item.id}>
+                  <CardContent className="pt-4 flex items-center gap-3">
+                    {item.kind === "image" ? (
+                      <div className="h-16 w-16 bg-black/5 rounded-lg overflow-hidden shrink-0 flex items-center justify-center">
+                        {scrapeItemUrls[item.id] ? (
+                          <img src={scrapeItemUrls[item.id]} alt={item.suggested_label} className="max-h-full max-w-full object-contain" />
+                        ) : (
+                          <Loader2 className="h-4 w-4 animate-spin text-black/20" />
+                        )}
+                      </div>
+                    ) : (
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-black/80 line-clamp-2">{item.content}</p>
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <Badge variant="outline" className="text-xs mb-1">{assetCategoryInfo(item.suggested_category).label}</Badge>
+                      <p className="text-sm font-medium truncate">{item.suggested_label}</p>
+                    </div>
+                    <div className="flex gap-1 shrink-0">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={promotingItemId === item.id}
+                        onClick={() => approveScrapeItem(item)}
+                      >
+                        {promotingItemId === item.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Approve"}
+                      </Button>
+                      <Button size="sm" variant="ghost" className="text-red-500 hover:text-red-600" onClick={() => rejectScrapeItem(item.id)}>
+                        Reject
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
 
           {/* Text Assets */}
           <div>
