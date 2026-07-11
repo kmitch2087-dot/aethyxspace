@@ -59,6 +59,21 @@ interface Referral {
   referred_client: { full_name: string } | null;
 }
 
+interface BountyApplicant {
+  id: string;
+  full_name: string;
+  email: string;
+  phone: string | null;
+  relationship_note: string | null;
+  tax_ack: boolean;
+  status: "pending" | "approved" | "rejected";
+  w9_file_path: string | null;
+  w9_uploaded_at: string | null;
+  code: string | null;
+  applied_at: string;
+  reviewed_at: string | null;
+}
+
 const STATUS_OPTIONS = ["pending", "signed", "live", "payout_sent", "cancelled"] as const;
 type ReferralStatus = typeof STATUS_OPTIONS[number];
 
@@ -121,6 +136,12 @@ export default function ReferralProgram() {
   });
   const [addSubmitting, setAddSubmitting] = useState(false);
 
+  const [applicants, setApplicants] = useState<BountyApplicant[]>([]);
+  const [applicantsLoading, setApplicantsLoading] = useState(true);
+  const [applicantTab, setApplicantTab] = useState<"pending" | "approved" | "rejected">("pending");
+  const [reviewingId, setReviewingId] = useState<string | null>(null);
+  const [w9UploadingId, setW9UploadingId] = useState<string | null>(null);
+
   const fetchSettings = async () => {
     setSettingsLoading(true);
     const { data, error } = await supabase
@@ -166,10 +187,21 @@ export default function ReferralProgram() {
     setProfiles((data as ClientProfile[]) || []);
   };
 
+  const fetchApplicants = async () => {
+    setApplicantsLoading(true);
+    const { data } = await supabase
+      .from("bounty_applicants")
+      .select("*")
+      .order("applied_at", { ascending: false });
+    setApplicants((data as BountyApplicant[]) || []);
+    setApplicantsLoading(false);
+  };
+
   useEffect(() => {
     fetchSettings();
     fetchReferrals();
     fetchProfiles();
+    fetchApplicants();
   }, []);
 
   const handleSaveSettings = async () => {
@@ -282,6 +314,67 @@ export default function ReferralProgram() {
     fetchReferrals();
   };
 
+  const handleW9Upload = async (applicant: BountyApplicant, file: File) => {
+    setW9UploadingId(applicant.id);
+    const path = `${applicant.id}/${Date.now()}_${file.name}`;
+    const { error: uploadError } = await supabase.storage.from("bounty-documents").upload(path, file);
+    if (uploadError) {
+      setW9UploadingId(null);
+      toast({ title: "Upload failed", description: uploadError.message, variant: "destructive" });
+      return;
+    }
+    const { error } = await supabase
+      .from("bounty_applicants")
+      .update({ w9_file_path: path, w9_uploaded_at: new Date().toISOString() })
+      .eq("id", applicant.id);
+    setW9UploadingId(null);
+    if (error) {
+      toast({ title: "Failed to save W9 reference", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({ title: "W9 attached" });
+    fetchApplicants();
+  };
+
+  const generateBountyCode = () => crypto.randomUUID().replace(/-/g, "").slice(0, 12);
+
+  const handleApproveApplicant = async (applicant: BountyApplicant) => {
+    setReviewingId(applicant.id);
+    const { data: userData } = await supabase.auth.getUser();
+    const { error } = await supabase
+      .from("bounty_applicants")
+      .update({
+        status: "approved",
+        code: generateBountyCode(),
+        reviewed_at: new Date().toISOString(),
+        reviewed_by: userData.user?.id ?? null,
+      })
+      .eq("id", applicant.id);
+    setReviewingId(null);
+    if (error) {
+      toast({ title: "Approval failed", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({ title: "Applicant approved" });
+    fetchApplicants();
+  };
+
+  const handleRejectApplicant = async (applicant: BountyApplicant) => {
+    setReviewingId(applicant.id);
+    const { data: userData } = await supabase.auth.getUser();
+    const { error } = await supabase
+      .from("bounty_applicants")
+      .update({ status: "rejected", reviewed_at: new Date().toISOString(), reviewed_by: userData.user?.id ?? null })
+      .eq("id", applicant.id);
+    setReviewingId(null);
+    if (error) {
+      toast({ title: "Rejection failed", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({ title: "Applicant rejected" });
+    fetchApplicants();
+  };
+
   const filteredReferrals = activeTab === "all"
     ? referrals
     : referrals.filter((r) => r.status === activeTab);
@@ -297,9 +390,9 @@ export default function ReferralProgram() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-display tracking-wider flex items-center gap-2">
-          <GitFork className="h-6 w-6 text-primary" /> Referral Program
+          <GitFork className="h-6 w-6 text-primary" /> Bounty Program
         </h1>
-        <p className="text-sm text-muted-foreground mt-1">Manage referral rewards, settings, and track all referral activity.</p>
+        <p className="text-sm text-muted-foreground mt-1">Manage bounty applications, rewards, settings, and track all referral activity.</p>
       </div>
 
       {/* Settings Card */}
@@ -405,6 +498,110 @@ export default function ReferralProgram() {
               </Button>
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Bounty Applicants */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base font-semibold">Applicants</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Tabs value={applicantTab} onValueChange={(v) => setApplicantTab(v as typeof applicantTab)}>
+            <TabsList className="mb-4">
+              <TabsTrigger value="pending">
+                Pending ({applicants.filter((a) => a.status === "pending").length})
+              </TabsTrigger>
+              <TabsTrigger value="approved">
+                Approved ({applicants.filter((a) => a.status === "approved").length})
+              </TabsTrigger>
+              <TabsTrigger value="rejected">
+                Rejected ({applicants.filter((a) => a.status === "rejected").length})
+              </TabsTrigger>
+            </TabsList>
+            {(["pending", "approved", "rejected"] as const).map((tab) => (
+              <TabsContent key={tab} value={tab}>
+                {applicantsLoading ? (
+                  <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+                ) : applicants.filter((a) => a.status === tab).length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-8">No applicants here.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {applicants.filter((a) => a.status === tab).map((applicant) => {
+                      const isReviewing = reviewingId === applicant.id;
+                      const isUploadingW9 = w9UploadingId === applicant.id;
+                      return (
+                        <div key={applicant.id} className="border border-border rounded-lg px-4 py-3 space-y-2">
+                          <div className="flex items-center justify-between gap-3 flex-wrap">
+                            <div>
+                              <p className="text-sm font-medium">{applicant.full_name}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {applicant.email}{applicant.phone ? ` · ${applicant.phone}` : ""}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              {applicant.status === "pending" && (
+                                <>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="h-7 text-xs px-2"
+                                    disabled={isReviewing}
+                                    onClick={() => handleApproveApplicant(applicant)}
+                                  >
+                                    Approve
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="h-7 text-xs px-2 text-destructive"
+                                    disabled={isReviewing}
+                                    onClick={() => handleRejectApplicant(applicant)}
+                                  >
+                                    Reject
+                                  </Button>
+                                </>
+                              )}
+                              {applicant.status === "approved" && applicant.code && (
+                                <span className="text-xs font-mono text-muted-foreground bg-muted/50 rounded px-2 py-1">
+                                  {applicant.code}
+                                </span>
+                              )}
+                              {isReviewing && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+                            </div>
+                          </div>
+                          {applicant.relationship_note && (
+                            <p className="text-xs text-muted-foreground">{applicant.relationship_note}</p>
+                          )}
+                          <div className="flex items-center gap-2">
+                            <Label className="text-xs shrink-0">W9:</Label>
+                            {applicant.w9_file_path ? (
+                              <span className="text-xs text-green-700">Attached</span>
+                            ) : (
+                              <span className="text-xs text-muted-foreground">Not attached</span>
+                            )}
+                            <label className="text-xs text-primary cursor-pointer hover:underline">
+                              {isUploadingW9 ? "Uploading…" : applicant.w9_file_path ? "Replace" : "Attach"}
+                              <input
+                                type="file"
+                                className="hidden"
+                                disabled={isUploadingW9}
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) handleW9Upload(applicant, file);
+                                  e.target.value = "";
+                                }}
+                              />
+                            </label>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </TabsContent>
+            ))}
+          </Tabs>
         </CardContent>
       </Card>
 

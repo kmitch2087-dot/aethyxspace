@@ -50,7 +50,7 @@ const navItems = [
   { title: "Invoices", url: "/admin/invoices", icon: Receipt },
   { title: "Documents", url: "/admin/documents", icon: FolderOpen },
   { title: "Media", url: "/admin/media", icon: ImageIcon },
-  { title: "Referral Program", url: "/admin/referral-program", icon: GitBranch },
+  { title: "Bounty Program", url: "/admin/referral-program", icon: GitBranch },
   { title: "Add-Ons", url: "/admin/add-ons", icon: Puzzle },
 ];
 
