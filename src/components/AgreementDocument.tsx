@@ -58,6 +58,71 @@ interface AgreementDocumentProps {
   onSubmit: () => void
 }
 
+// Hoisted to module scope deliberately — this must NOT be defined inside
+// AgreementDocument's render body. A component defined inside a parent's render
+// function gets a brand-new function identity every render, so React treats each
+// render's <Field> as a different component type and remounts the underlying
+// input/textarea DOM node — which drops focus after every keystroke (you type one
+// character, the field deselects, you have to click back in to continue). Keeping
+// Field here, with isLocked/mode/onBlurSave passed explicitly instead of captured
+// via closure, gives it one stable identity for the component's entire lifetime.
+function Field({
+  label,
+  value,
+  onChange,
+  editableIn,
+  multiline = false,
+  type = "text",
+  isLocked,
+  mode,
+  onBlurSave,
+}: {
+  label?: string
+  value: string
+  onChange: (v: string) => void
+  editableIn: "admin" | "client" | "both" | "none"
+  multiline?: boolean
+  type?: string
+  isLocked: boolean
+  mode: "admin" | "client" | "view"
+  onBlurSave: () => void
+}) {
+  const editable =
+    !isLocked &&
+    (editableIn === "both" ||
+      (editableIn === "admin" && mode === "admin") ||
+      (editableIn === "client" && mode === "client"))
+
+  if (editable) {
+    if (multiline) {
+      return (
+        <textarea
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          onBlur={onBlurSave}
+          className="w-full border-b border-gray-300 focus:border-teal-500 outline-none bg-yellow-50 rounded px-1 py-0.5 min-h-[80px] text-sm resize-y"
+          placeholder={label}
+        />
+      )
+    }
+    return (
+      <input
+        type={type}
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        onBlur={onBlurSave}
+        className="border-b border-gray-300 focus:border-teal-500 outline-none bg-yellow-50 rounded px-1 py-0.5 w-full text-sm"
+        placeholder={label}
+      />
+    )
+  }
+  return (
+    <span className={value ? "text-gray-900" : "text-gray-400 italic"}>
+      {value || `[${label || "Not provided"}]`}
+    </span>
+  )
+}
+
 export default function AgreementDocument({
   record,
   clientProfileId,
@@ -298,57 +363,6 @@ export default function AgreementDocument({
       })
     : null
 
-  function Field({
-    label,
-    value,
-    onChange,
-    editableIn,
-    multiline = false,
-    type = "text",
-  }: {
-    label?: string
-    value: string
-    onChange: (v: string) => void
-    editableIn: "admin" | "client" | "both" | "none"
-    multiline?: boolean
-    type?: string
-  }) {
-    const editable =
-      !record.is_locked &&
-      (editableIn === "both" ||
-        (editableIn === "admin" && mode === "admin") ||
-        (editableIn === "client" && mode === "client"))
-
-    if (editable) {
-      if (multiline) {
-        return (
-          <textarea
-            value={value}
-            onChange={e => onChange(e.target.value)}
-            onBlur={triggerAutoSave}
-            className="w-full border-b border-gray-300 focus:border-teal-500 outline-none bg-yellow-50 rounded px-1 py-0.5 min-h-[80px] text-sm resize-y"
-            placeholder={label}
-          />
-        )
-      }
-      return (
-        <input
-          type={type}
-          value={value}
-          onChange={e => onChange(e.target.value)}
-          onBlur={triggerAutoSave}
-          className="border-b border-gray-300 focus:border-teal-500 outline-none bg-yellow-50 rounded px-1 py-0.5 w-full text-sm"
-          placeholder={label}
-        />
-      )
-    }
-    return (
-      <span className={value ? "text-gray-900" : "text-gray-400 italic"}>
-        {value || `[${label || "Not provided"}]`}
-      </span>
-    )
-  }
-
   const sectionClass = "mb-8"
   const sectionTitle = "text-sm font-bold uppercase tracking-wider text-gray-700 mb-3 border-b border-gray-200 pb-1"
   const bodyText = "text-sm text-gray-700 leading-relaxed"
@@ -409,6 +423,9 @@ export default function AgreementDocument({
                   value={clientLegalName}
                   onChange={setClientLegalName}
                   editableIn="client"
+                  isLocked={record.is_locked}
+                  mode={mode}
+                  onBlurSave={triggerAutoSave}
                 />
                 <span className={bodyText}>("Client")</span>
               </div>
@@ -420,6 +437,9 @@ export default function AgreementDocument({
                 value={clientCompany}
                 onChange={setClientCompany}
                 editableIn="client"
+                isLocked={record.is_locked}
+                mode={mode}
+                onBlurSave={triggerAutoSave}
               />
             </div>
             <div className={fieldRow}>
@@ -429,6 +449,9 @@ export default function AgreementDocument({
                 value={clientAddress}
                 onChange={setClientAddress}
                 editableIn="client"
+                isLocked={record.is_locked}
+                mode={mode}
+                onBlurSave={triggerAutoSave}
               />
             </div>
           </div>
@@ -444,6 +467,9 @@ export default function AgreementDocument({
               onChange={setProjectScope}
               editableIn="admin"
               multiline
+              isLocked={record.is_locked}
+              mode={mode}
+              onBlurSave={triggerAutoSave}
             />
           </div>
           <p className={bodyText + " mt-3 mb-1"}>Services included in this agreement:</p>
@@ -454,6 +480,9 @@ export default function AgreementDocument({
               onChange={setServicesIncluded}
               editableIn="admin"
               multiline
+              isLocked={record.is_locked}
+              mode={mode}
+              onBlurSave={triggerAutoSave}
             />
           </div>
         </div>
@@ -470,6 +499,9 @@ export default function AgreementDocument({
                 onChange={setTimelineStart}
                 editableIn="admin"
                 type="date"
+                isLocked={record.is_locked}
+                mode={mode}
+                onBlurSave={triggerAutoSave}
               />
             </div>
             <div>
@@ -480,6 +512,9 @@ export default function AgreementDocument({
                 onChange={setTimelineEnd}
                 editableIn="admin"
                 type="date"
+                isLocked={record.is_locked}
+                mode={mode}
+                onBlurSave={triggerAutoSave}
               />
             </div>
           </div>
@@ -504,6 +539,9 @@ export default function AgreementDocument({
                   onChange={setTotalInvestment}
                   editableIn="admin"
                   type="number"
+                  isLocked={record.is_locked}
+                  mode={mode}
+                  onBlurSave={triggerAutoSave}
                 />
               </div>
             </div>
@@ -517,6 +555,9 @@ export default function AgreementDocument({
                   onChange={setDownPaymentAmount}
                   editableIn="admin"
                   type="number"
+                  isLocked={record.is_locked}
+                  mode={mode}
+                  onBlurSave={triggerAutoSave}
                 />
               </div>
             </div>
@@ -529,6 +570,9 @@ export default function AgreementDocument({
               onChange={setPaymentSchedule}
               editableIn="admin"
               multiline
+              isLocked={record.is_locked}
+              mode={mode}
+              onBlurSave={triggerAutoSave}
             />
           </div>
           <p className={bodyText + " mt-3"}>
@@ -554,6 +598,9 @@ export default function AgreementDocument({
                 onChange={setRevisionRounds}
                 editableIn="admin"
                 type="number"
+                isLocked={record.is_locked}
+                mode={mode}
+                onBlurSave={triggerAutoSave}
               />
             </span>{" "}
             rounds of revisions per deliverable, applied across the design and development phases.
@@ -592,6 +639,9 @@ export default function AgreementDocument({
             onChange={setHostingNotes}
             editableIn="admin"
             multiline
+            isLocked={record.is_locked}
+            mode={mode}
+            onBlurSave={triggerAutoSave}
           />
         </div>
 
@@ -646,6 +696,9 @@ export default function AgreementDocument({
             onChange={setAdditionalTerms}
             editableIn="admin"
             multiline
+            isLocked={record.is_locked}
+            mode={mode}
+            onBlurSave={triggerAutoSave}
           />
         </div>
 
@@ -679,6 +732,9 @@ export default function AgreementDocument({
                   value={clientLegalName}
                   onChange={setClientLegalName}
                   editableIn="client"
+                  isLocked={record.is_locked}
+                  mode={mode}
+                  onBlurSave={triggerAutoSave}
                 />
               </div>
               <div>
@@ -688,6 +744,9 @@ export default function AgreementDocument({
                   value={clientCompany}
                   onChange={setClientCompany}
                   editableIn="client"
+                  isLocked={record.is_locked}
+                  mode={mode}
+                  onBlurSave={triggerAutoSave}
                 />
               </div>
               <div>
@@ -697,6 +756,9 @@ export default function AgreementDocument({
                   value={clientAddress}
                   onChange={setClientAddress}
                   editableIn="client"
+                  isLocked={record.is_locked}
+                  mode={mode}
+                  onBlurSave={triggerAutoSave}
                 />
               </div>
             </div>
