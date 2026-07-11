@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { usePortalClientProfile } from "@/hooks/usePortalClientProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { CalendarDays, AlertTriangle, TrendingUp, Minus } from "lucide-react";
@@ -66,6 +67,7 @@ const ScheduleIcon = ({ status }: { status: ScheduleStatus }) => {
 
 export default function PortalProjects() {
   const { user } = useAuth();
+  const { profile: resolvedProfile, loading: profileLoading } = usePortalClientProfile();
   const { toast } = useToast();
 
   const [loading, setLoading] = useState(true);
@@ -74,18 +76,14 @@ export default function PortalProjects() {
   const [updates, setUpdates] = useState<any[]>([]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || profileLoading) return;
     load();
-  }, [user]);
+  }, [user, resolvedProfile, profileLoading]);
 
   async function load() {
     setLoading(true);
     try {
-      const { data: profile } = await supabase
-        .from("client_profiles")
-        .select("id")
-        .eq("user_id", user!.id)
-        .maybeSingle();
+      const profile = resolvedProfile;
 
       if (!profile) { setLoading(false); return; }
 

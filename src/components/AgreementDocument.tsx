@@ -49,6 +49,10 @@ interface AgreementDocumentProps {
   clientEmail: string
   logoUrl?: string
   mode: "admin" | "client" | "view"
+  /** When true, forces read-only "view" rendering regardless of mode/is_locked — used by
+   * "View as Client" so an admin previewing a client's portal can never save/submit on
+   * their behalf. */
+  readOnly?: boolean
   onSave: (updates: Partial<AgreementRecord>) => Promise<void>
   onSubmit: () => void
 }
@@ -60,11 +64,12 @@ export default function AgreementDocument({
   clientEmail,
   logoUrl,
   mode: modeProp,
+  readOnly = false,
   onSave,
   onSubmit,
 }: AgreementDocumentProps) {
   const { toast } = useToast()
-  const mode = record.is_locked ? "view" : modeProp
+  const mode = (record.is_locked || readOnly) ? "view" : modeProp
 
   const [projectScope, setProjectScope] = useState(record.project_scope || "")
   const [servicesIncluded, setServicesIncluded] = useState(record.services_included || "")

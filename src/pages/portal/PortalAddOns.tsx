@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { usePortalClientProfile } from "@/hooks/usePortalClientProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,7 @@ interface ClientAddOnRow {
 
 const PortalAddOns = () => {
   const { user } = useAuth();
+  const { profile: resolvedProfile, loading: profileLoading, isViewingAsAdmin } = usePortalClientProfile();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [profileId, setProfileId] = useState<string | null>(null);
@@ -34,14 +36,9 @@ const PortalAddOns = () => {
   const [requestingId, setRequestingId] = useState<string | null>(null);
 
   const load = async () => {
-    if (!user) return;
+    if (!user || profileLoading) return;
     setLoading(true);
-    const { data: profileData } = await supabase
-      .from("client_profiles")
-      .select("id")
-      .eq("user_id", user.id)
-      .maybeSingle();
-    const pid = profileData?.id ?? null;
+    const pid = resolvedProfile?.id ?? null;
     setProfileId(pid);
 
     const [catalogResult, addOnsResult] = await Promise.all([
@@ -68,10 +65,10 @@ const PortalAddOns = () => {
   useEffect(() => {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user, resolvedProfile, profileLoading]);
 
   const requestAddOn = async (catalogId: string) => {
-    if (!profileId) return;
+    if (!profileId || isViewingAsAdmin) return;
     setRequestingId(catalogId);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await (supabase as any).from("client_add_ons").insert({
@@ -123,7 +120,7 @@ const PortalAddOns = () => {
               size="sm"
               variant="outline"
               className="mt-2"
-              disabled={requestingId === item.id}
+              disabled={isViewingAsAdmin || requestingId === item.id}
               onClick={() => requestAddOn(item.id)}
             >
               {requestingId === item.id ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-2" /> : null}

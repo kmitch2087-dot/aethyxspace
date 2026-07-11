@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2, ArrowRight } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { usePortalClientProfile } from "@/hooks/usePortalClientProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +26,7 @@ const SECTION_META: Record<string, { eyebrow: string; title: string }> = {
 
 const PortalIntake = () => {
   const { user } = useAuth();
+  const { profile: resolvedProfile, loading: profileLoading, isViewingAsAdmin } = usePortalClientProfile();
   const { toast } = useToast();
   const nav = useNavigate();
   const [fields, setFields] = useState<Field[]>([]);
@@ -34,25 +36,23 @@ const PortalIntake = () => {
   const [profile, setProfile] = useState<any>(null);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || profileLoading) return;
     (async () => {
-      const [{ data: f }, { data: p }] = await Promise.all([
-        supabase.from("intake_form_fields").select("*").eq("active", true).order("section").order("display_order"),
-        supabase.from("client_profiles").select("*").eq("user_id", user.id).maybeSingle(),
-      ]);
+      const { data: f } = await supabase.from("intake_form_fields").select("*").eq("active", true).order("section").order("display_order");
+      const p = resolvedProfile;
       setFields((f || []) as any);
       setProfile(p);
       if (p) {
         setValues({
           full_name: p.full_name || "",
           email: p.email || user.email || "",
-          phone: p.phone || "",
-          business_name: p.business_name || "",
+          phone: String(p.phone ?? ""),
+          business_name: String(p.business_name ?? ""),
         });
       }
       setLoading(false);
     })();
-  }, [user]);
+  }, [user, resolvedProfile, profileLoading]);
 
   const grouped = useMemo(() => {
     const m: Record<string, Field[]> = { about: [], project: [], market: [], extra: [] };
@@ -64,7 +64,7 @@ const PortalIntake = () => {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!profile || !user) return;
+    if (!profile || !user || isViewingAsAdmin) return;
     const missing = fields.filter((f) => f.required && !(values[f.field_key] || "").trim());
     if (missing.length) {
       toast({ title: "A few fields are missing", description: missing.map((m) => m.label).join(", "), variant: "destructive" });
@@ -165,7 +165,7 @@ const PortalIntake = () => {
           );
         })}
         <div className="flex justify-end">
-          <Button type="submit" disabled={submitting} className="rounded-full px-8">
+          <Button type="submit" disabled={isViewingAsAdmin || submitting} className="rounded-full px-8">
             {submitting ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Submitting…</> : <>Submit intake <ArrowRight className="h-4 w-4 ml-2" /></>}
           </Button>
         </div>

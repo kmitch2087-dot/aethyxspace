@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { usePortalClientProfile } from "@/hooks/usePortalClientProfile";
 import { supabase } from "@/integrations/supabase/client";
 import {
   FileText, Download, Loader2, MessageSquare, Send,
@@ -11,17 +12,24 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import DocumentViewer from "@/components/DocumentViewer";
+import { getProjectTypeTemplate } from "@/lib/projectTemplates";
 
-const SLOT_LABELS: Record<string, string> = {
-  site_audit: "Site Audit",
-  market_research: "Market Research",
-  service_tier: "Service Tier Information",
-  plan: "Project Plan",
-  agreement: "Proposal & Agreement",
-};
+// Mirrors ClientDetail.tsx's getSlotLabel/getAgreementSlotKey pattern: a slot's label and
+// whether it's the agreement slot depend on which of the client's plans (by project_type)
+// actually defines that slot key — e.g. "market_research" (Website Build) vs "ga_market_research"
+// (Google Ads) live in different plans' defaultSlots. Falls back to the raw key / non-agreement
+// when no plan defines the slot, matching the previous graceful-degradation behavior.
+function getSlotTemplateFor(plans: { project_type: string }[], slotType: string) {
+  for (const plan of plans) {
+    const match = getProjectTypeTemplate(plan.project_type).defaultSlots?.find((s) => s.key === slotType);
+    if (match) return match;
+  }
+  return null;
+}
 
 const PortalDocuments = () => {
   const { user } = useAuth();
+  const { profile: resolvedProfile, loading: profileLoading, isViewingAsAdmin } = usePortalClientProfile();
   const [documents, setDocuments] = useState<any[]>([]);
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -39,14 +47,11 @@ const PortalDocuments = () => {
   const [slotSignedUrls, setSlotSignedUrls] = useState<Record<string, string>>({});
   const [slotsLoading, setSlotsLoading] = useState(true);
   const [agreementRecord, setAgreementRecord] = useState<any>(null);
+  const [plans, setPlans] = useState<any[]>([]);
 
   const load = async () => {
-    if (!user) return;
-    const { data: p } = await supabase
-      .from("client_profiles")
-      .select("id")
-      .eq("user_id", user.id)
-      .maybeSingle();
+    if (!user || profileLoading) return;
+    const p = resolvedProfile;
     setProfile(p);
 
     const profileId = p?.id;
@@ -66,6 +71,14 @@ const PortalDocuments = () => {
         .eq("client_profile_id", profileId)
         .maybeSingle();
       setAgreementRecord(agr);
+
+      // Fetch the client's project plans so slot labels/agreement-ness can be resolved
+      // per project type (Website Build vs Google Ads use different slot keys).
+      const { data: plansData } = await (supabase as any)
+        .from("client_project_plans")
+        .select("id, project_type")
+        .eq("client_profile_id", profileId);
+      setPlans(plansData || []);
     }
     setSlotsLoading(false);
 
@@ -81,7 +94,7 @@ const PortalDocuments = () => {
     setDocuments(data || []);
     setLoading(false);
 
-    if (profileId) {
+    if (profileId && !isViewingAsAdmin) {
       (supabase as any)
         .from("client_portal_seen_at")
         .upsert(
@@ -92,7 +105,7 @@ const PortalDocuments = () => {
     }
   };
 
-  useEffect(() => { load(); }, [user]);
+  useEffect(() => { load(); }, [user, resolvedProfile, profileLoading]);
 
   // Expand/collapse a slot; generate signed URL on first expand for uploaded slots
   const handleExpandSlot = async (slot: any) => {
@@ -159,7 +172,7 @@ const PortalDocuments = () => {
   };
 
   const sendMessage = async () => {
-    if (!user || !profile || !thread || !newMsg.trim()) return;
+    if (!user || !profile || !thread || !newMsg.trim() || isViewingAsAdmin) return;
     setSending(true);
     const { data, error } = await supabase
       .from("client_messages")
@@ -207,10 +220,11 @@ const PortalDocuments = () => {
         ) : (
           <div className="space-y-3">
             {visibleSlots.map((slot) => {
-              const label = SLOT_LABELS[slot.slot_type] || slot.slot_type;
+              const slotTemplate = getSlotTemplateFor(plans, slot.slot_type);
+              const label = slotTemplate?.label ?? slot.slot_type;
               const isExpanded = expandedSlot === slot.id;
               const signedUrl = slotSignedUrls[slot.id];
-              const isAgreement = slot.slot_type === "agreement";
+              const isAgreement = slotTemplate?.isAgreement ?? false;
 
               // ── Agreement slot ──
               if (isAgreement) {
@@ -379,7 +393,7 @@ const PortalDocuments = () => {
           </div>
           <div className="flex gap-2 pt-2 border-t">
             <Textarea rows={2} value={newMsg} onChange={(e) => setNewMsg(e.target.value)} placeholder="Type your message…" />
-            <Button onClick={sendMessage} disabled={sending || !newMsg.trim()}>
+            <Button onClick={sendMessage} disabled={isViewingAsAdmin || sending || !newMsg.trim()}>
               {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
             </Button>
           </div>

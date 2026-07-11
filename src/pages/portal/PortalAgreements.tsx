@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { usePortalClientProfile } from "@/hooks/usePortalClientProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { FileSignature, Loader2 } from "lucide-react";
@@ -7,19 +8,16 @@ import AgreementDocument from "@/components/AgreementDocument";
 
 const PortalAgreements = () => {
   const { user } = useAuth();
+  const { profile: resolvedProfile, loading: profileLoading, isViewingAsAdmin } = usePortalClientProfile();
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<{ id: string; full_name: string; email: string | null } | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [record, setRecord] = useState<any | null>(null);
 
   const load = async () => {
-    if (!user) return;
+    if (!user || profileLoading) return;
     setLoading(true);
-    const { data: profileData } = await supabase
-      .from("client_profiles")
-      .select("id, full_name, email")
-      .eq("user_id", user.id)
-      .maybeSingle();
+    const profileData = resolvedProfile;
     setProfile(profileData);
 
     if (profileData) {
@@ -31,13 +29,15 @@ const PortalAgreements = () => {
         .maybeSingle();
       setRecord(recordData);
 
-      (supabase as any)
-        .from("client_portal_seen_at")
-        .upsert(
-          { client_profile_id: profileData.id, item_type: "agreements", last_seen_at: new Date().toISOString() },
-          { onConflict: "client_profile_id,item_type" },
-        )
-        .then(() => {});
+      if (!isViewingAsAdmin) {
+        (supabase as any)
+          .from("client_portal_seen_at")
+          .upsert(
+            { client_profile_id: profileData.id, item_type: "agreements", last_seen_at: new Date().toISOString() },
+            { onConflict: "client_profile_id,item_type" },
+          )
+          .then(() => {});
+      }
     }
     setLoading(false);
   };
@@ -45,7 +45,7 @@ const PortalAgreements = () => {
   useEffect(() => {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user, resolvedProfile, profileLoading]);
 
   if (loading) {
     return (
@@ -81,7 +81,9 @@ const PortalAgreements = () => {
         clientName={profile.full_name}
         clientEmail={profile.email || ""}
         mode="client"
+        readOnly={isViewingAsAdmin}
         onSave={async (updates) => {
+          if (isViewingAsAdmin) return;
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const { error } = await (supabase as any)
             .from("client_agreement_records")

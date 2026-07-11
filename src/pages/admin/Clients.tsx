@@ -44,9 +44,15 @@ interface InvoiceAgg {
   needs_review: boolean;
 }
 
+interface LastSignIn {
+  client_profile_id: string;
+  last_sign_in_at: string | null;
+}
+
 const Clients = () => {
   const [clients, setClients] = useState<ClientRow[]>([]);
   const [invAgg, setInvAgg] = useState<InvoiceAgg[]>([]);
+  const [lastSignIns, setLastSignIns] = useState<LastSignIn[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
@@ -68,12 +74,15 @@ const Clients = () => {
   const [previewingEmails, setPreviewingEmails] = useState(false);
 
   const fetchAll = async () => {
-    const [c, i] = await Promise.all([
+    const [c, i, ls] = await Promise.all([
       supabase.from("client_profiles").select("id, full_name, email, business_name, status, stripe_customer_ids").order("full_name"),
       supabase.from("client_invoices").select("client_profile_id, amount_due, needs_review"),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (supabase as any).rpc("get_client_last_sign_ins"),
     ]);
     setClients((c.data as ClientRow[]) || []);
     setInvAgg((i.data as InvoiceAgg[]) || []);
+    setLastSignIns((ls.data as LastSignIn[]) || []);
     setLoading(false);
   };
 
@@ -91,6 +100,12 @@ const Clients = () => {
     });
     return m;
   }, [invAgg]);
+
+  const lastSignInByClient = useMemo(() => {
+    const m = new Map<string, string | null>();
+    lastSignIns.forEach((r) => m.set(r.client_profile_id, r.last_sign_in_at));
+    return m;
+  }, [lastSignIns]);
 
   const duplicates = useMemo(() => {
     const emailMap = new Map<string, ClientRow[]>();
@@ -269,7 +284,10 @@ const Clients = () => {
                         {agg?.review ? <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/40 text-xs">Needs review</Badge> : null}
                         {isDupe && <Badge className="bg-orange-500/20 text-orange-300 border-orange-500/40 text-xs">Duplicate</Badge>}
                       </div>
-                      <p className="text-xs text-muted-foreground">{c.email || "—"}{c.business_name ? ` · ${c.business_name}` : ""}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {c.email || "—"}{c.business_name ? ` · ${c.business_name}` : ""}
+                        {lastSignInByClient.get(c.id) ? ` · Last login ${new Date(lastSignInByClient.get(c.id)!).toLocaleDateString()}` : " · Never logged in"}
+                      </p>
                     </div>
                     <div className="text-right text-xs text-muted-foreground">
                       <div>{agg?.count || 0} invoice{(agg?.count || 0) === 1 ? "" : "s"}</div>

@@ -19,7 +19,7 @@ import {
   Eye, EyeOff, Clock, ListTodo, FolderInput, Sparkles,
 } from "lucide-react";
 import { format } from "date-fns";
-import { PROJECT_TYPES, DEFAULT_PROJECT_TYPE, getProjectTypeTemplate, type ProjectTypeKey } from "@/lib/projectTemplates";
+import { PROJECT_TYPES, DEFAULT_PROJECT_TYPE, getProjectTypeTemplate, type ProjectTypeKey, type SlotTemplate } from "@/lib/projectTemplates";
 import AgreementDocument from "@/components/AgreementDocument";
 import DocumentViewer from "@/components/DocumentViewer";
 
@@ -94,7 +94,7 @@ interface ProjectRow { id: string; name: string; status: string; notes: string |
 interface DocumentSlot {
   id: string;
   client_profile_id: string;
-  slot_type: 'site_audit' | 'market_research' | 'service_tier' | 'plan' | 'agreement';
+  slot_type: string;
   status: 'pending' | 'in_progress' | 'uploaded' | 'na' | 'in_preparation' | 'awaiting_signature' | 'completed';
   storage_path?: string;
   file_name?: string;
@@ -194,24 +194,22 @@ interface ProjectTask {
   updated_at: string;
 }
 
-const SLOT_TYPES = ['site_audit', 'market_research', 'service_tier', 'plan', 'agreement'];
-const NON_AGREEMENT_SLOTS = ['site_audit', 'market_research', 'service_tier', 'plan'];
-
-const SLOT_LABELS: Record<string, string> = {
-  site_audit: 'Site Audit',
-  market_research: 'Market Research',
-  service_tier: 'Service Tier Information',
-  plan: 'Project Plan',
-  agreement: 'Proposal & Agreement',
-};
-
-const SLOT_PHASE_NAMES: Record<string, string> = {
-  site_audit: 'Site Audit',
-  market_research: 'Market Research',
-  service_tier: 'Service Tier',
-  plan: 'Project Planning',
-  agreement: 'Contract & Agreement',
-};
+function getSlotsForPlan(plan: ProjectPlan | null): SlotTemplate[] {
+  if (!plan) return [];
+  return getProjectTypeTemplate(plan.project_type).defaultSlots ?? [];
+}
+function getSlotLabel(plan: ProjectPlan | null, slotType: string): string {
+  return getSlotsForPlan(plan).find((s) => s.key === slotType)?.label ?? slotType;
+}
+function getSlotPhaseName(plan: ProjectPlan | null, slotType: string): string {
+  return getSlotsForPlan(plan).find((s) => s.key === slotType)?.phaseName ?? slotType;
+}
+function getAgreementSlotKey(plan: ProjectPlan | null): string | null {
+  return getSlotsForPlan(plan).find((s) => s.isAgreement)?.key ?? null;
+}
+function getNonAgreementSlotKeys(plan: ProjectPlan | null): string[] {
+  return getSlotsForPlan(plan).filter((s) => !s.isAgreement).map((s) => s.key);
+}
 
 const IMAGE_EXTS = new Set(["jpg", "jpeg", "png", "gif", "webp", "svg", "avif"]);
 
@@ -266,6 +264,7 @@ const ClientDetail = () => {
   const [agreements, setAgreements] = useState<AgreementRow[]>([]);
   const [intakes, setIntakes] = useState<IntakeRow[]>([]);
   const [messages, setMessages] = useState<MessageRow[]>([]);
+  const [lastSignIn, setLastSignIn] = useState<string | null>(null);
   const [projects, setProjects] = useState<ProjectRow[]>([]);
 
   // Add-ons
@@ -438,7 +437,7 @@ const ClientDetail = () => {
 
     const emailLc = p.email ? p.email.toLowerCase() : null;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const [inv, dc, ag, it, ms, pr, ao, as_] = await Promise.all([
+    const [inv, dc, ag, it, ms, ls, pr, ao, as_] = await Promise.all([
       supabase.from("client_invoices").select("*").eq("client_profile_id", id).order("created_at", { ascending: false }),
       supabase.from("client_documents").select("*").or(`client_profile_id.eq.${id},user_id.eq.${p.user_id}`).order("created_at", { ascending: false }),
       emailLc
@@ -448,6 +447,8 @@ const ClientDetail = () => {
         ? supabase.from("client_intakes").select("*").or(`client_profile_id.eq.${id},email.eq.${emailLc}`).order("created_at", { ascending: false })
         : supabase.from("client_intakes").select("*").eq("client_profile_id", id).order("created_at", { ascending: false }),
       supabase.from("client_messages").select("*").or(`client_profile_id.eq.${id},user_id.eq.${p.user_id}`).order("created_at", { ascending: false }),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (supabase as any).rpc("get_client_last_sign_ins"),
       supabase.from("client_projects").select("*").eq("client_profile_id", id).order("created_at", { ascending: false }),
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (supabase as any).from("client_add_ons").select("*, catalog:add_on_catalog_id(name, type, category, display_price)").eq("client_profile_id", id).order("created_at", { ascending: false }),
@@ -460,6 +461,10 @@ const ClientDetail = () => {
     setAgreements((ag.data as AgreementRow[]) || []);
     setIntakes((it.data as IntakeRow[]) || []);
     setMessages((ms.data as MessageRow[]) || []);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const lastSignInData = (ls.data as any as Array<{ client_profile_id: string; last_sign_in_at: string | null }>) || [];
+    const thisClientLastSignIn = lastSignInData.find((r) => r.client_profile_id === id)?.last_sign_in_at || null;
+    setLastSignIn(thisClientLastSignIn);
     setProjects((pr.data as ProjectRow[]) || []);
     setAddOns((ao.data as AddOnRow[]) || []);
     const assetRows = (as_.data as ClientAsset[]) || [];
@@ -536,17 +541,12 @@ const ClientDetail = () => {
   useEffect(() => { fetchAll(); fetchPlan(); fetchAgreementRecord(); fetchPendingScrapeItems(); /* eslint-disable-next-line */ }, [id]);
   useEffect(() => { fetchCatalog(); }, []);
 
+  // Auto-create a Website Build plan if the client doesn't have one yet — every
+  // client should have at least this one by default. Other project types (Google
+  // Ads, etc.) are added explicitly via "+ New Project" and never auto-created.
   useEffect(() => {
     if (!id) return;
-    const initSlots = async () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (supabase as any).from('client_document_slots').upsert(
-        SLOT_TYPES.map((t) => ({ client_profile_id: id, slot_type: t })),
-        { onConflict: 'client_profile_id,slot_type', ignoreDuplicates: true },
-      );
-      // Auto-create a Website Build plan if the client doesn't have one yet — every
-      // client should have at least this one by default. Other project types (Google
-      // Ads, etc.) are added explicitly via "+ New Project" and never auto-created.
+    const ensureWebsitePlan = async () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data: existingWebsitePlan } = await (supabase as any)
         .from('client_project_plans').select('id').eq('client_profile_id', id)
@@ -559,14 +559,33 @@ const ClientDetail = () => {
         });
         fetchPlan();
       }
+    };
+    ensureWebsitePlan();
+    /* eslint-disable-next-line */
+  }, [id]);
+
+  // Seed document slots for every project type the client currently has a plan for
+  // — each plan's own defaultSlots (from projectTemplates.ts), not a fixed global
+  // list. Re-runs (idempotently, via upsert+ignoreDuplicates) whenever allPlans
+  // changes/loads, so this correctly waits for fetchPlan() to populate allPlans
+  // rather than racing it.
+  useEffect(() => {
+    if (!id || allPlans.length === 0) return;
+    const seedSlots = async () => {
+      const allSlotTemplates = allPlans.flatMap((p) => getSlotsForPlan(p));
+      if (allSlotTemplates.length === 0) return;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase as any).from('client_document_slots').upsert(
+        allSlotTemplates.map((s) => ({ client_profile_id: id, slot_type: s.key })),
+        { onConflict: 'client_profile_id,slot_type', ignoreDuplicates: true },
+      );
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data: slotsData } = await (supabase as any)
         .from('client_document_slots').select('*').eq('client_profile_id', id);
       setDocSlots((slotsData as DocumentSlot[]) || []);
     };
-    initSlots();
-    /* eslint-disable-next-line */
-  }, [id]);
+    seedSlots();
+  }, [id, allPlans]);
 
   const saveProfile = async () => {
     if (!profile) return;
@@ -1191,55 +1210,65 @@ const ClientDetail = () => {
 
   const updateProjectPhaseForSlot = async (slotType: string) => {
     if (!id) return;
-    // Document slots (Site Audit / Market Research / etc.) only ever map onto the
-    // client's Website Build plan — a client may also have a Google Ads (or other)
-    // plan, and slot uploads must never bleed into those.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: planData } = await (supabase as any).from('client_project_plans')
-      .select('id').eq('client_profile_id', id).eq('project_type', 'website_build').maybeSingle();
-    if (!planData) return;
-    const phaseName = SLOT_PHASE_NAMES[slotType];
+    // Slot keys are namespaced per project type (e.g. ga_* for Google Ads), so find
+    // which of the client's plans this slot actually belongs to instead of assuming
+    // Website Build.
+    const owningPlan = allPlans.find((p) => getSlotsForPlan(p).some((s) => s.key === slotType));
+    if (!owningPlan) return;
+    const phaseName = getSlotPhaseName(owningPlan, slotType);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: existing } = await (supabase as any).from('client_project_phases')
-      .select('id').eq('plan_id', planData.id).ilike('name', phaseName).maybeSingle();
+      .select('id').eq('plan_id', owningPlan.id).ilike('name', phaseName).maybeSingle();
     if (existing) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (supabase as any).from('client_project_phases')
         .update({ completion_percent: 100, status: 'complete', updated_at: new Date().toISOString() })
         .eq('id', existing.id);
+    } else if (owningPlan.project_type === 'google_ads') {
+      // Google Ads' defaultSlots phaseNames (e.g. "Market Research") don't correspond to
+      // any of its defaultPhases (e.g. "Week 1: Access, Setup + Strategy") at all — unlike
+      // Website Build, where "no match" can legitimately mean an older plan instance just
+      // hasn't had its phases auto-seeded yet (its slot/phase names DO correspond 1:1).
+      // So for Google Ads specifically, skip phase-linking for this slot entirely instead
+      // of inserting a spurious, unrelated phase that would pollute completion_percent.
+      // The slot's own status/upload is unaffected — that's handled by the caller.
+      return;
     } else {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data: phaseCount } = await (supabase as any).from('client_project_phases')
-        .select('id').eq('plan_id', planData.id);
+        .select('id').eq('plan_id', owningPlan.id);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (supabase as any).from('client_project_phases').insert({
-        plan_id: planData.id, name: phaseName, completion_percent: 100,
+        plan_id: owningPlan.id, name: phaseName, completion_percent: 100,
         status: 'complete', sort_order: (phaseCount?.length || 0),
       });
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: allPhases } = await (supabase as any).from('client_project_phases')
-      .select('completion_percent').eq('plan_id', planData.id);
+      .select('completion_percent').eq('plan_id', owningPlan.id);
     if (allPhases?.length) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const avg = Math.round(allPhases.reduce((s: number, p: any) => s + p.completion_percent, 0) / allPhases.length);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (supabase as any).from('client_project_plans')
-        .update({ completion_percent: avg, updated_at: new Date().toISOString() }).eq('id', planData.id);
+        .update({ completion_percent: avg, updated_at: new Date().toISOString() }).eq('id', owningPlan.id);
     }
   };
 
-  const checkAndTriggerAgreement = async (currentSlots: DocumentSlot[]) => {
-    const agreementSlot = currentSlots.find((s) => s.slot_type === 'agreement');
+  const checkAndTriggerAgreement = async (currentSlots: DocumentSlot[], owningPlan: ProjectPlan) => {
+    const agreementKey = getAgreementSlotKey(owningPlan);
+    if (!agreementKey) return; // this project type has no agreement slot (e.g. Google Ads)
+    const agreementSlot = currentSlots.find((s) => s.slot_type === agreementKey);
     if (!agreementSlot || !['pending', 'in_progress'].includes(agreementSlot.status)) return;
-    const allOthersDone = NON_AGREEMENT_SLOTS.every((t) => {
+    const nonAgreementKeys = getNonAgreementSlotKeys(owningPlan);
+    const allOthersDone = nonAgreementKeys.every((t) => {
       const s = currentSlots.find((sl) => sl.slot_type === t);
       return s?.status === 'uploaded' || s?.status === 'na';
     });
     if (allOthersDone && id) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (supabase as any).from('client_document_slots').upsert(
-        { client_profile_id: id, slot_type: 'agreement', status: 'in_preparation' },
+        { client_profile_id: id, slot_type: agreementKey, status: 'in_preparation' },
         { onConflict: 'client_profile_id,slot_type' },
       );
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1250,26 +1279,28 @@ const ClientDetail = () => {
 
   const handleSlotUpload = async (slotType: string, file: File) => {
     if (!id) return;
+    const owningPlan = allPlans.find((p) => getSlotsForPlan(p).some((s) => s.key === slotType));
     setUploadingSlot(slotType);
     try {
       const path = `${id}/${slotType}/${Date.now()}_${file.name}`;
       const { error: uploadError } = await supabase.storage.from('client-slot-docs').upload(path, file);
       if (uploadError) throw uploadError;
+      const isAgreementSlot = owningPlan ? getAgreementSlotKey(owningPlan) === slotType : false;
       // Agreement upload → awaiting signature; all others → uploaded
-      const newStatus = slotType === 'agreement' ? 'awaiting_signature' : 'uploaded';
+      const newStatus = isAgreementSlot ? 'awaiting_signature' : 'uploaded';
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (supabase as any).from('client_document_slots').upsert({
         client_profile_id: id, slot_type: slotType, status: newStatus,
         storage_path: path, file_name: file.name, file_size: file.size,
         uploaded_at: new Date().toISOString(),
       }, { onConflict: 'client_profile_id,slot_type' });
-      if (slotType !== 'agreement') await updateProjectPhaseForSlot(slotType);
+      if (!isAgreementSlot) await updateProjectPhaseForSlot(slotType);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data } = await (supabase as any).from('client_document_slots').select('*').eq('client_profile_id', id);
       const refreshed = (data as DocumentSlot[]) || [];
       setDocSlots(refreshed);
-      if (slotType !== 'agreement') await checkAndTriggerAgreement(refreshed);
-      toast({ title: slotType === 'agreement' ? 'Proposal uploaded — awaiting client signature' : `${SLOT_LABELS[slotType]} uploaded` });
+      if (!isAgreementSlot && owningPlan) await checkAndTriggerAgreement(refreshed, owningPlan);
+      toast({ title: isAgreementSlot ? 'Proposal uploaded — awaiting client signature' : `${getSlotLabel(owningPlan, slotType)} uploaded` });
     } catch {
       toast({ title: 'Upload failed', variant: 'destructive' });
     } finally {
@@ -1306,6 +1337,7 @@ const ClientDetail = () => {
 
   const updateSlotStatus = async (slotType: string, status: DocumentSlot['status']) => {
     if (!id) return;
+    const owningPlan = allPlans.find((p) => getSlotsForPlan(p).some((s) => s.key === slotType));
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (supabase as any).from('client_document_slots').upsert(
       { client_profile_id: id, slot_type: slotType, status },
@@ -1313,7 +1345,8 @@ const ClientDetail = () => {
     );
     const updated = docSlots.map((s) => s.slot_type === slotType ? { ...s, status } : s);
     setDocSlots(updated);
-    if (slotType !== 'agreement') await checkAndTriggerAgreement(updated);
+    const isAgreementSlot = owningPlan ? getAgreementSlotKey(owningPlan) === slotType : false;
+    if (!isAgreementSlot && owningPlan) await checkAndTriggerAgreement(updated, owningPlan);
   };
 
   const toggleSlotView = async (slotType: string) => {
@@ -1391,8 +1424,18 @@ const ClientDetail = () => {
           </Button>
           <h1 className="text-2xl font-display tracking-wider">{profile.full_name}</h1>
           <p className="text-sm text-muted-foreground">{profile.email}</p>
+          <p className="text-xs text-muted-foreground">
+            {lastSignIn ? `Last login ${new Date(lastSignIn).toLocaleDateString()}` : "Never logged in"}
+          </p>
         </div>
         <div className="flex gap-2 flex-wrap">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => window.open(`/portal?viewAs=${profile.id}`, "_blank", "noopener,noreferrer")}
+          >
+            <Eye className="h-4 w-4 mr-2" /> View as {profile.first_name || profile.full_name.split(" ")[0]}
+          </Button>
           {profile.email && (
             <Button variant="outline" size="sm" onClick={handleResendInvite}>
               <Mail className="h-4 w-4 mr-2" /> Resend invite
@@ -1517,14 +1560,14 @@ const ClientDetail = () => {
               <h3 className="font-display text-sm tracking-wider">Project Documents</h3>
             </div>
             <div className="divide-y divide-black/5">
-              {SLOT_TYPES.map((slotType) => {
+              {getSlotsForPlan(plan).map(({ key: slotType }) => {
                 const slot = docSlots.find((s) => s.slot_type === slotType);
                 const status = slot?.status || 'pending';
                 const isUploading = uploadingSlot === slotType;
-                const isAgreement = slotType === 'agreement';
+                const isAgreement = getAgreementSlotKey(plan) === slotType;
                 return (
                   <div key={slotType} className="flex items-center gap-3 px-4 py-3 flex-wrap">
-                    <span className="text-sm font-medium w-48 shrink-0">{SLOT_LABELS[slotType]}</span>
+                    <span className="text-sm font-medium w-48 shrink-0">{getSlotLabel(plan, slotType)}</span>
 
                     {/* Status badges */}
                     {status === 'pending' && <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">Pending</span>}
@@ -1623,7 +1666,7 @@ const ClientDetail = () => {
               return (
                 <div className="border-t border-black/10 overflow-hidden">
                   <div className="flex items-center justify-between px-4 py-2 border-b border-black/5 bg-muted/30">
-                    <span className="text-sm font-medium">{SLOT_LABELS[expandedSlot]}</span>
+                    <span className="text-sm font-medium">{getSlotLabel(plan, expandedSlot)}</span>
                     <button onClick={() => setExpandedSlot(null)} className="text-xs text-muted-foreground hover:text-black">
                       Close
                     </button>
@@ -3033,8 +3076,8 @@ const ClientDetail = () => {
                 <SelectValue placeholder="Choose a slot…" />
               </SelectTrigger>
               <SelectContent style={lightVars} className="bg-white text-black">
-                {SLOT_TYPES.map((slotType) => (
-                  <SelectItem key={slotType} value={slotType}>{SLOT_LABELS[slotType]}</SelectItem>
+                {getSlotsForPlan(plan).map(({ key: slotType }) => (
+                  <SelectItem key={slotType} value={slotType}>{getSlotLabel(plan, slotType)}</SelectItem>
                 ))}
               </SelectContent>
             </Select>

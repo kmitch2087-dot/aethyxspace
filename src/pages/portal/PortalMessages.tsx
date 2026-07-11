@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { usePortalClientProfile } from "@/hooks/usePortalClientProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,6 +10,7 @@ import { format } from "date-fns";
 
 const PortalMessages = () => {
   const { user } = useAuth();
+  const { profile: resolvedProfile, loading: profileLoading, isViewingAsAdmin } = usePortalClientProfile();
   const { toast } = useToast();
   const [messages, setMessages] = useState<any[]>([]);
   const [profileId, setProfileId] = useState<string | null>(null);
@@ -17,13 +19,8 @@ const PortalMessages = () => {
   const [loading, setLoading] = useState(true);
 
   const fetchMessages = async () => {
-    if (!user) return;
-    const { data: profile } = await supabase
-      .from("client_profiles")
-      .select("id")
-      .eq("user_id", user.id)
-      .maybeSingle();
-    const pid = profile?.id || null;
+    if (!user || profileLoading) return;
+    const pid = resolvedProfile?.id ?? null;
     setProfileId(pid);
     const filter = pid
       ? `client_profile_id.eq.${pid},user_id.eq.${user.id}`
@@ -39,10 +36,10 @@ const PortalMessages = () => {
 
   useEffect(() => {
     fetchMessages();
-  }, [user]);
+  }, [user, resolvedProfile, profileLoading]);
 
   const handleSend = async () => {
-    if (!newMessage.trim() || !user) return;
+    if (!newMessage.trim() || !user || isViewingAsAdmin) return;
     setSending(true);
     const { error } = await supabase.from("client_messages").insert({
       user_id: user.id,
@@ -71,7 +68,7 @@ const PortalMessages = () => {
           maxLength={2000}
           className="min-h-[120px]"
         />
-        <Button onClick={handleSend} disabled={sending || !newMessage.trim()}>
+        <Button onClick={handleSend} disabled={isViewingAsAdmin || sending || !newMessage.trim()}>
           {sending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Send className="h-4 w-4 mr-2" />}
           Send Message
         </Button>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { usePortalClientProfile } from "@/hooks/usePortalClientProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle2, Circle, ListTodo } from "lucide-react";
@@ -16,6 +17,7 @@ const priorityColors: Record<string, string> = {
 
 export default function PortalTasks() {
   const { user } = useAuth();
+  const { profile: resolvedProfile, loading: profileLoading, isViewingAsAdmin } = usePortalClientProfile();
   const { toast } = useToast();
 
   const [loading, setLoading] = useState(true);
@@ -23,19 +25,15 @@ export default function PortalTasks() {
   const [completing, setCompleting] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || profileLoading) return;
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user, resolvedProfile, profileLoading]);
 
   async function load() {
     setLoading(true);
     try {
-      const { data: profile } = await supabase
-        .from("client_profiles")
-        .select("id")
-        .eq("user_id", user!.id)
-        .maybeSingle();
+      const profile = resolvedProfile;
 
       if (!profile) { setLoading(false); return; }
 
@@ -56,13 +54,15 @@ export default function PortalTasks() {
 
       setTasks(tasksData ?? []);
 
-      (supabase as any)
-        .from("client_portal_seen_at")
-        .upsert(
-          { client_profile_id: profile.id, item_type: "tasks", last_seen_at: new Date().toISOString() },
-          { onConflict: "client_profile_id,item_type" },
-        )
-        .then(() => {});
+      if (!isViewingAsAdmin) {
+        (supabase as any)
+          .from("client_portal_seen_at")
+          .upsert(
+            { client_profile_id: profile.id, item_type: "tasks", last_seen_at: new Date().toISOString() },
+            { onConflict: "client_profile_id,item_type" },
+          )
+          .then(() => {});
+      }
     } catch {
       toast({ title: "Failed to load tasks", variant: "destructive" });
     } finally {
@@ -71,6 +71,7 @@ export default function PortalTasks() {
   }
 
   async function markTaskComplete(taskId: string) {
+    if (isViewingAsAdmin) return;
     setCompleting(taskId);
     const { error } = await (supabase as any)
       .from("client_project_tasks")
@@ -117,7 +118,7 @@ export default function PortalTasks() {
               >
                 <button
                   onClick={() => !done && markTaskComplete(task.id)}
-                  disabled={done || completing === task.id}
+                  disabled={done || completing === task.id || isViewingAsAdmin}
                   className="mt-0.5 shrink-0 text-white/40 hover:text-teal-400 disabled:cursor-default disabled:hover:text-white/40 transition-colors"
                   aria-label={done ? "Task complete" : "Mark complete"}
                 >
