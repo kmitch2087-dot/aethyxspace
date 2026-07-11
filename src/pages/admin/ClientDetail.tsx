@@ -16,7 +16,7 @@ import {
   ArrowLeft, Loader2, Save, Upload, Mail, Plus, ExternalLink,
   AlertTriangle, CheckCircle2, Trash2, RefreshCcw, FileText, Bell, Pencil, XCircle,
   ChevronDown, ChevronUp, Download, ArrowUp, ArrowDown,
-  Eye, EyeOff, Clock, ListTodo,
+  Eye, EyeOff, Clock, ListTodo, FolderInput,
 } from "lucide-react";
 import { format } from "date-fns";
 import { PROJECT_TYPES, DEFAULT_PROJECT_TYPE, getProjectTypeTemplate, type ProjectTypeKey } from "@/lib/projectTemplates";
@@ -281,6 +281,9 @@ const ClientDetail = () => {
   const [editingDocId, setEditingDocId] = useState<string | null>(null);
   const [editingDocTitle, setEditingDocTitle] = useState("");
   const [viewingDoc, setViewingDoc] = useState<DocRow | null>(null);
+  const [assignSlotDoc, setAssignSlotDoc] = useState<DocRow | null>(null);
+  const [assignSlotType, setAssignSlotType] = useState<string>("");
+  const [assigningSlot, setAssigningSlot] = useState(false);
 
   // Intake collapsible inside Documents tab
   const [intakesOpen, setIntakesOpen] = useState(false);
@@ -337,6 +340,7 @@ const ClientDetail = () => {
   const [allPlans, setAllPlans] = useState<ProjectPlan[]>([]);
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
   const plan = allPlans.find((p) => p.id === selectedPlanId) || allPlans[0] || null;
+  const slotCapablePlan = allPlans.find((p) => getProjectTypeTemplate(p.project_type).usesDocumentSlots);
   const [phases, setPhases] = useState<ProjectPhase[]>([]);
   const [planUpdates, setPlanUpdates] = useState<ProjectUpdate[]>([]);
   const [creatingPlan, setCreatingPlan] = useState(false);
@@ -1152,6 +1156,30 @@ const ClientDetail = () => {
     }
   };
 
+  const handleAssignToSlot = async () => {
+    if (!assignSlotDoc || !assignSlotType) return;
+    setAssigningSlot(true);
+    try {
+      let path: string = assignSlotDoc.file_url;
+      const marker = "/client-documents/";
+      const idx = path.indexOf(marker);
+      if (idx !== -1) path = path.substring(idx + marker.length);
+      const bucket = assignSlotDoc.parent_admin_doc_id ? "admin-documents" : "client-documents";
+      const { data: blob, error: downloadError } = await supabase.storage.from(bucket).download(path);
+      if (downloadError || !blob) {
+        toast({ title: "Could not read source file", description: downloadError?.message, variant: "destructive" });
+        return;
+      }
+      const originalName = assignSlotDoc.file_url.split("/").pop() || assignSlotDoc.title;
+      const file = new File([blob], originalName, { type: blob.type });
+      await handleSlotUpload(assignSlotType, file);
+      setAssignSlotDoc(null);
+      setAssignSlotType("");
+    } finally {
+      setAssigningSlot(false);
+    }
+  };
+
   const updateSlotStatus = async (slotType: string, status: DocumentSlot['status']) => {
     if (!id) return;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1544,6 +1572,15 @@ const ClientDetail = () => {
                       </div>
                     </button>
                     <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {slotCapablePlan && (
+                        <button
+                          className="p-1 rounded-full bg-white/80 hover:bg-teal-50 text-black/40 hover:text-teal-600"
+                          onClick={(e) => { e.stopPropagation(); setAssignSlotDoc(d); setAssignSlotType(""); }}
+                          title="Assign to project slot"
+                        >
+                          <FolderInput className="h-3.5 w-3.5" />
+                        </button>
+                      )}
                       <button
                         className="p-1 rounded-full bg-white/80 hover:bg-blue-50 text-black/40 hover:text-blue-600"
                         onClick={(e) => { e.stopPropagation(); setEditingDocId(d.id); setEditingDocTitle(d.title); }}
@@ -2805,6 +2842,35 @@ const ClientDetail = () => {
           {viewingDoc && (
             <DocumentViewer url={docUrls[viewingDoc.id] || null} fileName={viewingDoc.file_url} />
           )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!assignSlotDoc} onOpenChange={(open) => !open && setAssignSlotDoc(null)}>
+        <DialogContent className="sm:max-w-md bg-white text-black" style={lightVars}>
+          <DialogHeader><DialogTitle className="text-black">Assign to Project Slot</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Copy "{assignSlotDoc?.title}" into one of this project's document slots.
+            </p>
+            <Select value={assignSlotType} onValueChange={setAssignSlotType}>
+              <SelectTrigger className="bg-white text-black border-black/20">
+                <SelectValue placeholder="Choose a slot…" />
+              </SelectTrigger>
+              <SelectContent style={lightVars} className="bg-white text-black">
+                {SLOT_TYPES.map((slotType) => (
+                  <SelectItem key={slotType} value={slotType}>{SLOT_LABELS[slotType]}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button
+              onClick={handleAssignToSlot}
+              disabled={!assignSlotType || assigningSlot}
+              className="w-full"
+            >
+              {assigningSlot && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+              Assign
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
 
