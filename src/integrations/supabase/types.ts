@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      add_on_catalog: {
+        Row: {
+          active: boolean
+          category: string
+          created_at: string
+          description: string | null
+          display_price: string | null
+          id: string
+          name: string
+          price_max: number | null
+          price_min: number | null
+          sort_order: number
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          category?: string
+          created_at?: string
+          description?: string | null
+          display_price?: string | null
+          id?: string
+          name: string
+          price_max?: number | null
+          price_min?: number | null
+          sort_order?: number
+          type?: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          category?: string
+          created_at?: string
+          description?: string | null
+          display_price?: string | null
+          id?: string
+          name?: string
+          price_max?: number | null
+          price_min?: number | null
+          sort_order?: number
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       admin_documents: {
         Row: {
           category: string | null
@@ -137,6 +182,155 @@ export type Database = {
         }
         Relationships: []
       }
+      client_add_ons: {
+        Row: {
+          add_on_catalog_id: string | null
+          client_profile_id: string
+          created_at: string
+          custom_name: string | null
+          end_date: string | null
+          id: string
+          notes: string | null
+          price: number | null
+          start_date: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          add_on_catalog_id?: string | null
+          client_profile_id: string
+          created_at?: string
+          custom_name?: string | null
+          end_date?: string | null
+          id?: string
+          notes?: string | null
+          price?: number | null
+          start_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          add_on_catalog_id?: string | null
+          client_profile_id?: string
+          created_at?: string
+          custom_name?: string | null
+          end_date?: string | null
+          id?: string
+          notes?: string | null
+          price?: number | null
+          start_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_add_ons_add_on_catalog_id_fkey"
+            columns: ["add_on_catalog_id"]
+            isOneToOne: false
+            referencedRelation: "add_on_catalog"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_add_ons_client_profile_id_fkey"
+            columns: ["client_profile_id"]
+            isOneToOne: false
+            referencedRelation: "client_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_agreement_records: {
+        Row: {
+          additional_terms: string
+          client_address: string
+          client_company: string
+          client_legal_name: string
+          client_profile_id: string
+          client_signature_data: string | null
+          client_signed_at: string | null
+          created_at: string
+          down_payment_amount: number | null
+          down_payment_status: string
+          hosting_notes: string
+          id: string
+          id_document_path: string | null
+          is_locked: boolean
+          paid_at: string | null
+          payment_schedule: string
+          project_scope: string
+          revision_rounds: number
+          services_included: string
+          stripe_checkout_session_id: string | null
+          submitted_at: string | null
+          timeline_end: string | null
+          timeline_start: string | null
+          total_investment: number | null
+          updated_at: string
+        }
+        Insert: {
+          additional_terms?: string
+          client_address?: string
+          client_company?: string
+          client_legal_name?: string
+          client_profile_id: string
+          client_signature_data?: string | null
+          client_signed_at?: string | null
+          created_at?: string
+          down_payment_amount?: number | null
+          down_payment_status?: string
+          hosting_notes?: string
+          id?: string
+          id_document_path?: string | null
+          is_locked?: boolean
+          paid_at?: string | null
+          payment_schedule?: string
+          project_scope?: string
+          revision_rounds?: number
+          services_included?: string
+          stripe_checkout_session_id?: string | null
+          submitted_at?: string | null
+          timeline_end?: string | null
+          timeline_start?: string | null
+          total_investment?: number | null
+          updated_at?: string
+        }
+        Update: {
+          additional_terms?: string
+          client_address?: string
+          client_company?: string
+          client_legal_name?: string
+          client_profile_id?: string
+          client_signature_data?: string | null
+          client_signed_at?: string | null
+          created_at?: string
+          down_payment_amount?: number | null
+          down_payment_status?: string
+          hosting_notes?: string
+          id?: string
+          id_document_path?: string | null
+          is_locked?: boolean
+          paid_at?: string | null
+          payment_schedule?: string
+          project_scope?: string
+          revision_rounds?: number
+          services_included?: string
+          stripe_checkout_session_id?: string | null
+          submitted_at?: string | null
+          timeline_end?: string | null
+          timeline_start?: string | null
+          total_investment?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_agreement_records_client_profile_id_fkey"
+            columns: ["client_profile_id"]
+            isOneToOne: true
+            referencedRelation: "client_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_agreements: {
         Row: {
           agreement_url: string | null
@@ -181,6 +375,109 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      client_assets: {
+        Row: {
+          bg_color: string | null
+          category: string
+          client_profile_id: string
+          content: string | null
+          created_at: string
+          file_name: string | null
+          file_size: number | null
+          file_url: string | null
+          id: string
+          label: string
+          sort_order: number
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          bg_color?: string | null
+          category?: string
+          client_profile_id: string
+          content?: string | null
+          created_at?: string
+          file_name?: string | null
+          file_size?: number | null
+          file_url?: string | null
+          id?: string
+          label: string
+          sort_order?: number
+          type?: string
+          updated_at?: string
+        }
+        Update: {
+          bg_color?: string | null
+          category?: string
+          client_profile_id?: string
+          content?: string | null
+          created_at?: string
+          file_name?: string | null
+          file_size?: number | null
+          file_url?: string | null
+          id?: string
+          label?: string
+          sort_order?: number
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_assets_client_profile_id_fkey"
+            columns: ["client_profile_id"]
+            isOneToOne: false
+            referencedRelation: "client_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_document_slots: {
+        Row: {
+          client_profile_id: string
+          created_at: string
+          file_name: string | null
+          file_size: number | null
+          id: string
+          slot_type: string
+          status: string
+          storage_path: string | null
+          updated_at: string
+          uploaded_at: string | null
+        }
+        Insert: {
+          client_profile_id: string
+          created_at?: string
+          file_name?: string | null
+          file_size?: number | null
+          id?: string
+          slot_type: string
+          status?: string
+          storage_path?: string | null
+          updated_at?: string
+          uploaded_at?: string | null
+        }
+        Update: {
+          client_profile_id?: string
+          created_at?: string
+          file_name?: string | null
+          file_size?: number | null
+          id?: string
+          slot_type?: string
+          status?: string
+          storage_path?: string | null
+          updated_at?: string
+          uploaded_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_document_slots_client_profile_id_fkey"
+            columns: ["client_profile_id"]
+            isOneToOne: false
+            referencedRelation: "client_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       client_documents: {
         Row: {
@@ -229,6 +526,7 @@ export type Database = {
           linked_user_id: string | null
           notes: string | null
           phone: string | null
+          referral_code: string | null
           responses: Json
           status: string
           updated_at: string
@@ -243,6 +541,7 @@ export type Database = {
           linked_user_id?: string | null
           notes?: string | null
           phone?: string | null
+          referral_code?: string | null
           responses?: Json
           status?: string
           updated_at?: string
@@ -257,6 +556,7 @@ export type Database = {
           linked_user_id?: string | null
           notes?: string | null
           phone?: string | null
+          referral_code?: string | null
           responses?: Json
           status?: string
           updated_at?: string
@@ -389,6 +689,8 @@ export type Database = {
           notes: string | null
           phone: string | null
           portal_activated_at: string | null
+          portal_last_login_notified_at: string | null
+          referral_enabled: boolean
           source: string | null
           status: string
           stripe_customer_id: string | null
@@ -414,6 +716,8 @@ export type Database = {
           notes?: string | null
           phone?: string | null
           portal_activated_at?: string | null
+          portal_last_login_notified_at?: string | null
+          referral_enabled?: boolean
           source?: string | null
           status?: string
           stripe_customer_id?: string | null
@@ -439,6 +743,8 @@ export type Database = {
           notes?: string | null
           phone?: string | null
           portal_activated_at?: string | null
+          portal_last_login_notified_at?: string | null
+          referral_enabled?: boolean
           source?: string | null
           status?: string
           stripe_customer_id?: string | null
@@ -447,6 +753,188 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      client_project_phases: {
+        Row: {
+          completion_percent: number
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          plan_id: string
+          sort_order: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          completion_percent?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          plan_id: string
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          completion_percent?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          plan_id?: string
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_project_phases_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "client_project_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_project_plans: {
+        Row: {
+          client_profile_id: string
+          completion_percent: number
+          created_at: string
+          github_url: string | null
+          id: string
+          overview: string | null
+          project_name: string
+          project_type: string
+          start_date: string | null
+          status: string
+          target_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          client_profile_id: string
+          completion_percent?: number
+          created_at?: string
+          github_url?: string | null
+          id?: string
+          overview?: string | null
+          project_name?: string
+          project_type?: string
+          start_date?: string | null
+          status?: string
+          target_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          client_profile_id?: string
+          completion_percent?: number
+          created_at?: string
+          github_url?: string | null
+          id?: string
+          overview?: string | null
+          project_name?: string
+          project_type?: string
+          start_date?: string | null
+          status?: string
+          target_date?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_project_plans_client_profile_id_fkey"
+            columns: ["client_profile_id"]
+            isOneToOne: false
+            referencedRelation: "client_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_project_tasks: {
+        Row: {
+          assigned_to: string
+          created_at: string
+          description: string | null
+          due_date: string | null
+          id: string
+          plan_id: string
+          priority: string
+          sort_order: number
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          plan_id: string
+          priority?: string
+          sort_order?: number
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          plan_id?: string
+          priority?: string
+          sort_order?: number
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_project_tasks_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "client_project_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_project_updates: {
+        Row: {
+          author: string
+          content: string
+          created_at: string
+          id: string
+          is_client_visible: boolean
+          plan_id: string
+        }
+        Insert: {
+          author?: string
+          content: string
+          created_at?: string
+          id?: string
+          is_client_visible?: boolean
+          plan_id: string
+        }
+        Update: {
+          author?: string
+          content?: string
+          created_at?: string
+          id?: string
+          is_client_visible?: boolean
+          plan_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_project_updates_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "client_project_plans"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       client_projects: {
         Row: {
@@ -889,6 +1377,134 @@ export type Database = {
           },
         ]
       }
+      referral_links: {
+        Row: {
+          client_profile_id: string
+          code: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          client_profile_id: string
+          code: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          client_profile_id?: string
+          code?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_links_client_profile_id_fkey"
+            columns: ["client_profile_id"]
+            isOneToOne: true
+            referencedRelation: "client_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      referral_program_settings: {
+        Row: {
+          commission_rate: number
+          completion_bonus_amount: number
+          eligibility_notes: string
+          enabled: boolean
+          first_reward_amount: number
+          id: string
+          new_client_discount: number
+          payout_methods: string[]
+          tier_threshold: number
+          updated_at: string
+        }
+        Insert: {
+          commission_rate?: number
+          completion_bonus_amount?: number
+          eligibility_notes?: string
+          enabled?: boolean
+          first_reward_amount?: number
+          id?: string
+          new_client_discount?: number
+          payout_methods?: string[]
+          tier_threshold?: number
+          updated_at?: string
+        }
+        Update: {
+          commission_rate?: number
+          completion_bonus_amount?: number
+          eligibility_notes?: string
+          enabled?: boolean
+          first_reward_amount?: number
+          id?: string
+          new_client_discount?: number
+          payout_methods?: string[]
+          tier_threshold?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          completion_bonus_paid_at: string | null
+          created_at: string
+          first_reward_paid_at: string | null
+          id: string
+          notes: string | null
+          payout_method: string | null
+          referred_email: string
+          referred_name: string | null
+          referred_profile_id: string | null
+          referrer_profile_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          completion_bonus_paid_at?: string | null
+          created_at?: string
+          first_reward_paid_at?: string | null
+          id?: string
+          notes?: string | null
+          payout_method?: string | null
+          referred_email: string
+          referred_name?: string | null
+          referred_profile_id?: string | null
+          referrer_profile_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          completion_bonus_paid_at?: string | null
+          created_at?: string
+          first_reward_paid_at?: string | null
+          id?: string
+          notes?: string | null
+          payout_method?: string | null
+          referred_email?: string
+          referred_name?: string | null
+          referred_profile_id?: string | null
+          referrer_profile_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referrals_referred_profile_id_fkey"
+            columns: ["referred_profile_id"]
+            isOneToOne: false
+            referencedRelation: "client_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referrals_referrer_profile_id_fkey"
+            columns: ["referrer_profile_id"]
+            isOneToOne: false
+            referencedRelation: "client_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       review_submissions: {
         Row: {
           city: string
@@ -1051,6 +1667,15 @@ export type Database = {
           msg_id: number
           read_ct: number
         }[]
+      }
+      resolve_and_record_referral: {
+        Args: {
+          p_code: string
+          p_intake_id: string
+          p_referred_email: string
+          p_referred_name: string
+        }
+        Returns: undefined
       }
     }
     Enums: {
