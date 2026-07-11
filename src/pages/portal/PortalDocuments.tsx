@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { usePortalClientProfile } from "@/hooks/usePortalClientProfile";
 import { supabase } from "@/integrations/supabase/client";
 import {
   FileText, Download, Loader2, MessageSquare, Send,
@@ -22,6 +23,7 @@ const SLOT_LABELS: Record<string, string> = {
 
 const PortalDocuments = () => {
   const { user } = useAuth();
+  const { profile: resolvedProfile } = usePortalClientProfile();
   const [documents, setDocuments] = useState<any[]>([]);
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -41,12 +43,8 @@ const PortalDocuments = () => {
   const [agreementRecord, setAgreementRecord] = useState<any>(null);
 
   const load = async () => {
-    if (!user) return;
-    const { data: p } = await supabase
-      .from("client_profiles")
-      .select("id")
-      .eq("user_id", user.id)
-      .maybeSingle();
+    if (!user || !resolvedProfile) return;
+    const p = resolvedProfile;
     setProfile(p);
 
     const profileId = p?.id;
@@ -92,7 +90,7 @@ const PortalDocuments = () => {
     }
   };
 
-  useEffect(() => { load(); }, [user]);
+  useEffect(() => { load(); }, [user, resolvedProfile]);
 
   // Expand/collapse a slot; generate signed URL on first expand for uploaded slots
   const handleExpandSlot = async (slot: any) => {

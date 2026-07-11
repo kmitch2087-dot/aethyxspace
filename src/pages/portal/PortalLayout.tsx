@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Outlet, useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { usePortalClientProfile } from "@/hooks/usePortalClientProfile";
 import { supabase } from "@/integrations/supabase/client";
 import Seo from "@/components/Seo";
 import { AlertCircle } from "lucide-react";
@@ -128,13 +129,16 @@ function PortalSidebar({
 
 const PortalLayout = () => {
   const { user } = useAuth();
+  const { profile, isViewingAsAdmin } = usePortalClientProfile();
   const [needsIntake, setNeedsIntake] = useState(false);
   const [referralEnabled, setReferralEnabled] = useState(false);
   const [badgeCounts, setBadgeCounts] = useState<Record<string, number>>({});
 
-  // Notify admin once when an invited client first signs in.
+  // Notify admin once when an invited client first signs in. Skipped entirely
+  // while an admin is viewing as another client — these are real-client-only
+  // side effects.
   useEffect(() => {
-    if (!user) return;
+    if (!user || isViewingAsAdmin) return;
     const key = `portal-activation-notified:${user.id}`;
     if (!sessionStorage.getItem(key)) {
       sessionStorage.setItem(key, "1");
@@ -150,21 +154,14 @@ const PortalLayout = () => {
         if (data && !data.intake_completed_at) setNeedsIntake(true);
         if (data?.referral_enabled) setReferralEnabled(true);
       });
-  }, [user]);
+  }, [user, isViewingAsAdmin]);
 
   // Notification badge counts for Documents/Tasks/Agreements nav items. Separate effect from
   // the intake/referral check above so it can be reasoned about (and modified) independently.
   useEffect(() => {
-    if (!user) return;
+    if (!user || isViewingAsAdmin || !profile) return;
     (async () => {
       try {
-        const { data: profile } = await supabase
-          .from("client_profiles")
-          .select("id")
-          .eq("user_id", user.id)
-          .maybeSingle();
-        if (!profile) return;
-
         const { data: seenRows } = await (supabase as any)
           .from("client_portal_seen_at")
           .select("item_type, last_seen_at")
@@ -228,12 +225,18 @@ const PortalLayout = () => {
         console.warn("Failed to compute portal notification badges:", err);
       }
     })();
-  }, [user]);
+  }, [user, profile, isViewingAsAdmin]);
 
   return (
     <SidebarProvider>
       <Seo title="Client Portal | Aethyx" description="Aethyx client portal." noindex />
       <div className="min-h-screen flex w-full bg-transparent">
+        {isViewingAsAdmin && profile && (
+          <div className="fixed top-0 left-0 right-0 z-50 bg-amber-500 text-black text-sm px-4 py-2 flex items-center justify-between">
+            <span>Viewing as {profile.full_name} — read-only</span>
+            <a href={`/admin/clients/${profile.id}`} className="font-medium underline">Exit</a>
+          </div>
+        )}
         <PortalSidebar showIntake={needsIntake} showReferrals={referralEnabled} badgeCounts={badgeCounts} />
         <div className="flex-1 flex flex-col">
           <header className="h-12 flex items-center border-b border-border/30 px-4">

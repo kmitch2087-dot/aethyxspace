@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { usePortalClientProfile } from "@/hooks/usePortalClientProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { FileSignature, Loader2 } from "lucide-react";
@@ -7,19 +8,16 @@ import AgreementDocument from "@/components/AgreementDocument";
 
 const PortalAgreements = () => {
   const { user } = useAuth();
+  const { profile: resolvedProfile } = usePortalClientProfile();
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<{ id: string; full_name: string; email: string | null } | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [record, setRecord] = useState<any | null>(null);
 
   const load = async () => {
-    if (!user) return;
+    if (!user || !resolvedProfile) return;
     setLoading(true);
-    const { data: profileData } = await supabase
-      .from("client_profiles")
-      .select("id, full_name, email")
-      .eq("user_id", user.id)
-      .maybeSingle();
+    const profileData = resolvedProfile;
     setProfile(profileData);
 
     if (profileData) {
@@ -45,7 +43,7 @@ const PortalAgreements = () => {
   useEffect(() => {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user, resolvedProfile]);
 
   if (loading) {
     return (

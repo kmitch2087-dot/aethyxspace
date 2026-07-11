@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2, ArrowRight } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { usePortalClientProfile } from "@/hooks/usePortalClientProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +26,7 @@ const SECTION_META: Record<string, { eyebrow: string; title: string }> = {
 
 const PortalIntake = () => {
   const { user } = useAuth();
+  const { profile: resolvedProfile } = usePortalClientProfile();
   const { toast } = useToast();
   const nav = useNavigate();
   const [fields, setFields] = useState<Field[]>([]);
@@ -34,12 +36,10 @@ const PortalIntake = () => {
   const [profile, setProfile] = useState<any>(null);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !resolvedProfile) return;
     (async () => {
-      const [{ data: f }, { data: p }] = await Promise.all([
-        supabase.from("intake_form_fields").select("*").eq("active", true).order("section").order("display_order"),
-        supabase.from("client_profiles").select("*").eq("user_id", user.id).maybeSingle(),
-      ]);
+      const { data: f } = await supabase.from("intake_form_fields").select("*").eq("active", true).order("section").order("display_order");
+      const p = resolvedProfile;
       setFields((f || []) as any);
       setProfile(p);
       if (p) {
@@ -52,7 +52,7 @@ const PortalIntake = () => {
       }
       setLoading(false);
     })();
-  }, [user]);
+  }, [user, resolvedProfile]);
 
   const grouped = useMemo(() => {
     const m: Record<string, Field[]> = { about: [], project: [], market: [], extra: [] };

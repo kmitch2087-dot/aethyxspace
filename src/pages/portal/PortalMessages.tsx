@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { usePortalClientProfile } from "@/hooks/usePortalClientProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,6 +10,7 @@ import { format } from "date-fns";
 
 const PortalMessages = () => {
   const { user } = useAuth();
+  const { profile: resolvedProfile } = usePortalClientProfile();
   const { toast } = useToast();
   const [messages, setMessages] = useState<any[]>([]);
   const [profileId, setProfileId] = useState<string | null>(null);
@@ -17,13 +19,8 @@ const PortalMessages = () => {
   const [loading, setLoading] = useState(true);
 
   const fetchMessages = async () => {
-    if (!user) return;
-    const { data: profile } = await supabase
-      .from("client_profiles")
-      .select("id")
-      .eq("user_id", user.id)
-      .maybeSingle();
-    const pid = profile?.id || null;
+    if (!user || !resolvedProfile) return;
+    const pid = resolvedProfile.id;
     setProfileId(pid);
     const filter = pid
       ? `client_profile_id.eq.${pid},user_id.eq.${user.id}`
@@ -39,7 +36,7 @@ const PortalMessages = () => {
 
   useEffect(() => {
     fetchMessages();
-  }, [user]);
+  }, [user, resolvedProfile]);
 
   const handleSend = async () => {
     if (!newMessage.trim() || !user) return;

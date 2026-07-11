@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { usePortalClientProfile } from "@/hooks/usePortalClientProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle2, Circle, ListTodo } from "lucide-react";
@@ -16,6 +17,7 @@ const priorityColors: Record<string, string> = {
 
 export default function PortalTasks() {
   const { user } = useAuth();
+  const { profile: resolvedProfile } = usePortalClientProfile();
   const { toast } = useToast();
 
   const [loading, setLoading] = useState(true);
@@ -23,19 +25,15 @@ export default function PortalTasks() {
   const [completing, setCompleting] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !resolvedProfile) return;
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user, resolvedProfile]);
 
   async function load() {
     setLoading(true);
     try {
-      const { data: profile } = await supabase
-        .from("client_profiles")
-        .select("id")
-        .eq("user_id", user!.id)
-        .maybeSingle();
+      const profile = resolvedProfile;
 
       if (!profile) { setLoading(false); return; }
 

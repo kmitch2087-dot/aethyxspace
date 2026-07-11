@@ -1,23 +1,21 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { usePortalClientProfile } from "@/hooks/usePortalClientProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { User, MessageSquare, FolderOpen } from "lucide-react";
 
 const PortalOverview = () => {
   const { user } = useAuth();
+  const { profile: resolvedProfile } = usePortalClientProfile();
   const [profile, setProfile] = useState<any>(null);
   const [msgCount, setMsgCount] = useState(0);
   const [docCount, setDocCount] = useState(0);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !resolvedProfile) return;
     const load = async () => {
-      const { data: profileData } = await supabase
-        .from("client_profiles")
-        .select("*")
-        .eq("user_id", user.id)
-        .maybeSingle();
+      const profileData = resolvedProfile;
       setProfile(profileData);
       const pid = profileData?.id;
       const msgFilter = pid ? `client_profile_id.eq.${pid},user_id.eq.${user.id}` : `user_id.eq.${user.id}`;
@@ -30,7 +28,7 @@ const PortalOverview = () => {
       setDocCount((docRes.data || []).length);
     };
     load();
-  }, [user]);
+  }, [user, resolvedProfile]);
 
   return (
     <div>
