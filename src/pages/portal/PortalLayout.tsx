@@ -45,7 +45,15 @@ const baseNavItems = [
   { title: "Tasks", url: "/portal/tasks", icon: ListTodo },
 ];
 
-function PortalSidebar({ showIntake, showReferrals }: { showIntake: boolean; showReferrals: boolean }) {
+function PortalSidebar({
+  showIntake,
+  showReferrals,
+  badgeCounts,
+}: {
+  showIntake: boolean;
+  showReferrals: boolean;
+  badgeCounts: Record<string, number>;
+}) {
   const filteredBase = showReferrals
     ? baseNavItems
     : baseNavItems.filter((item) => item.title !== "Referrals");
@@ -71,21 +79,33 @@ function PortalSidebar({ showIntake, showReferrals }: { showIntake: boolean; sho
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {navItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink
-                      to={item.url}
-                      end={item.url === "/portal"}
-                      className="hover:bg-muted/50"
-                      activeClassName="bg-muted text-primary font-medium"
-                    >
-                      <item.icon className="mr-2 h-4 w-4" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {navItems.map((item) => {
+                const badgeKey = item.title === "Documents" ? "documents"
+                  : item.title === "Tasks" ? "tasks"
+                  : item.title === "Agreements" ? "agreements"
+                  : null;
+                const badgeCount = badgeKey ? (badgeCounts[badgeKey] ?? 0) : 0;
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <NavLink
+                        to={item.url}
+                        end={item.url === "/portal"}
+                        className="hover:bg-muted/50"
+                        activeClassName="bg-muted text-primary font-medium"
+                      >
+                        <item.icon className="mr-2 h-4 w-4" />
+                        {!collapsed && <span>{item.title}</span>}
+                        {!collapsed && badgeCount > 0 && (
+                          <span className="ml-auto rounded-full bg-primary text-primary-foreground text-[10px] leading-none px-1.5 py-1">
+                            {badgeCount}
+                          </span>
+                        )}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -110,6 +130,7 @@ const PortalLayout = () => {
   const { user } = useAuth();
   const [needsIntake, setNeedsIntake] = useState(false);
   const [referralEnabled, setReferralEnabled] = useState(false);
+  const [badgeCounts, setBadgeCounts] = useState<Record<string, number>>({});
 
   // Notify admin once when an invited client first signs in.
   useEffect(() => {
@@ -131,11 +152,86 @@ const PortalLayout = () => {
       });
   }, [user]);
 
+  // Notification badge counts for Documents/Tasks/Agreements nav items. Separate effect from
+  // the intake/referral check above so it can be reasoned about (and modified) independently.
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const { data: profile } = await supabase
+        .from("client_profiles")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (!profile) return;
+
+      const { data: seenRows } = await (supabase as any)
+        .from("client_portal_seen_at")
+        .select("item_type, last_seen_at")
+        .eq("client_profile_id", profile.id);
+      const seenMap: Record<string, string> = {};
+      (seenRows ?? []).forEach((r: any) => { seenMap[r.item_type] = r.last_seen_at; });
+      const epoch = "1970-01-01T00:00:00.000Z";
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const [{ count: docsCount }, { data: agreementRow }, { data: plansData }] = await Promise.all([
+        supabase
+          .from("client_documents")
+          .select("id", { count: "exact", head: true })
+          .eq("client_profile_id", profile.id)
+          .gt("created_at", seenMap.documents ?? epoch),
+        (supabase as any)
+          .from("client_agreement_records")
+          .select("sent_at")
+          .eq("client_profile_id", profile.id)
+          .maybeSingle(),
+        (supabase as any)
+          .from("client_project_plans")
+          .select("id")
+          .eq("client_profile_id", profile.id),
+      ]);
+
+      const agreementUnseen =
+        agreementRow?.sent_at && agreementRow.sent_at > (seenMap.agreements ?? epoch) ? 1 : 0;
+
+      const planIds = (plansData ?? []).map((p: any) => p.id);
+      let tasksUnseen = 0;
+      if (planIds.length) {
+        const dueSoonCutoff = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
+        const [{ data: newTasks }, { data: dueSoonTasks }] = await Promise.all([
+          (supabase as any)
+            .from("client_project_tasks")
+            .select("id")
+            .in("plan_id", planIds)
+            .eq("assigned_to", "client")
+            .gt("created_at", seenMap.tasks ?? epoch),
+          (supabase as any)
+            .from("client_project_tasks")
+            .select("id")
+            .in("plan_id", planIds)
+            .eq("assigned_to", "client")
+            .neq("status", "complete")
+            .lte("due_date", dueSoonCutoff),
+        ]);
+        const unseenIds = new Set([
+          ...(newTasks ?? []).map((t: any) => t.id),
+          ...(dueSoonTasks ?? []).map((t: any) => t.id),
+        ]);
+        tasksUnseen = unseenIds.size;
+      }
+
+      setBadgeCounts({
+        documents: docsCount ?? 0,
+        agreements: agreementUnseen,
+        tasks: tasksUnseen,
+      });
+    })();
+  }, [user]);
+
   return (
     <SidebarProvider>
       <Seo title="Client Portal | Aethyx" description="Aethyx client portal." noindex />
       <div className="min-h-screen flex w-full bg-transparent">
-        <PortalSidebar showIntake={needsIntake} showReferrals={referralEnabled} />
+        <PortalSidebar showIntake={needsIntake} showReferrals={referralEnabled} badgeCounts={badgeCounts} />
         <div className="flex-1 flex flex-col">
           <header className="h-12 flex items-center border-b border-border/30 px-4">
             <SidebarTrigger />
