@@ -8,7 +8,7 @@ import AgreementDocument from "@/components/AgreementDocument";
 
 const PortalAgreements = () => {
   const { user } = useAuth();
-  const { profile: resolvedProfile, loading: profileLoading } = usePortalClientProfile();
+  const { profile: resolvedProfile, loading: profileLoading, isViewingAsAdmin } = usePortalClientProfile();
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<{ id: string; full_name: string; email: string | null } | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -79,7 +79,9 @@ const PortalAgreements = () => {
         clientName={profile.full_name}
         clientEmail={profile.email || ""}
         mode="client"
+        readOnly={isViewingAsAdmin}
         onSave={async (updates) => {
+          if (isViewingAsAdmin) return;
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const { error } = await (supabase as any)
             .from("client_agreement_records")

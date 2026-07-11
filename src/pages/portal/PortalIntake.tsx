@@ -26,7 +26,7 @@ const SECTION_META: Record<string, { eyebrow: string; title: string }> = {
 
 const PortalIntake = () => {
   const { user } = useAuth();
-  const { profile: resolvedProfile, loading: profileLoading } = usePortalClientProfile();
+  const { profile: resolvedProfile, loading: profileLoading, isViewingAsAdmin } = usePortalClientProfile();
   const { toast } = useToast();
   const nav = useNavigate();
   const [fields, setFields] = useState<Field[]>([]);
@@ -64,7 +64,7 @@ const PortalIntake = () => {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!profile || !user) return;
+    if (!profile || !user || isViewingAsAdmin) return;
     const missing = fields.filter((f) => f.required && !(values[f.field_key] || "").trim());
     if (missing.length) {
       toast({ title: "A few fields are missing", description: missing.map((m) => m.label).join(", "), variant: "destructive" });
@@ -165,7 +165,7 @@ const PortalIntake = () => {
           );
         })}
         <div className="flex justify-end">
-          <Button type="submit" disabled={submitting} className="rounded-full px-8">
+          <Button type="submit" disabled={isViewingAsAdmin || submitting} className="rounded-full px-8">
             {submitting ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Submitting…</> : <>Submit intake <ArrowRight className="h-4 w-4 ml-2" /></>}
           </Button>
         </div>

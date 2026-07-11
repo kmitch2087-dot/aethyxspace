@@ -23,7 +23,7 @@ const SLOT_LABELS: Record<string, string> = {
 
 const PortalDocuments = () => {
   const { user } = useAuth();
-  const { profile: resolvedProfile, loading: profileLoading } = usePortalClientProfile();
+  const { profile: resolvedProfile, loading: profileLoading, isViewingAsAdmin } = usePortalClientProfile();
   const [documents, setDocuments] = useState<any[]>([]);
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -157,7 +157,7 @@ const PortalDocuments = () => {
   };
 
   const sendMessage = async () => {
-    if (!user || !profile || !thread || !newMsg.trim()) return;
+    if (!user || !profile || !thread || !newMsg.trim() || isViewingAsAdmin) return;
     setSending(true);
     const { data, error } = await supabase
       .from("client_messages")
@@ -377,7 +377,7 @@ const PortalDocuments = () => {
           </div>
           <div className="flex gap-2 pt-2 border-t">
             <Textarea rows={2} value={newMsg} onChange={(e) => setNewMsg(e.target.value)} placeholder="Type your message…" />
-            <Button onClick={sendMessage} disabled={sending || !newMsg.trim()}>
+            <Button onClick={sendMessage} disabled={isViewingAsAdmin || sending || !newMsg.trim()}>
               {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
             </Button>
           </div>

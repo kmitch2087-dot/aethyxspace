@@ -1410,6 +1410,13 @@ const ClientDetail = () => {
           <p className="text-sm text-muted-foreground">{profile.email}</p>
         </div>
         <div className="flex gap-2 flex-wrap">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => window.open(`/portal/overview?viewAs=${profile.id}`, "_blank", "noopener,noreferrer")}
+          >
+            <Eye className="h-4 w-4 mr-2" /> View as {profile.first_name || profile.full_name.split(" ")[0]}
+          </Button>
           {profile.email && (
             <Button variant="outline" size="sm" onClick={handleResendInvite}>
               <Mail className="h-4 w-4 mr-2" /> Resend invite
