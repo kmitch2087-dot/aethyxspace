@@ -27,6 +27,7 @@ import { template as marketingServicesSpotlight } from './marketing-services-spo
 import { template as referralSigned } from './referral-signed.tsx'
 import { template as referralPayout } from './referral-payout.tsx'
 import { template as addOnActivated } from './add-on-activated.tsx'
+import { template as bountyApproved } from './bounty-approved.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'inquiry-notification': inquiryNotification,
@@ -45,4 +46,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'referral-signed': referralSigned,
   'referral-payout': referralPayout,
   'add-on-activated': addOnActivated,
+  'bounty-approved': bountyApproved,
 }

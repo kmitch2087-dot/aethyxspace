@@ -375,6 +375,21 @@ export default function ReferralProgram() {
     fetchApplicants();
   };
 
+  const [sendingEmailId, setSendingEmailId] = useState<string | null>(null);
+
+  const handleSendApprovalEmail = async (applicant: BountyApplicant) => {
+    setSendingEmailId(applicant.id);
+    const { data, error } = await supabase.functions.invoke("bounty-actions", {
+      body: { action: "send_approval_email", applicantId: applicant.id },
+    });
+    setSendingEmailId(null);
+    if (error || !data?.success) {
+      toast({ title: "Failed to send email", description: error?.message || data?.error, variant: "destructive" });
+      return;
+    }
+    toast({ title: "Approval email sent" });
+  };
+
   const filteredReferrals = activeTab === "all"
     ? referrals
     : referrals.filter((r) => r.status === activeTab);
@@ -563,9 +578,21 @@ export default function ReferralProgram() {
                                 </>
                               )}
                               {applicant.status === "approved" && applicant.code && (
-                                <span className="text-xs font-mono text-muted-foreground bg-muted/50 rounded px-2 py-1">
-                                  {applicant.code}
-                                </span>
+                                <>
+                                  <span className="text-xs font-mono text-muted-foreground bg-muted/50 rounded px-2 py-1">
+                                    {applicant.code}
+                                  </span>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="h-7 text-xs px-2"
+                                    disabled={sendingEmailId === applicant.id}
+                                    onClick={() => handleSendApprovalEmail(applicant)}
+                                  >
+                                    {sendingEmailId === applicant.id ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}
+                                    Send approval email
+                                  </Button>
+                                </>
                               )}
                               {isReviewing && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
                             </div>
