@@ -530,6 +530,7 @@ export type Database = {
           file_url: string | null
           id: string
           label: string
+          plan_id: string | null
           sort_order: number
           type: string
           updated_at: string
@@ -545,6 +546,7 @@ export type Database = {
           file_url?: string | null
           id?: string
           label: string
+          plan_id?: string | null
           sort_order?: number
           type?: string
           updated_at?: string
@@ -560,6 +562,7 @@ export type Database = {
           file_url?: string | null
           id?: string
           label?: string
+          plan_id?: string | null
           sort_order?: number
           type?: string
           updated_at?: string
@@ -570,6 +573,13 @@ export type Database = {
             columns: ["client_profile_id"]
             isOneToOne: false
             referencedRelation: "client_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_assets_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "client_project_plans"
             referencedColumns: ["id"]
           },
         ]
@@ -1825,6 +1835,13 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      get_client_last_sign_ins: {
+        Args: never
+        Returns: {
+          client_profile_id: string
+          last_sign_in_at: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1994,3 +2011,4 @@ export const Constants = {
     },
   },
 } as const
+
