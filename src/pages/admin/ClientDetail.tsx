@@ -3135,6 +3135,18 @@ const ClientDetail = () => {
 
         {/* MESSAGES */}
         <TabsContent value="messages" className="mt-4 space-y-3">
+          {messages.length === 0 ? <p className="text-sm text-muted-foreground py-8 text-center">No messages.</p> : [...messages].reverse().map((m) => (
+            <div key={m.id} className={`flex ${m.sender === "admin" ? "justify-end" : "justify-start"}`}>
+              <Card className={`max-w-[80%] ${m.sender === "admin" ? "bg-primary/5 border-primary/20" : ""}`}>
+                <CardContent className="pt-4">
+                  <p className="text-sm whitespace-pre-wrap">{m.message}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {m.sender === "admin" ? "You" : profile.full_name} · {format(new Date(m.created_at), "MMM d, yyyy h:mm a")}
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          ))}
           <div className="flex gap-2 items-end">
             <Textarea
               value={newAdminMessage}
@@ -3147,18 +3159,6 @@ const ClientDetail = () => {
               {sendingMessage ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
             </Button>
           </div>
-          {messages.length === 0 ? <p className="text-sm text-muted-foreground py-8 text-center">No messages.</p> : messages.map((m) => (
-            <div key={m.id} className={`flex ${m.sender === "admin" ? "justify-end" : "justify-start"}`}>
-              <Card className={`max-w-[80%] ${m.sender === "admin" ? "bg-primary/5 border-primary/20" : ""}`}>
-                <CardContent className="pt-4">
-                  <p className="text-sm whitespace-pre-wrap">{m.message}</p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {m.sender === "admin" ? "You" : profile.full_name} · {format(new Date(m.created_at), "MMM d, yyyy h:mm a")}
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          ))}
         </TabsContent>
       </Tabs>
 
