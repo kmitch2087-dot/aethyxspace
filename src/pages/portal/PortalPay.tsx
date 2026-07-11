@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { usePortalClientProfile } from "@/hooks/usePortalClientProfile";
 import { loadStripe, type Stripe } from "@stripe/stripe-js";
 import {
   Elements,
@@ -19,6 +20,7 @@ interface InvoiceData {
   amount_due: number;
   description: string | null;
   status: string;
+  client_profile_id: string | null;
 }
 
 const PaymentForm = ({ amount, onSuccess }: { amount: number; onSuccess: () => void }) => {
@@ -87,6 +89,7 @@ const PortalPay = () => {
   const { invoiceId } = useParams<{ invoiceId: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { profile, loading: profileLoading, isViewingAsAdmin } = usePortalClientProfile();
   const [invoice, setInvoice] = useState<InvoiceData | null>(null);
   const [stripePromise, setStripePromise] = useState<Promise<Stripe | null> | null>(null);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
@@ -95,11 +98,12 @@ const PortalPay = () => {
   const [paid, setPaid] = useState(false);
 
   useEffect(() => {
+    if (profileLoading) return;
     const init = async () => {
-      if (!invoiceId) return;
+      if (!invoiceId || !profile) { setLoading(false); return; }
       const { data: inv, error: invErr } = await supabase
         .from("client_invoices")
-        .select("id, invoice_number, amount_due, description, status")
+        .select("id, invoice_number, amount_due, description, status, client_profile_id")
         .eq("id", invoiceId)
         .maybeSingle();
       if (invErr || !inv) {
@@ -107,9 +111,23 @@ const PortalPay = () => {
         setLoading(false);
         return;
       }
+      // Defense in depth, matching every other portal page's explicit ownership
+      // check — RLS also grants admins unrestricted read access to this table
+      // (needed for the admin dashboard), so this guard is what actually stops
+      // an admin session (including View-as-Client) from loading/paying an
+      // invoice that doesn't belong to the client currently being viewed.
+      if (inv.client_profile_id !== profile.id) {
+        toast({ title: "Invoice not found", variant: "destructive" });
+        setLoading(false);
+        return;
+      }
       setInvoice(inv as InvoiceData);
       if (inv.status === "paid") {
         setPaid(true);
+        setLoading(false);
+        return;
+      }
+      if (isViewingAsAdmin) {
         setLoading(false);
         return;
       }
@@ -132,7 +150,7 @@ const PortalPay = () => {
       setLoading(false);
     };
     init();
-  }, [invoiceId, toast]);
+  }, [invoiceId, toast, profile, profileLoading, isViewingAsAdmin]);
 
   if (loading) {
     return (
@@ -180,7 +198,11 @@ const PortalPay = () => {
         </CardContent>
       </Card>
 
-      {clientSecret && stripePromise && (
+      {isViewingAsAdmin ? (
+        <p className="text-xs text-muted-foreground text-center">
+          Viewing as client — payment is disabled in this read-only preview.
+        </p>
+      ) : clientSecret && stripePromise && (
         <Card className="border-border/30">
           <CardContent className="pt-6">
             <Elements

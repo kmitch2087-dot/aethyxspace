@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { usePortalClientProfile } from "@/hooks/usePortalClientProfile";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -26,21 +27,29 @@ const statusVariant = (status: string) => {
 };
 
 const PortalPayments = () => {
+  const { profile, loading: profileLoading, isViewingAsAdmin } = usePortalClientProfile();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (profileLoading) return;
+    if (!profile) { setLoading(false); return; }
     (async () => {
+      // Explicit client-side scoping, not just RLS — this table's RLS also grants
+      // admins unrestricted read access (needed for the admin dashboard), so an
+      // unfiltered query here would show an admin session every invoice in the
+      // table instead of just the client currently being viewed.
       const { data } = await supabase
         .from("client_invoices")
         .select("id, invoice_number, amount_due, amount_paid, status, description, due_date, paid_at, created_at")
+        .eq("client_profile_id", profile.id)
         .order("created_at", { ascending: false });
       setInvoices((data as Invoice[]) || []);
       setLoading(false);
     })();
-  }, []);
+  }, [profile, profileLoading]);
 
-  if (loading) {
+  if (loading || profileLoading) {
     return <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   }
 
@@ -81,7 +90,7 @@ const PortalPayments = () => {
                   <div className="text-right">
                     <p className="font-display text-lg">${Number(inv.amount_due).toFixed(2)}</p>
                   </div>
-                  {inv.status !== "paid" && (
+                  {inv.status !== "paid" && !isViewingAsAdmin && (
                     <Button asChild size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
                       <Link to={`/portal/pay/${inv.id}`}>Pay now</Link>
                     </Button>
