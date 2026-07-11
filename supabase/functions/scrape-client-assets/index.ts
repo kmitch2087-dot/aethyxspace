@@ -90,6 +90,8 @@ Deno.serve(async (req: Request) => {
     const body = await req.json();
     const clientProfileId = String(body.clientProfileId || "");
     const sourceUrl = String(body.url || "");
+    const keywords = body.keywords ? String(body.keywords).trim().slice(0, 500) : null;
+    const planId = body.planId ? String(body.planId) : null;
     if (!clientProfileId || !sourceUrl) return json({ error: "clientProfileId and url required" }, 400, cors);
 
     let parsedUrl: URL;
@@ -107,7 +109,7 @@ Deno.serve(async (req: Request) => {
 
     const { data: scrapeRow, error: scrapeInsertErr } = await admin
       .from("client_asset_scrapes")
-      .insert({ client_profile_id: clientProfileId, source_url: sourceUrl, status: "running" })
+      .insert({ client_profile_id: clientProfileId, source_url: sourceUrl, status: "running", keywords, plan_id: planId })
       .select("id")
       .single();
     if (scrapeInsertErr || !scrapeRow) {
@@ -214,7 +216,17 @@ Deno.serve(async (req: Request) => {
       } else if (visibleText.length <= 40) {
         geminiError = `Not enough visible text to extract from (${visibleText.length} chars found, need >40) — the page likely renders its content via client-side JavaScript, which this scraper doesn't execute`;
       } else {
-        const prompt = `You are helping tag brand content scraped from a client's website for a design agency. Given the extracted page text and any OpenGraph metadata below, identify up to 5 distinct, meaningful brand-relevant blurbs (e.g. a tagline, mission statement, brand voice sample, "about" copy). For each, suggest a category from exactly this list: brand_voice, tagline, motto, mission, values, other. Respond with ONLY a JSON array, no other text, in this shape: [{"category": "...", "label": "...", "content": "..."}].
+        const keywordLine = keywords ? `\nPrioritize content related to: ${keywords}.\n` : "";
+        const prompt = `You are helping tag brand and business content scraped from a client's website for a design agency. Given the extracted page text and any OpenGraph metadata below, identify meaningful, distinct pieces of information in these categories:
+- brand_voice, tagline, motto, mission, values: brand identity content
+- contact_info: phone numbers, email addresses, physical addresses
+- hours: business/operating hours
+- staff: practitioner/employee names and their positions/titles/roles (one item per person, or grouped if clearly listed together)
+- other: any other genuinely useful business information not covered above
+
+Extract up to 10 distinct items total. Skip categories with no real content on the page — do not invent or guess.
+${keywordLine}
+For each item, suggest a category from exactly this list: brand_voice, tagline, motto, mission, values, contact_info, hours, staff, other. Respond with ONLY a JSON array, no other text, in this shape: [{"category": "...", "label": "...", "content": "..."}].
 
 OpenGraph title: ${ogTags.title || "(none)"}
 OpenGraph description: ${ogTags.description || "(none)"}
@@ -256,7 +268,7 @@ ${visibleText}`;
               console.warn("[scrape-client-assets] Gemini response had no JSON array. Raw text:", text.slice(0, 500));
             } else {
               const items = JSON.parse(jsonMatch[0]);
-              const validCategories = new Set(["brand_voice", "tagline", "motto", "mission", "values", "other"]);
+              const validCategories = new Set(["brand_voice", "tagline", "motto", "mission", "values", "contact_info", "hours", "staff", "other"]);
               for (const item of items) {
                 if (!item?.content || typeof item.content !== "string") continue;
                 const category = validCategories.has(item.category) ? item.category : "other";

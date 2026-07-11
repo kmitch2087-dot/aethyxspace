@@ -130,7 +130,7 @@ interface AddOnRow {
   } | null;
 }
 
-type AssetCategory = "brand_voice" | "tagline" | "motto" | "mission" | "values" | "logo" | "guideline" | "font" | "other";
+type AssetCategory = "brand_voice" | "tagline" | "motto" | "mission" | "values" | "contact_info" | "hours" | "staff" | "logo" | "guideline" | "font" | "other";
 
 interface ClientAsset {
   id: string;
@@ -230,6 +230,9 @@ function assetCategoryInfo(category: AssetCategory): { classes: string; label: s
     motto: { classes: "bg-blue-100 text-blue-700 border-blue-200", label: "Motto" },
     mission: { classes: "bg-green-100 text-green-700 border-green-200", label: "Mission" },
     values: { classes: "bg-orange-100 text-orange-700 border-orange-200", label: "Values" },
+    contact_info: { classes: "bg-pink-100 text-pink-700 border-pink-200", label: "Contact Info" },
+    hours: { classes: "bg-amber-100 text-amber-700 border-amber-200", label: "Hours" },
+    staff: { classes: "bg-indigo-100 text-indigo-700 border-indigo-200", label: "Staff" },
     logo: { classes: "bg-teal-100 text-teal-700 border-teal-200", label: "Logo" },
     guideline: { classes: "bg-blue-100 text-blue-700 border-blue-200", label: "Guidelines" },
     font: { classes: "bg-gray-100 text-gray-600 border-gray-200", label: "Font" },
@@ -335,6 +338,7 @@ const ClientDetail = () => {
   const [editingLabelValue, setEditingLabelValue] = useState("");
   const [scrapeDialogOpen, setScrapeDialogOpen] = useState(false);
   const [scrapeUrl, setScrapeUrl] = useState("");
+  const [scrapeKeywords, setScrapeKeywords] = useState("");
   const [scraping, setScraping] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [pendingScrapeItems, setPendingScrapeItems] = useState<any[]>([]);
@@ -864,15 +868,18 @@ const ClientDetail = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: scrapes } = await (supabase as any)
       .from("client_asset_scrapes")
-      .select("id")
+      .select("id, plan_id")
       .eq("client_profile_id", id);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const scrapeIds = (scrapes || []).map((s: any) => s.id);
+    const scrapeRows = (scrapes || []) as any[];
+    const scrapeIds = scrapeRows.map((s) => s.id);
     if (!scrapeIds.length) {
       setPendingScrapeItems([]);
       setScrapeItemsLoading(false);
       return;
     }
+    const scrapePlanById: Record<string, string | null> = {};
+    scrapeRows.forEach((s) => { scrapePlanById[s.id] = s.plan_id ?? null; });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: items } = await (supabase as any)
       .from("client_asset_scrape_items")
@@ -881,7 +888,10 @@ const ClientDetail = () => {
       .eq("status", "pending")
       .order("created_at");
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const rows = (items || []) as any[];
+    const rows = ((items || []) as any[]).map((item) => ({
+      ...item,
+      scrape_plan_id: scrapePlanById[item.scrape_id] ?? null,
+    }));
     setPendingScrapeItems(rows);
     setScrapeItemsLoading(false);
 
@@ -903,7 +913,12 @@ const ClientDetail = () => {
     if (!profile || !scrapeUrl.trim()) return;
     setScraping(true);
     const { data, error } = await supabase.functions.invoke("scrape-client-assets", {
-      body: { clientProfileId: profile.id, url: scrapeUrl.trim() },
+      body: {
+        clientProfileId: profile.id,
+        url: scrapeUrl.trim(),
+        keywords: scrapeKeywords.trim() || null,
+        planId: plan?.id ?? null,
+      },
     });
     setScraping(false);
     if (error || !data?.ok) {
@@ -923,17 +938,18 @@ const ClientDetail = () => {
     }
     setScrapeDialogOpen(false);
     setScrapeUrl("");
+    setScrapeKeywords("");
     fetchPendingScrapeItems();
   };
 
-  const approveScrapeItem = async (item: { id: string; kind: string; suggested_category: string; suggested_label: string; content: string | null }) => {
+  const approveScrapeItem = async (item: { id: string; kind: string; suggested_category: string; suggested_label: string; content: string | null; scrape_plan_id: string | null }) => {
     if (!profile) return;
     setPromotingItemId(item.id);
     if (item.kind === "text") {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error } = await (supabase as any).from("client_assets").insert({
         client_profile_id: profile.id,
-        plan_id: plan?.id ?? null,
+        plan_id: item.scrape_plan_id ?? plan?.id ?? null,
         type: "text",
         category: item.suggested_category,
         label: item.suggested_label,
@@ -952,7 +968,7 @@ const ClientDetail = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error } = await (supabase as any).from("client_assets").insert({
         client_profile_id: profile.id,
-        plan_id: plan?.id ?? null,
+        plan_id: item.scrape_plan_id ?? plan?.id ?? null,
         type: "file",
         category: item.suggested_category,
         label: item.suggested_label,
@@ -3343,6 +3359,18 @@ const ClientDetail = () => {
                 Extracts images and brand copy for your review — nothing goes live until you approve it below.
               </p>
             </div>
+            <div>
+              <Label className="text-black">Keywords / phrases to focus on <span className="text-black/40 text-xs">(optional)</span></Label>
+              <Input
+                value={scrapeKeywords}
+                onChange={(e) => setScrapeKeywords(e.target.value)}
+                placeholder="pricing, class schedule, teacher bios"
+                className="bg-white text-black border-black/20"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Leave blank to auto-extract everything relevant. Still scans the same page — doesn't search other pages.
+              </p>
+            </div>
             <Button onClick={handleScrape} disabled={scraping || !scrapeUrl.trim()} className="w-full">
               {scraping && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
               {scraping ? "Scraping…" : "Scrape"}
@@ -3368,6 +3396,9 @@ const ClientDetail = () => {
                   <SelectItem value="motto">Motto</SelectItem>
                   <SelectItem value="mission">Mission Statement</SelectItem>
                   <SelectItem value="values">Brand Values</SelectItem>
+                  <SelectItem value="contact_info">Contact Info</SelectItem>
+                  <SelectItem value="hours">Hours</SelectItem>
+                  <SelectItem value="staff">Staff</SelectItem>
                   <SelectItem value="other">Other</SelectItem>
                 </SelectContent>
               </Select>

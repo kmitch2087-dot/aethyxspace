@@ -487,6 +487,8 @@ export type Database = {
           created_at: string
           error_message: string | null
           id: string
+          keywords: string | null
+          plan_id: string | null
           source_url: string
           status: string
         }
@@ -496,6 +498,8 @@ export type Database = {
           created_at?: string
           error_message?: string | null
           id?: string
+          keywords?: string | null
+          plan_id?: string | null
           source_url: string
           status?: string
         }
@@ -505,6 +509,8 @@ export type Database = {
           created_at?: string
           error_message?: string | null
           id?: string
+          keywords?: string | null
+          plan_id?: string | null
           source_url?: string
           status?: string
         }
@@ -514,6 +520,13 @@ export type Database = {
             columns: ["client_profile_id"]
             isOneToOne: false
             referencedRelation: "client_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_asset_scrapes_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "client_project_plans"
             referencedColumns: ["id"]
           },
         ]
