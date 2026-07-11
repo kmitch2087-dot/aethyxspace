@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { usePortalClientProfile } from "@/hooks/usePortalClientProfile";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,12 +21,27 @@ const PortalOverview = () => {
       const pid = profileData?.id;
       const msgFilter = pid ? `client_profile_id.eq.${pid},user_id.eq.${user.id}` : `user_id.eq.${user.id}`;
       const docFilter = pid ? `client_profile_id.eq.${pid},user_id.eq.${user.id}` : `user_id.eq.${user.id}`;
-      const [msgRes, docRes] = await Promise.all([
+      // Documents count must match ClientDetail.tsx's admin-side count: generic shared
+      // documents (client_documents) PLUS anything uploaded via the project document-slots
+      // flow (client_document_slots) — this previously only counted the former, so it
+      // undercounted for any client with slot-uploaded documents (Site Audit, Service Tier,
+      // etc.) and never matched what the admin actually sees as "documents uploaded."
+      const [msgRes, docRes, slotRes] = await Promise.all([
         supabase.from("client_messages").select("id").or(msgFilter),
         supabase.from("client_documents").select("id").or(docFilter),
+        pid
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ? (supabase as any)
+              .from("client_document_slots")
+              .select("id, status")
+              .eq("client_profile_id", pid)
+          : Promise.resolve({ data: [] }),
       ]);
       setMsgCount((msgRes.data || []).length);
-      setDocCount((docRes.data || []).length);
+      const uploadedSlotCount = (slotRes.data || []).filter((s: { status: string }) =>
+        ["uploaded", "awaiting_signature", "completed"].includes(s.status)
+      ).length;
+      setDocCount((docRes.data || []).length + uploadedSlotCount);
     };
     load();
   }, [user, resolvedProfile]);
@@ -51,27 +67,31 @@ const PortalOverview = () => {
           </CardContent>
         </Card>
 
-        <Card className="border-border/30">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Messages</CardTitle>
-            <MessageSquare className="h-4 w-4 text-blue-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{msgCount}</div>
-            <p className="text-xs text-muted-foreground mt-1">messages sent</p>
-          </CardContent>
-        </Card>
+        <Link to="/portal/messages" className="block">
+          <Card className="border-border/30 hover:border-primary/40 transition-colors cursor-pointer h-full">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Messages</CardTitle>
+              <MessageSquare className="h-4 w-4 text-blue-400" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{msgCount}</div>
+              <p className="text-xs text-muted-foreground mt-1">messages sent</p>
+            </CardContent>
+          </Card>
+        </Link>
 
-        <Card className="border-border/30">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Documents</CardTitle>
-            <FolderOpen className="h-4 w-4 text-emerald-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{docCount}</div>
-            <p className="text-xs text-muted-foreground mt-1">files available</p>
-          </CardContent>
-        </Card>
+        <Link to="/portal/documents" className="block">
+          <Card className="border-border/30 hover:border-primary/40 transition-colors cursor-pointer h-full">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Documents</CardTitle>
+              <FolderOpen className="h-4 w-4 text-emerald-400" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{docCount}</div>
+              <p className="text-xs text-muted-foreground mt-1">files available</p>
+            </CardContent>
+          </Card>
+        </Link>
       </div>
     </div>
   );
