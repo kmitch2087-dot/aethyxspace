@@ -43,6 +43,7 @@ type Intake = {
   linked_user_id: string | null;
   notes: string | null;
   created_at: string;
+  referral_code: string | null;
 };
 
 const STATUS_LABEL: Record<IntakeStatus, string> = {
@@ -71,6 +72,7 @@ const Intakes = () => {
   const [selected, setSelected] = useState<Intake | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [referrerNames, setReferrerNames] = useState<Record<string, string>>({});
 
   const load = async () => {
     setLoading(true);
@@ -80,8 +82,33 @@ const Intakes = () => {
       .order("created_at", { ascending: false });
     if (error) {
       toast({ title: "Failed to load", description: error.message, variant: "destructive" });
-    } else {
-      setIntakes((data || []) as unknown as Intake[]);
+      setLoading(false);
+      return;
+    }
+    const rows = (data || []) as unknown as Intake[];
+    setIntakes(rows);
+
+    const codes = Array.from(new Set(rows.map((r) => r.referral_code).filter(Boolean))) as string[];
+    if (codes.length > 0) {
+      const { data: links } = await supabase
+        .from("referral_links")
+        .select("code, client_profile_id")
+        .in("code", codes);
+      const profileIds = Array.from(new Set((links || []).map((l) => l.client_profile_id)));
+      if (profileIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from("client_profiles")
+          .select("id, full_name")
+          .in("id", profileIds);
+        const profileNameById: Record<string, string> = {};
+        (profiles || []).forEach((p) => { profileNameById[p.id] = p.full_name; });
+        const nameByCode: Record<string, string> = {};
+        (links || []).forEach((l) => {
+          const name = profileNameById[l.client_profile_id];
+          if (name) nameByCode[l.code] = name;
+        });
+        setReferrerNames(nameByCode);
+      }
     }
     setLoading(false);
   };
@@ -267,6 +294,11 @@ const Intakes = () => {
                     {STATUS_LABEL[selected.status]}
                   </Badge>
                 </div>
+                {selected.referral_code && referrerNames[selected.referral_code] && (
+                  <div className="flex items-center gap-2 text-black/70">
+                    <Gift className="h-4 w-4" /> Referred by {referrerNames[selected.referral_code]}
+                  </div>
+                )}
               </div>
 
               <div className="mt-6 flex flex-wrap gap-2">
