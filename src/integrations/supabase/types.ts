@@ -676,6 +676,35 @@ export type Database = {
         }
         Relationships: []
       }
+      client_portal_seen_at: {
+        Row: {
+          client_profile_id: string
+          id: string
+          item_type: string
+          last_seen_at: string
+        }
+        Insert: {
+          client_profile_id: string
+          id?: string
+          item_type: string
+          last_seen_at?: string
+        }
+        Update: {
+          client_profile_id?: string
+          id?: string
+          item_type?: string
+          last_seen_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_portal_seen_at_client_profile_id_fkey"
+            columns: ["client_profile_id"]
+            isOneToOne: false
+            referencedRelation: "client_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_profiles: {
         Row: {
           archived_at: string | null
