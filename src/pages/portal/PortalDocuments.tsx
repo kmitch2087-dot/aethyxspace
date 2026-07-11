@@ -29,6 +29,8 @@ const PortalDocuments = () => {
   const [thread, setThread] = useState<{ doc: any; messages: any[] } | null>(null);
   const [newMsg, setNewMsg] = useState("");
   const [sending, setSending] = useState(false);
+  const [viewingDoc, setViewingDoc] = useState<any>(null);
+  const [viewingDocUrl, setViewingDocUrl] = useState<string | null>(null);
   const { toast } = useToast();
 
   // Project Documents state
@@ -117,6 +119,23 @@ const PortalDocuments = () => {
       }
       window.open(data.signedUrl, "_blank", "noopener,noreferrer");
     } finally { setDownloadingId(null); }
+  };
+
+  const handleView = async (doc: any) => {
+    setViewingDoc(doc);
+    setViewingDocUrl(null);
+    let path: string = doc.file_url;
+    const marker = "/client-documents/";
+    const idx = path.indexOf(marker);
+    if (idx !== -1) path = path.substring(idx + marker.length);
+    const bucket = doc.parent_admin_doc_id ? "admin-documents" : "client-documents";
+    const { data, error } = await supabase.storage.from(bucket).createSignedUrl(path, 3600);
+    if (error || !data?.signedUrl) {
+      toast({ title: "Unable to open document", variant: "destructive" });
+      setViewingDoc(null);
+      return;
+    }
+    setViewingDocUrl(data.signedUrl);
   };
 
   const openThread = async (doc: any) => {
@@ -309,7 +328,7 @@ const PortalDocuments = () => {
           {documents.map((doc) => (
             <div key={doc.id} className="flex items-center gap-3 p-4 rounded-lg border border-border/30 bg-card hover:border-primary/30 transition-colors">
               <FileText className="h-5 w-5 text-primary shrink-0" />
-              <button onClick={() => handleDownload(doc)} disabled={downloadingId === doc.id} className="flex-1 min-w-0 text-left">
+              <button onClick={() => handleView(doc)} className="flex-1 min-w-0 text-left">
                 <p className="text-sm font-medium truncate">{doc.title}</p>
                 <p className="text-xs text-muted-foreground">
                   {format(new Date(doc.created_at), "MMM d, yyyy")} • Uploaded by {doc.uploaded_by}
@@ -326,6 +345,15 @@ const PortalDocuments = () => {
           ))}
         </div>
       )}
+
+      <Dialog open={!!viewingDoc} onOpenChange={(open) => { if (!open) { setViewingDoc(null); setViewingDocUrl(null); } }}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader><DialogTitle>{viewingDoc?.title}</DialogTitle></DialogHeader>
+          {viewingDoc && (
+            <DocumentViewer url={viewingDocUrl} fileName={viewingDoc.title} />
+          )}
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={!!thread} onOpenChange={(o) => !o && setThread(null)}>
         <DialogContent className="max-w-lg">
