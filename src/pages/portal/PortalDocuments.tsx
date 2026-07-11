@@ -80,6 +80,16 @@ const PortalDocuments = () => {
       .order("created_at", { ascending: false });
     setDocuments(data || []);
     setLoading(false);
+
+    if (profileId) {
+      (supabase as any)
+        .from("client_portal_seen_at")
+        .upsert(
+          { client_profile_id: profileId, item_type: "documents", last_seen_at: new Date().toISOString() },
+          { onConflict: "client_profile_id,item_type" },
+        )
+        .then(() => {});
+    }
   };
 
   useEffect(() => { load(); }, [user]);

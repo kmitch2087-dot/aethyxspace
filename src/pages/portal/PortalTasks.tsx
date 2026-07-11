@@ -55,6 +55,14 @@ export default function PortalTasks() {
         .order("sort_order");
 
       setTasks(tasksData ?? []);
+
+      (supabase as any)
+        .from("client_portal_seen_at")
+        .upsert(
+          { client_profile_id: profile.id, item_type: "tasks", last_seen_at: new Date().toISOString() },
+          { onConflict: "client_profile_id,item_type" },
+        )
+        .then(() => {});
     } catch {
       toast({ title: "Failed to load tasks", variant: "destructive" });
     } finally {

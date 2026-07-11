@@ -30,6 +30,14 @@ const PortalAgreements = () => {
         .eq("client_profile_id", profileData.id)
         .maybeSingle();
       setRecord(recordData);
+
+      (supabase as any)
+        .from("client_portal_seen_at")
+        .upsert(
+          { client_profile_id: profileData.id, item_type: "agreements", last_seen_at: new Date().toISOString() },
+          { onConflict: "client_profile_id,item_type" },
+        )
+        .then(() => {});
     }
     setLoading(false);
   };
