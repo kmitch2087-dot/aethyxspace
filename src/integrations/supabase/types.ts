@@ -259,12 +259,14 @@ export type Database = {
           payment_schedule: string
           project_scope: string
           revision_rounds: number
+          sent_at: string | null
           services_included: string
           stripe_checkout_session_id: string | null
           submitted_at: string | null
           timeline_end: string | null
           timeline_start: string | null
           total_investment: number | null
+          unlock_count: number
           updated_at: string
         }
         Insert: {
@@ -286,12 +288,14 @@ export type Database = {
           payment_schedule?: string
           project_scope?: string
           revision_rounds?: number
+          sent_at?: string | null
           services_included?: string
           stripe_checkout_session_id?: string | null
           submitted_at?: string | null
           timeline_end?: string | null
           timeline_start?: string | null
           total_investment?: number | null
+          unlock_count?: number
           updated_at?: string
         }
         Update: {
@@ -313,12 +317,14 @@ export type Database = {
           payment_schedule?: string
           project_scope?: string
           revision_rounds?: number
+          sent_at?: string | null
           services_included?: string
           stripe_checkout_session_id?: string | null
           submitted_at?: string | null
           timeline_end?: string | null
           timeline_start?: string | null
           total_investment?: number | null
+          unlock_count?: number
           updated_at?: string
         }
         Relationships: [
