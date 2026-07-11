@@ -13,6 +13,7 @@ const PortalAgreements = () => {
   const [profile, setProfile] = useState<{ id: string; full_name: string; email: string | null } | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [record, setRecord] = useState<any | null>(null);
+  const [logoUrl, setLogoUrl] = useState<string | undefined>(undefined);
 
   const load = async () => {
     if (!user || profileLoading) return;
@@ -28,6 +29,27 @@ const PortalAgreements = () => {
         .eq("client_profile_id", profileData.id)
         .maybeSingle();
       setRecord(recordData);
+
+      // Client's own logo for the agreement header — client_assets already has a
+      // correctly-scoped client-own SELECT policy (ca_client_own), so this reads directly.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: logoAsset } = await (supabase as any)
+        .from("client_assets")
+        .select("file_name")
+        .eq("client_profile_id", profileData.id)
+        .eq("category", "logo")
+        .eq("type", "file")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (logoAsset?.file_name) {
+        const { data: signed } = await supabase.storage
+          .from("client-assets")
+          .createSignedUrl(logoAsset.file_name, 60 * 60 * 24 * 7);
+        setLogoUrl(signed?.signedUrl);
+      } else {
+        setLogoUrl(undefined);
+      }
 
       if (!isViewingAsAdmin) {
         (supabase as any)
@@ -80,6 +102,7 @@ const PortalAgreements = () => {
         clientProfileId={profile.id}
         clientName={profile.full_name}
         clientEmail={profile.email || ""}
+        logoUrl={logoUrl}
         mode="client"
         readOnly={isViewingAsAdmin}
         onSave={async (updates) => {

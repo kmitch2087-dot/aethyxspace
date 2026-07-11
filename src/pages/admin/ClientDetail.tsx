@@ -1441,6 +1441,13 @@ const ClientDetail = () => {
   const unassignedAssets = assets.filter((a) => a.plan_id === null);
   const textAssets = planAssets.filter((a) => a.type === "text");
   const fileAssets = planAssets.filter((a) => a.type === "file");
+  // Prefer the currently-selected project's logo; fall back to any logo the client has
+  // (e.g. a multi-business client whose existing logos are still sitting "Unassigned")
+  // rather than showing no logo at all on the agreement.
+  const clientLogoAsset =
+    planAssets.find((a) => a.category === "logo" && a.type === "file") ||
+    assets.find((a) => a.category === "logo" && a.type === "file");
+  const clientLogoUrl = clientLogoAsset ? assetSignedUrls[clientLogoAsset.id] : undefined;
 
   return (
     <div className="space-y-6">
@@ -3405,6 +3412,7 @@ const ClientDetail = () => {
               clientProfileId={profile.id}
               clientName={profile.full_name}
               clientEmail={profile.email || ""}
+              logoUrl={clientLogoUrl}
               mode="admin"
               onSave={async (updates) => {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
