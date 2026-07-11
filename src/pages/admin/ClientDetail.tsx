@@ -144,6 +144,7 @@ interface ClientAsset {
   sort_order: number;
   created_at: string;
   bg_color?: string | null;
+  plan_id: string | null;
 }
 
 interface ProjectPlan {
@@ -799,6 +800,7 @@ const ClientDetail = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await (supabase as any).from("client_assets").insert({
       client_profile_id: profile.id,
+      plan_id: plan?.id ?? null,
       type: "text",
       category: textAssetCategory,
       label: textAssetLabel.trim(),
@@ -834,6 +836,7 @@ const ClientDetail = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error: insErr } = await (supabase as any).from("client_assets").insert({
       client_profile_id: profile.id,
+      plan_id: plan?.id ?? null,
       type: "file",
       category: fileAssetCategory,
       label: fileAssetLabel.trim(),
@@ -930,6 +933,7 @@ const ClientDetail = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error } = await (supabase as any).from("client_assets").insert({
         client_profile_id: profile.id,
+        plan_id: plan?.id ?? null,
         type: "text",
         category: item.suggested_category,
         label: item.suggested_label,
@@ -948,6 +952,7 @@ const ClientDetail = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error } = await (supabase as any).from("client_assets").insert({
         client_profile_id: profile.id,
+        plan_id: plan?.id ?? null,
         type: "file",
         category: item.suggested_category,
         label: item.suggested_label,
@@ -996,6 +1001,18 @@ const ClientDetail = () => {
   const saveAssetBgColor = async (asset: ClientAsset, color: string | null) => {
     await (supabase as any).from("client_assets").update({ bg_color: color }).eq("id", asset.id);
     setAssets((prev) => prev.map((a) => a.id === asset.id ? { ...a, bg_color: color } : a));
+  };
+
+  const assignAssetToPlan = async (asset: ClientAsset) => {
+    if (!plan) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any).from("client_assets").update({ plan_id: plan.id }).eq("id", asset.id);
+    if (error) {
+      toast({ title: "Failed to assign", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({ title: `Assigned to ${plan.project_name}` });
+    fetchAll();
   };
 
   // Plan handlers
@@ -1375,7 +1392,7 @@ const ClientDetail = () => {
   const handleLogoUpload = async (file: File) => {
     if (!profile) return;
     setLogoUploading(true);
-    const existingLogo = assets.find((a) => a.category === 'logo' && a.type === 'file');
+    const existingLogo = assets.find((a) => a.category === 'logo' && a.type === 'file' && a.plan_id === (plan?.id ?? null));
     if (existingLogo) {
       if (existingLogo.file_name) {
         await supabase.storage.from('client-assets').remove([existingLogo.file_name]);
@@ -1396,6 +1413,7 @@ const ClientDetail = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (supabase as any).from('client_assets').insert({
       client_profile_id: profile.id,
+      plan_id: plan?.id ?? null,
       type: 'file',
       category: 'logo',
       label: 'Primary Logo',
@@ -1419,8 +1437,10 @@ const ClientDetail = () => {
 
   const activeRecurringAddOns = addOns.filter((a) => a.status === "active" && a.catalog?.type === "recurring");
   const totalMonthly = activeRecurringAddOns.reduce((sum, a) => sum + Number(a.price || 0), 0);
-  const textAssets = assets.filter((a) => a.type === "text");
-  const fileAssets = assets.filter((a) => a.type === "file");
+  const planAssets = assets.filter((a) => a.plan_id === (plan?.id ?? null));
+  const unassignedAssets = assets.filter((a) => a.plan_id === null);
+  const textAssets = planAssets.filter((a) => a.type === "text");
+  const fileAssets = planAssets.filter((a) => a.type === "file");
 
   return (
     <div className="space-y-6">
@@ -1975,13 +1995,43 @@ const ClientDetail = () => {
 
         {/* ASSETS */}
         <TabsContent value="assets" className="mt-4 space-y-6">
-          {/* Primary Logo */}
+          {!plan ? (
+            <p className="text-sm text-muted-foreground py-10 text-center">
+              This client has no project yet — assets are scoped to a project, so create one first (Plan tab).
+            </p>
+          ) : (
+            <>
+              {unassignedAssets.length > 0 && (
+                <div className="border border-amber-300 bg-amber-50 rounded-xl p-4">
+                  <h3 className="font-display text-sm tracking-wider text-amber-800 mb-3">
+                    Unassigned Assets ({unassignedAssets.length})
+                  </h3>
+                  <p className="text-xs text-amber-700 mb-3">
+                    These assets aren't linked to a specific project yet — assign each to the project it belongs to.
+                  </p>
+                  <div className="space-y-2">
+                    {unassignedAssets.map((asset) => (
+                      <div key={asset.id} className="flex items-center justify-between gap-3 bg-white rounded-lg px-3 py-2 border border-amber-200">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium truncate">{asset.label}</p>
+                          <p className="text-xs text-muted-foreground">{assetCategoryInfo(asset.category).label} · {asset.type}</p>
+                        </div>
+                        <Button size="sm" variant="outline" onClick={() => assignAssetToPlan(asset)}>
+                          Assign to {plan.project_name}
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Primary Logo */}
           <div>
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-display text-base tracking-wider">Primary Logo</h3>
             </div>
             {(() => {
-              const logoAsset = assets.find((a) => a.category === 'logo' && a.type === 'file');
+              const logoAsset = planAssets.find((a) => a.category === 'logo' && a.type === 'file');
               const logoUrl = logoAsset ? assetSignedUrls[logoAsset.id] : null;
               if (logoAsset) {
                 return (
@@ -2307,6 +2357,8 @@ const ClientDetail = () => {
               );
             })()}
           </div>
+            </>
+          )}
         </TabsContent>
 
         {/* PLAN */}
