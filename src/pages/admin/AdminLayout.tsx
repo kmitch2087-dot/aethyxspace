@@ -3,6 +3,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import Seo from "@/components/Seo";
+import AdminAssistant from "@/components/AdminAssistant";
 import {
   Sidebar,
   SidebarContent,
@@ -161,6 +162,7 @@ const AdminLayout = () => {
           </main>
         </div>
       </div>
+      <AdminAssistant />
     </SidebarProvider>
   );
 };
