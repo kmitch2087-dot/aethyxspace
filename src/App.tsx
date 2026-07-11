@@ -31,6 +31,7 @@ import AdminLayout from "./pages/admin/AdminLayout";
 import Dashboard from "./pages/admin/Dashboard";
 import BlogManager from "./pages/admin/BlogManager";
 import Inquiries from "./pages/admin/Inquiries";
+import Inbox from "./pages/admin/Inbox";
 import Reviews from "./pages/admin/Reviews";
 import Agreements from "./pages/admin/Agreements";
 import Financials from "./pages/admin/Financials";
@@ -97,6 +98,7 @@ const App = () => (
               <Route index element={<Dashboard />} />
               <Route path="blog" element={<BlogManager />} />
               <Route path="inquiries" element={<Inquiries />} />
+              <Route path="inbox" element={<Inbox />} />
               <Route path="intakes" element={<Intakes />} />
               <Route path="intake-form" element={<IntakeFormManager />} />
               <Route path="reviews" element={<Reviews />} />

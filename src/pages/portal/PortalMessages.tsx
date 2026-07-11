@@ -3,6 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { usePortalClientProfile } from "@/hooks/usePortalClientProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Send, Loader2 } from "lucide-react";
@@ -83,11 +84,16 @@ const PortalMessages = () => {
       ) : (
         <div className="space-y-3">
           {messages.map((msg) => (
-            <div key={msg.id} className="p-4 rounded-lg border border-border/30 bg-card">
-              <p className="text-sm whitespace-pre-wrap">{msg.message}</p>
-              <p className="text-xs text-muted-foreground mt-2">
-                {format(new Date(msg.created_at), "MMM d, yyyy 'at' h:mm a")}
-              </p>
+            <div key={msg.id} className={`flex ${msg.sender === "admin" ? "justify-start" : "justify-end"}`}>
+              <Card className={`max-w-[80%] ${msg.sender === "admin" ? "" : "bg-primary/5 border-primary/20"}`}>
+                <CardContent className="pt-4">
+                  <p className="text-sm whitespace-pre-wrap">{msg.message}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {msg.sender === "admin" ? "Aethyx" : "You"} ·{" "}
+                    {format(new Date(msg.created_at), "MMM d, yyyy 'at' h:mm a")}
+                  </p>
+                </CardContent>
+              </Card>
             </div>
           ))}
         </div>

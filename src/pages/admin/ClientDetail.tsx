@@ -16,7 +16,7 @@ import {
   ArrowLeft, Loader2, Save, Upload, Mail, Plus, ExternalLink,
   AlertTriangle, CheckCircle2, Trash2, RefreshCcw, FileText, Bell, Pencil, XCircle,
   ChevronDown, ChevronUp, Download, ArrowUp, ArrowDown,
-  Eye, EyeOff, Clock, ListTodo, FolderInput, Sparkles,
+  Eye, EyeOff, Clock, ListTodo, FolderInput, Sparkles, Send,
 } from "lucide-react";
 import { format } from "date-fns";
 import { PROJECT_TYPES, DEFAULT_PROJECT_TYPE, getProjectTypeTemplate, type ProjectTypeKey, type SlotTemplate } from "@/lib/projectTemplates";
@@ -88,7 +88,7 @@ interface IntakeRow {
   business_name: string | null;
   responses: Record<string, { label: string; section: string; value: string }> | null;
 }
-interface MessageRow { id: string; message: string; created_at: string; }
+interface MessageRow { id: string; message: string; created_at: string; sender: string; }
 interface ProjectRow { id: string; name: string; status: string; notes: string | null; created_at: string; }
 
 interface DocumentSlot {
@@ -268,6 +268,8 @@ const ClientDetail = () => {
   const [agreements, setAgreements] = useState<AgreementRow[]>([]);
   const [intakes, setIntakes] = useState<IntakeRow[]>([]);
   const [messages, setMessages] = useState<MessageRow[]>([]);
+  const [newAdminMessage, setNewAdminMessage] = useState("");
+  const [sendingMessage, setSendingMessage] = useState(false);
   const [lastSignIn, setLastSignIn] = useState<string | null>(null);
   const [projects, setProjects] = useState<ProjectRow[]>([]);
 
@@ -717,6 +719,25 @@ const ClientDetail = () => {
 
   const deleteProject = async (pid: string) => {
     await supabase.from("client_projects").delete().eq("id", pid);
+    fetchAll();
+  };
+
+  const sendAdminMessage = async () => {
+    if (!profile || !newAdminMessage.trim()) return;
+    setSendingMessage(true);
+    const { error } = await supabase.from("client_messages").insert({
+      user_id: profile.user_id,
+      client_profile_id: profile.id,
+      sender: "admin",
+      message: newAdminMessage.trim(),
+    });
+    setSendingMessage(false);
+    if (error) {
+      toast({ title: "Failed to send", description: error.message, variant: "destructive" });
+      return;
+    }
+    setNewAdminMessage("");
+    toast({ title: "Message sent" });
     fetchAll();
   };
 
@@ -3113,13 +3134,31 @@ const ClientDetail = () => {
         </TabsContent>
 
         {/* MESSAGES */}
-        <TabsContent value="messages" className="mt-4 space-y-2">
-          {messages.length === 0 ? <p className="text-sm text-muted-foreground py-8 text-center">No messages.</p> : messages.map((m) => (
-            <Card key={m.id}><CardContent className="pt-4">
-              <p className="text-sm whitespace-pre-wrap">{m.message}</p>
-              <p className="text-xs text-muted-foreground mt-1">{format(new Date(m.created_at), "MMM d, yyyy h:mm a")}</p>
-            </CardContent></Card>
+        <TabsContent value="messages" className="mt-4 space-y-3">
+          {messages.length === 0 ? <p className="text-sm text-muted-foreground py-8 text-center">No messages.</p> : [...messages].reverse().map((m) => (
+            <div key={m.id} className={`flex ${m.sender === "admin" ? "justify-end" : "justify-start"}`}>
+              <Card className={`max-w-[80%] ${m.sender === "admin" ? "bg-primary/5 border-primary/20" : ""}`}>
+                <CardContent className="pt-4">
+                  <p className="text-sm whitespace-pre-wrap">{m.message}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {m.sender === "admin" ? "You" : profile.full_name} · {format(new Date(m.created_at), "MMM d, yyyy h:mm a")}
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
           ))}
+          <div className="flex gap-2 items-end">
+            <Textarea
+              value={newAdminMessage}
+              onChange={(e) => setNewAdminMessage(e.target.value)}
+              placeholder="Reply to this client…"
+              className="min-h-[80px] max-h-40"
+              maxLength={2000}
+            />
+            <Button onClick={sendAdminMessage} disabled={sendingMessage || !newAdminMessage.trim()}>
+              {sendingMessage ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+            </Button>
+          </div>
         </TabsContent>
       </Tabs>
 
