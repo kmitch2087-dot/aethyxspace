@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, MessageSquare, Star, DollarSign, FileSignature, BarChart3, Share2, Facebook, ShieldCheck } from "lucide-react";
+import { FileText, MessageSquare, Star, DollarSign, FileSignature, BarChart3, Share2, Facebook, ShieldCheck, Receipt } from "lucide-react";
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -17,13 +18,23 @@ const Dashboard = () => {
   });
   const [trafficStats, setTrafficStats] = useState({ tiktok: 0, instagram: 0, facebook: 0, other: 0, total: 0 });
   const [loading, setLoading] = useState(true);
+  const [attention, setAttention] = useState({
+    unreadThreads: 0,
+    pendingInvoicesCount: 0,
+    pendingInvoicesTotal: 0,
+    pendingIntakes: 0,
+    pendingBountyApplicants: 0,
+    pendingAddOnRequests: 0,
+  });
 
   useEffect(() => {
     // Cleanup: remove any FB credentials previously persisted in localStorage (now stored as backend secrets)
     try {
       localStorage.removeItem("fb_page_id");
       localStorage.removeItem("fb_access_token");
-    } catch {}
+    } catch {
+      // intentionally empty
+    }
 
     const fetchStats = async () => {
       const [postsRes, inquiriesRes, reviewsRes, agreementsRes, financialsRes, trafficRes] =
@@ -39,11 +50,16 @@ const Dashboard = () => {
       const posts = postsRes.data || [];
       const reviews = reviewsRes.data || [];
       const financials = financialsRes.data || [];
-      const traffic = trafficRes.data || [];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const traffic = (trafficRes.data || []) as any[];
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const tiktok = traffic.filter((t: any) => t.source === "tiktok").length;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const instagram = traffic.filter((t: any) => t.source === "instagram").length;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const facebook = traffic.filter((t: any) => t.source === "facebook").length;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const other = traffic.filter((t: any) => t.source === "other").length;
 
       setTrafficStats({ tiktok, instagram, facebook, other, total: traffic.length });
@@ -62,7 +78,45 @@ const Dashboard = () => {
       });
       setLoading(false);
     };
+
+    const fetchAttention = async () => {
+      const [msgRes, invRes, intakeRes, bountyRes, addOnRes] = await Promise.all([
+        supabase
+          .from("client_messages")
+          .select("client_profile_id, sender, created_at")
+          .order("created_at", { ascending: false }),
+        supabase.from("client_invoices").select("amount_due, status").neq("status", "paid"),
+        supabase.from("client_intakes").select("id").eq("status", "new"),
+        supabase.from("bounty_applicants").select("id").eq("status", "pending"),
+        supabase.from("client_add_ons").select("id").eq("status", "requested"),
+      ]);
+
+      // A thread "needs attention" when the most recent message in it was sent by the
+      // client (i.e. admin hasn't replied yet) — no separate seen-at tracking needed.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const msgRows = (msgRes.data || []) as any[];
+      const latestByThread = new Map<string, string>();
+      for (const row of msgRows) {
+        const key = row.client_profile_id || "unknown";
+        if (!latestByThread.has(key)) latestByThread.set(key, row.sender);
+      }
+      const unreadThreads = Array.from(latestByThread.values()).filter((s) => s === "client").length;
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const invoices = (invRes.data || []) as any[];
+
+      setAttention({
+        unreadThreads,
+        pendingInvoicesCount: invoices.length,
+        pendingInvoicesTotal: invoices.reduce((sum, i) => sum + Number(i.amount_due || 0), 0),
+        pendingIntakes: (intakeRes.data || []).length,
+        pendingBountyApplicants: (bountyRes.data || []).length,
+        pendingAddOnRequests: (addOnRes.data || []).length,
+      });
+    };
+
     fetchStats();
+    fetchAttention();
   }, []);
 
   if (loading) {
@@ -116,6 +170,74 @@ const Dashboard = () => {
   return (
     <div>
       <h1 className="text-2xl font-display tracking-wider mb-6">Dashboard</h1>
+
+      <h2 className="text-xl font-display tracking-wider mb-4">Needs Attention</h2>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 mb-10">
+        <Link to="/admin/inbox" className="block">
+          <Card className="border-border/30 hover:border-primary/40 transition-colors cursor-pointer h-full">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Unread Messages</CardTitle>
+              <MessageSquare className="h-4 w-4 text-blue-400" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{attention.unreadThreads}</div>
+              <p className="text-xs text-muted-foreground mt-1">threads awaiting reply</p>
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link to="/admin/invoices" className="block">
+          <Card className="border-border/30 hover:border-primary/40 transition-colors cursor-pointer h-full">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Pending Invoices</CardTitle>
+              <Receipt className="h-4 w-4 text-emerald-400" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{attention.pendingInvoicesCount}</div>
+              <p className="text-xs text-muted-foreground mt-1">${attention.pendingInvoicesTotal.toLocaleString()} outstanding</p>
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link to="/admin/intakes" className="block">
+          <Card className="border-border/30 hover:border-primary/40 transition-colors cursor-pointer h-full">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">New Intakes</CardTitle>
+              <FileSignature className="h-4 w-4 text-purple-400" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{attention.pendingIntakes}</div>
+              <p className="text-xs text-muted-foreground mt-1">awaiting review</p>
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link to="/admin/referral-program" className="block">
+          <Card className="border-border/30 hover:border-primary/40 transition-colors cursor-pointer h-full">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Bounty Applicants</CardTitle>
+              <Share2 className="h-4 w-4 text-teal-400" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{attention.pendingBountyApplicants}</div>
+              <p className="text-xs text-muted-foreground mt-1">pending approval</p>
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link to="/admin/add-ons" className="block">
+          <Card className="border-border/30 hover:border-primary/40 transition-colors cursor-pointer h-full">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Add-On Requests</CardTitle>
+              <DollarSign className="h-4 w-4 text-yellow-400" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{attention.pendingAddOnRequests}</div>
+              <p className="text-xs text-muted-foreground mt-1">pending requests</p>
+            </CardContent>
+          </Card>
+        </Link>
+      </div>
 
       <Tabs defaultValue="overview" className="space-y-6">
         <TabsList>
