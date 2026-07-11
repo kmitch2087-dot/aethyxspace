@@ -130,7 +130,7 @@ interface AddOnRow {
   } | null;
 }
 
-type AssetCategory = "brand_voice" | "tagline" | "motto" | "mission" | "values" | "logo" | "guideline" | "font" | "other";
+type AssetCategory = "brand_voice" | "tagline" | "motto" | "mission" | "values" | "contact_info" | "hours" | "staff" | "logo" | "guideline" | "font" | "other";
 
 interface ClientAsset {
   id: string;
@@ -230,6 +230,9 @@ function assetCategoryInfo(category: AssetCategory): { classes: string; label: s
     motto: { classes: "bg-blue-100 text-blue-700 border-blue-200", label: "Motto" },
     mission: { classes: "bg-green-100 text-green-700 border-green-200", label: "Mission" },
     values: { classes: "bg-orange-100 text-orange-700 border-orange-200", label: "Values" },
+    contact_info: { classes: "bg-pink-100 text-pink-700 border-pink-200", label: "Contact Info" },
+    hours: { classes: "bg-amber-100 text-amber-700 border-amber-200", label: "Hours" },
+    staff: { classes: "bg-indigo-100 text-indigo-700 border-indigo-200", label: "Staff" },
     logo: { classes: "bg-teal-100 text-teal-700 border-teal-200", label: "Logo" },
     guideline: { classes: "bg-blue-100 text-blue-700 border-blue-200", label: "Guidelines" },
     font: { classes: "bg-gray-100 text-gray-600 border-gray-200", label: "Font" },
@@ -3361,6 +3364,9 @@ const ClientDetail = () => {
                   <SelectItem value="motto">Motto</SelectItem>
                   <SelectItem value="mission">Mission Statement</SelectItem>
                   <SelectItem value="values">Brand Values</SelectItem>
+                  <SelectItem value="contact_info">Contact Info</SelectItem>
+                  <SelectItem value="hours">Hours</SelectItem>
+                  <SelectItem value="staff">Staff</SelectItem>
                   <SelectItem value="other">Other</SelectItem>
                 </SelectContent>
               </Select>
