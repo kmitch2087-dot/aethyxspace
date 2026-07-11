@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Package } from "lucide-react";
 import { computeAddOnRequestState } from "@/lib/addOnRequestState";
+import { useToast } from "@/hooks/use-toast";
 
 interface CatalogItem {
   id: string;
@@ -25,6 +26,7 @@ interface ClientAddOnRow {
 
 const PortalAddOns = () => {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [profileId, setProfileId] = useState<string | null>(null);
   const [catalog, setCatalog] = useState<CatalogItem[]>([]);
@@ -81,6 +83,8 @@ const PortalAddOns = () => {
     setRequestingId(null);
     if (!error) {
       setClientAddOns((prev) => [...prev, { id: crypto.randomUUID(), add_on_catalog_id: catalogId, status: "requested" }]);
+    } else {
+      toast({ title: "Request failed", description: error.message, variant: "destructive" });
     }
   };
 
