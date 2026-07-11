@@ -8,14 +8,14 @@ import AgreementDocument from "@/components/AgreementDocument";
 
 const PortalAgreements = () => {
   const { user } = useAuth();
-  const { profile: resolvedProfile } = usePortalClientProfile();
+  const { profile: resolvedProfile, loading: profileLoading } = usePortalClientProfile();
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<{ id: string; full_name: string; email: string | null } | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [record, setRecord] = useState<any | null>(null);
 
   const load = async () => {
-    if (!user || !resolvedProfile) return;
+    if (!user || profileLoading) return;
     setLoading(true);
     const profileData = resolvedProfile;
     setProfile(profileData);
@@ -43,7 +43,7 @@ const PortalAgreements = () => {
   useEffect(() => {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, resolvedProfile]);
+  }, [user, resolvedProfile, profileLoading]);
 
   if (loading) {
     return (

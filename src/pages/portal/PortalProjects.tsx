@@ -67,7 +67,7 @@ const ScheduleIcon = ({ status }: { status: ScheduleStatus }) => {
 
 export default function PortalProjects() {
   const { user } = useAuth();
-  const { profile: resolvedProfile } = usePortalClientProfile();
+  const { profile: resolvedProfile, loading: profileLoading } = usePortalClientProfile();
   const { toast } = useToast();
 
   const [loading, setLoading] = useState(true);
@@ -76,9 +76,9 @@ export default function PortalProjects() {
   const [updates, setUpdates] = useState<any[]>([]);
 
   useEffect(() => {
-    if (!user || !resolvedProfile) return;
+    if (!user || profileLoading) return;
     load();
-  }, [user, resolvedProfile]);
+  }, [user, resolvedProfile, profileLoading]);
 
   async function load() {
     setLoading(true);

@@ -26,7 +26,7 @@ const SECTION_META: Record<string, { eyebrow: string; title: string }> = {
 
 const PortalIntake = () => {
   const { user } = useAuth();
-  const { profile: resolvedProfile } = usePortalClientProfile();
+  const { profile: resolvedProfile, loading: profileLoading } = usePortalClientProfile();
   const { toast } = useToast();
   const nav = useNavigate();
   const [fields, setFields] = useState<Field[]>([]);
@@ -36,7 +36,7 @@ const PortalIntake = () => {
   const [profile, setProfile] = useState<any>(null);
 
   useEffect(() => {
-    if (!user || !resolvedProfile) return;
+    if (!user || profileLoading) return;
     (async () => {
       const { data: f } = await supabase.from("intake_form_fields").select("*").eq("active", true).order("section").order("display_order");
       const p = resolvedProfile;
@@ -46,13 +46,13 @@ const PortalIntake = () => {
         setValues({
           full_name: p.full_name || "",
           email: p.email || user.email || "",
-          phone: p.phone || "",
-          business_name: p.business_name || "",
+          phone: String(p.phone ?? ""),
+          business_name: String(p.business_name ?? ""),
         });
       }
       setLoading(false);
     })();
-  }, [user, resolvedProfile]);
+  }, [user, resolvedProfile, profileLoading]);
 
   const grouped = useMemo(() => {
     const m: Record<string, Field[]> = { about: [], project: [], market: [], extra: [] };

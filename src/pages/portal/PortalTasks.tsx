@@ -17,7 +17,7 @@ const priorityColors: Record<string, string> = {
 
 export default function PortalTasks() {
   const { user } = useAuth();
-  const { profile: resolvedProfile } = usePortalClientProfile();
+  const { profile: resolvedProfile, loading: profileLoading } = usePortalClientProfile();
   const { toast } = useToast();
 
   const [loading, setLoading] = useState(true);
@@ -25,10 +25,10 @@ export default function PortalTasks() {
   const [completing, setCompleting] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user || !resolvedProfile) return;
+    if (!user || profileLoading) return;
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, resolvedProfile]);
+  }, [user, resolvedProfile, profileLoading]);
 
   async function load() {
     setLoading(true);

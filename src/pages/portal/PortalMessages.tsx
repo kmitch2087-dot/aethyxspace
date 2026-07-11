@@ -10,7 +10,7 @@ import { format } from "date-fns";
 
 const PortalMessages = () => {
   const { user } = useAuth();
-  const { profile: resolvedProfile } = usePortalClientProfile();
+  const { profile: resolvedProfile, loading: profileLoading } = usePortalClientProfile();
   const { toast } = useToast();
   const [messages, setMessages] = useState<any[]>([]);
   const [profileId, setProfileId] = useState<string | null>(null);
@@ -19,8 +19,8 @@ const PortalMessages = () => {
   const [loading, setLoading] = useState(true);
 
   const fetchMessages = async () => {
-    if (!user || !resolvedProfile) return;
-    const pid = resolvedProfile.id;
+    if (!user || profileLoading) return;
+    const pid = resolvedProfile?.id ?? null;
     setProfileId(pid);
     const filter = pid
       ? `client_profile_id.eq.${pid},user_id.eq.${user.id}`
@@ -36,7 +36,7 @@ const PortalMessages = () => {
 
   useEffect(() => {
     fetchMessages();
-  }, [user, resolvedProfile]);
+  }, [user, resolvedProfile, profileLoading]);
 
   const handleSend = async () => {
     if (!newMessage.trim() || !user) return;

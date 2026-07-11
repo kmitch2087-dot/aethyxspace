@@ -27,7 +27,7 @@ interface ClientAddOnRow {
 
 const PortalAddOns = () => {
   const { user } = useAuth();
-  const { profile: resolvedProfile } = usePortalClientProfile();
+  const { profile: resolvedProfile, loading: profileLoading } = usePortalClientProfile();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [profileId, setProfileId] = useState<string | null>(null);
@@ -36,9 +36,9 @@ const PortalAddOns = () => {
   const [requestingId, setRequestingId] = useState<string | null>(null);
 
   const load = async () => {
-    if (!user || !resolvedProfile) return;
+    if (!user || profileLoading) return;
     setLoading(true);
-    const pid = resolvedProfile.id;
+    const pid = resolvedProfile?.id ?? null;
     setProfileId(pid);
 
     const [catalogResult, addOnsResult] = await Promise.all([
@@ -65,7 +65,7 @@ const PortalAddOns = () => {
   useEffect(() => {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, resolvedProfile]);
+  }, [user, resolvedProfile, profileLoading]);
 
   const requestAddOn = async (catalogId: string) => {
     if (!profileId) return;

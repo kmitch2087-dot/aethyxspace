@@ -23,7 +23,7 @@ const SLOT_LABELS: Record<string, string> = {
 
 const PortalDocuments = () => {
   const { user } = useAuth();
-  const { profile: resolvedProfile } = usePortalClientProfile();
+  const { profile: resolvedProfile, loading: profileLoading } = usePortalClientProfile();
   const [documents, setDocuments] = useState<any[]>([]);
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -43,7 +43,7 @@ const PortalDocuments = () => {
   const [agreementRecord, setAgreementRecord] = useState<any>(null);
 
   const load = async () => {
-    if (!user || !resolvedProfile) return;
+    if (!user || profileLoading) return;
     const p = resolvedProfile;
     setProfile(p);
 
@@ -90,7 +90,7 @@ const PortalDocuments = () => {
     }
   };
 
-  useEffect(() => { load(); }, [user, resolvedProfile]);
+  useEffect(() => { load(); }, [user, resolvedProfile, profileLoading]);
 
   // Expand/collapse a slot; generate signed URL on first expand for uploaded slots
   const handleExpandSlot = async (slot: any) => {
