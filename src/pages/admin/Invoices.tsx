@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import {
   FileText, Plus, Loader2, RefreshCcw, ExternalLink, MoreHorizontal,
   Mail, Link as LinkIcon, CheckCircle2, XCircle, Bell, RotateCcw, Download, Send,
+  Eye, EyeOff,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -38,6 +39,7 @@ interface Invoice {
   created_at: string;
   email: string | null;
   client_profile_id: string | null;
+  hidden: boolean;
 }
 
 const Invoices = () => {
@@ -47,6 +49,16 @@ const Invoices = () => {
   const [createOpen, setCreateOpen] = useState(false);
   const [syncOpen, setSyncOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [showHidden, setShowHidden] = useState(false);
+
+  const toggleHidden = async (inv: Invoice) => {
+    const { error } = await supabase.from("client_invoices").update({ hidden: !inv.hidden }).eq("id", inv.id);
+    if (error) {
+      toast({ title: "Failed to update", description: error.message, variant: "destructive" });
+      return;
+    }
+    fetchAll();
+  };
 
   // Email composer
   const [emailInv, setEmailInv] = useState<Invoice | null>(null);
@@ -168,17 +180,26 @@ const Invoices = () => {
         <h1 className="text-2xl font-display tracking-wider flex items-center gap-2">
           <FileText className="h-6 w-6 text-primary" /> Invoices
         </h1>
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
+          <button
+            onClick={() => setShowHidden((v) => !v)}
+            className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 mr-2"
+          >
+            {showHidden ? "Hide hidden" : `Show hidden (${invoices.filter((i) => i.hidden).length})`}
+          </button>
           <Button variant="outline" size="sm" onClick={() => setSyncOpen(true)}><RefreshCcw className="h-4 w-4 mr-2" /> Sync from Stripe</Button>
           <Button size="sm" onClick={() => setCreateOpen(true)}><Plus className="h-4 w-4 mr-2" /> New Invoice</Button>
         </div>
       </div>
 
-      {invoices.length === 0 ? (
-        <Card><CardContent className="py-12 text-center text-muted-foreground text-sm">No invoices yet.</CardContent></Card>
-      ) : (
+      {(() => {
+        const visibleInvoices = showHidden ? invoices : invoices.filter((i) => !i.hidden);
+        if (visibleInvoices.length === 0) {
+          return <Card><CardContent className="py-12 text-center text-muted-foreground text-sm">No invoices yet.</CardContent></Card>;
+        }
+        return (
         <div className="space-y-2">
-          {invoices.map((inv) => {
+          {visibleInvoices.map((inv) => {
             const profile = profiles.find((p) => p.id === inv.client_profile_id);
             const isStripe = !!inv.stripe_invoice_id;
             const canRefund = isStripe && (inv.amount_paid > 0);
@@ -232,13 +253,15 @@ const Invoices = () => {
                             <DropdownMenuItem onClick={() => runAction(inv, "void")}><XCircle className="h-4 w-4 mr-2" /> Void</DropdownMenuItem>
                           </>
                         )}
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => toggleHidden(inv)}>
+                          {inv.hidden ? <Eye className="h-4 w-4 mr-2" /> : <EyeOff className="h-4 w-4 mr-2" />}
+                          {inv.hidden ? "Unhide" : "Hide"}
+                        </DropdownMenuItem>
                         {canRefund && (
-                          <>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => { setRefundInv(inv); setRefundAmount(""); }} className="text-destructive">
-                              <RotateCcw className="h-4 w-4 mr-2" /> Refund
-                            </DropdownMenuItem>
-                          </>
+                          <DropdownMenuItem onClick={() => { setRefundInv(inv); setRefundAmount(""); }} className="text-destructive">
+                            <RotateCcw className="h-4 w-4 mr-2" /> Refund
+                          </DropdownMenuItem>
                         )}
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -248,7 +271,8 @@ const Invoices = () => {
             );
           })}
         </div>
-      )}
+        );
+      })()}
 
       {/* Create */}
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
