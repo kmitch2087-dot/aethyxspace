@@ -75,7 +75,7 @@ interface Invoice {
   review_reason: string | null;
 }
 
-interface DocRow { id: string; title: string; file_url: string; created_at: string; }
+interface DocRow { id: string; title: string; file_url: string; created_at: string; parent_admin_doc_id: string | null; }
 interface AgreementRow { id: string; service_name: string | null; status: string; amount: number | null; agreement_url: string | null; created_at: string; }
 interface IntakeRow {
   id: string;
@@ -280,6 +280,7 @@ const ClientDetail = () => {
   const [sendingDocNotif, setSendingDocNotif] = useState(false);
   const [editingDocId, setEditingDocId] = useState<string | null>(null);
   const [editingDocTitle, setEditingDocTitle] = useState("");
+  const [viewingDoc, setViewingDoc] = useState<DocRow | null>(null);
 
   // Intake collapsible inside Documents tab
   const [intakesOpen, setIntakesOpen] = useState(false);
@@ -381,12 +382,23 @@ const ClientDetail = () => {
 
   const fetchSignedUrls = async (rows: DocRow[]) => {
     if (!rows.length) { setDocUrls({}); return; }
-    const { data: signed } = await supabase.storage
-      .from("client-documents")
-      .createSignedUrls(rows.map((d) => d.file_url), 3600);
+    const clientBucketRows = rows.filter((d) => !d.parent_admin_doc_id);
+    const adminBucketRows = rows.filter((d) => d.parent_admin_doc_id);
     const map: Record<string, string> = {};
-    (signed || []).forEach((item) => {
-      const doc = rows.find((d) => d.file_url === item.path);
+    const [clientSigned, adminSigned] = await Promise.all([
+      clientBucketRows.length
+        ? supabase.storage.from("client-documents").createSignedUrls(clientBucketRows.map((d) => d.file_url), 3600)
+        : Promise.resolve({ data: [] as { path: string | null; signedUrl: string }[] }),
+      adminBucketRows.length
+        ? supabase.storage.from("admin-documents").createSignedUrls(adminBucketRows.map((d) => d.file_url), 3600)
+        : Promise.resolve({ data: [] as { path: string | null; signedUrl: string }[] }),
+    ]);
+    (clientSigned.data || []).forEach((item) => {
+      const doc = clientBucketRows.find((d) => d.file_url === item.path);
+      if (doc && item.signedUrl) map[doc.id] = item.signedUrl;
+    });
+    (adminSigned.data || []).forEach((item) => {
+      const doc = adminBucketRows.find((d) => d.file_url === item.path);
       if (doc && item.signedUrl) map[doc.id] = item.signedUrl;
     });
     setDocUrls(map);
@@ -1501,7 +1513,7 @@ const ClientDetail = () => {
                   <div key={d.id} className="group relative border border-black/10 rounded-xl overflow-hidden bg-white hover:shadow-md transition-shadow">
                     <button
                       className="w-full text-left focus:outline-none"
-                      onClick={() => signedUrl && editingDocId !== d.id && window.open(signedUrl, "_blank")}
+                      onClick={() => signedUrl && editingDocId !== d.id && setViewingDoc(d)}
                       disabled={!signedUrl || editingDocId === d.id}
                     >
                       <div className="h-36 bg-black/5 flex items-center justify-center overflow-hidden">
@@ -2784,6 +2796,15 @@ const ClientDetail = () => {
               {uploading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Upload className="h-4 w-4 mr-2" />} Upload
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!viewingDoc} onOpenChange={(open) => !open && setViewingDoc(null)}>
+        <DialogContent className="sm:max-w-2xl bg-white text-black" style={lightVars}>
+          <DialogHeader><DialogTitle className="text-black">{viewingDoc?.title}</DialogTitle></DialogHeader>
+          {viewingDoc && (
+            <DocumentViewer url={docUrls[viewingDoc.id] || null} fileName={viewingDoc.file_url} />
+          )}
         </DialogContent>
       </Dialog>
 
