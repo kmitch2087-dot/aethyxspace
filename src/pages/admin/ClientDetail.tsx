@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -55,6 +56,7 @@ interface Profile {
   source: string | null;
   stripe_customer_id: string | null;
   stripe_customer_ids: string[] | null;
+  referral_enabled: boolean;
 }
 
 interface Invoice {
@@ -542,6 +544,22 @@ const ClientDetail = () => {
     setSaving(false);
     if (error) toast({ title: "Save failed", description: error.message, variant: "destructive" });
     else toast({ title: "Saved" });
+  };
+
+  const toggleReferralEnabled = async () => {
+    if (!profile) return;
+    const next = !profile.referral_enabled;
+    setProfile({ ...profile, referral_enabled: next });
+    const { error } = await supabase
+      .from("client_profiles")
+      .update({ referral_enabled: next })
+      .eq("id", profile.id);
+    if (error) {
+      setProfile((p) => (p ? { ...p, referral_enabled: !next } : p));
+      toast({ title: "Failed to update referral access", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: next ? "Referral access enabled" : "Referral access disabled" });
+    }
   };
 
   const handleResendInvite = async () => {
@@ -1255,6 +1273,17 @@ const ClientDetail = () => {
                   {!(profile.stripe_customer_ids || []).length && <span className="text-xs text-muted-foreground">None linked</span>}
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">Source: {profile.source || "—"}</p>
+              </div>
+              <div className="flex items-center justify-between rounded-md border border-border/40 px-4 py-3">
+                <div>
+                  <Label>Referral program access</Label>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {profile.referral_enabled
+                      ? "This client can see the Referrals page and share their link."
+                      : "This client cannot see the Referrals page yet."}
+                  </p>
+                </div>
+                <Switch checked={profile.referral_enabled} onCheckedChange={toggleReferralEnabled} />
               </div>
             </CardContent>
           </Card>
