@@ -29,6 +29,7 @@ import {
   GitBranch,
   FolderKanban,
   Package,
+  ListTodo,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -41,6 +42,7 @@ const baseNavItems = [
   { title: "Referrals", url: "/portal/referrals", icon: GitBranch },
   { title: "Add-Ons", url: "/portal/add-ons", icon: Package },
   { title: "My Project", url: "/portal/projects", icon: FolderKanban },
+  { title: "Tasks", url: "/portal/tasks", icon: ListTodo },
 ];
 
 function PortalSidebar({ showIntake, showReferrals }: { showIntake: boolean; showReferrals: boolean }) {
