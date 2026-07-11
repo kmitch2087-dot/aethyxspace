@@ -9,6 +9,13 @@ export interface PhaseTemplate {
   description?: string;
 }
 
+export interface SlotTemplate {
+  key: string;
+  label: string;
+  phaseName: string;
+  isAgreement?: boolean;
+}
+
 export interface ProjectTypeTemplate {
   key: ProjectTypeKey;
   label: string;
@@ -23,6 +30,7 @@ export interface ProjectTypeTemplate {
    */
   usesDocumentSlots: boolean;
   defaultPhases: PhaseTemplate[];
+  defaultSlots: SlotTemplate[];
 }
 
 export const PROJECT_TYPES: ProjectTypeTemplate[] = [
@@ -38,12 +46,19 @@ export const PROJECT_TYPES: ProjectTypeTemplate[] = [
       { name: "Project Planning" },
       { name: "Contract & Agreement" },
     ],
+    defaultSlots: [
+      { key: 'site_audit', label: 'Site Audit', phaseName: 'Site Audit' },
+      { key: 'market_research', label: 'Market Research', phaseName: 'Market Research' },
+      { key: 'service_tier', label: 'Service Tier Information', phaseName: 'Service Tier' },
+      { key: 'plan', label: 'Project Plan', phaseName: 'Project Planning' },
+      { key: 'agreement', label: 'Proposal & Agreement', phaseName: 'Contract & Agreement', isAgreement: true },
+    ],
   },
   {
     key: "google_ads",
     label: "Google Ads Management",
     defaultProjectName: "Google Ads Management",
-    usesDocumentSlots: false,
+    usesDocumentSlots: true,
     defaultPhases: [
       {
         name: "Week 1: Access, Setup + Strategy",
@@ -70,6 +85,13 @@ export const PROJECT_TYPES: ProjectTypeTemplate[] = [
         description:
           "Review full 90-day performance, identify strongest/weakest keywords, review CPC/cost-per-lead, recommend continue/adjust/increase budget/pause, deliver clear next-step recommendation.",
       },
+    ],
+    defaultSlots: [
+      { key: 'ga_digital_audit', label: 'Google Search / Digital Presence Audit', phaseName: 'Digital Presence Audit' },
+      { key: 'ga_market_research', label: 'Market Research', phaseName: 'Market Research' },
+      { key: 'ga_keyword_research', label: 'SEO Keyword Research', phaseName: 'Keyword Research' },
+      { key: 'ga_service_tier', label: 'Service Tier', phaseName: 'Service Tier' },
+      { key: 'ga_plan', label: 'Project Plan', phaseName: 'Project Plan' },
     ],
   },
 ];
