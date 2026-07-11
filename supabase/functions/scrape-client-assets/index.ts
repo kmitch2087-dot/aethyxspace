@@ -120,9 +120,14 @@ Deno.serve(async (req: Request) => {
       const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
       let pageResp: Response;
       try {
-        pageResp = await fetch(parsedUrl.toString(), { signal: controller.signal, redirect: "follow" });
+        pageResp = await fetch(parsedUrl.toString(), { signal: controller.signal, redirect: "manual" });
       } finally {
         clearTimeout(timeout);
+      }
+      // Don't follow redirects: a public hostname redirecting to an internal address would
+      // bypass the SSRF guard above. Single-page scrape only, no crawling — reject outright.
+      if (pageResp.type === "opaqueredirect" || (pageResp.status >= 300 && pageResp.status < 400)) {
+        throw new Error("Redirects are not followed for security reasons");
       }
       if (!pageResp.ok) throw new Error(`Fetch failed: ${pageResp.status}`);
       const html = await pageResp.text();
@@ -134,7 +139,25 @@ Deno.serve(async (req: Request) => {
       let imageCount = 0;
       for (let i = 0; i < imageUrls.length; i++) {
         try {
-          const imgResp = await fetch(imageUrls[i]);
+          // Same SSRF guard as the main page fetch: page-supplied image URLs are just as
+          // capable of pointing at internal infrastructure (e.g. cloud metadata endpoints).
+          let imgUrl: URL;
+          try {
+            imgUrl = new URL(imageUrls[i]);
+          } catch {
+            continue;
+          }
+          if (imgUrl.protocol !== "http:" && imgUrl.protocol !== "https:") continue;
+          if (isPrivateOrLoopback(imgUrl.hostname)) continue;
+
+          const imgController = new AbortController();
+          const imgTimeout = setTimeout(() => imgController.abort(), FETCH_TIMEOUT_MS);
+          let imgResp: Response;
+          try {
+            imgResp = await fetch(imageUrls[i], { signal: imgController.signal });
+          } finally {
+            clearTimeout(imgTimeout);
+          }
           if (!imgResp.ok) continue;
           const blob = await imgResp.blob();
           if (blob.size === 0 || blob.size > MAX_IMAGE_BYTES) continue;
@@ -170,18 +193,26 @@ Page text:
 ${visibleText}`;
 
         try {
-          const geminiResp = await fetch(
-            "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
-            {
-              method: "POST",
-              headers: { Authorization: `Bearer ${GEMINI_API_KEY}`, "Content-Type": "application/json" },
-              body: JSON.stringify({
-                model: "gemini-2.5-flash",
-                messages: [{ role: "user", content: prompt }],
-                stream: false,
-              }),
-            },
-          );
+          const geminiController = new AbortController();
+          const geminiTimeout = setTimeout(() => geminiController.abort(), FETCH_TIMEOUT_MS);
+          let geminiResp: Response;
+          try {
+            geminiResp = await fetch(
+              "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+              {
+                method: "POST",
+                headers: { Authorization: `Bearer ${GEMINI_API_KEY}`, "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  model: "gemini-2.5-flash",
+                  messages: [{ role: "user", content: prompt }],
+                  stream: false,
+                }),
+                signal: geminiController.signal,
+              },
+            );
+          } finally {
+            clearTimeout(geminiTimeout);
+          }
           if (geminiResp.ok) {
             const geminiJson = await geminiResp.json();
             const text = geminiJson?.choices?.[0]?.message?.content || "";
