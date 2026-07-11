@@ -39,7 +39,7 @@ const baseNavItems = [
   { title: "Documents", url: "/portal/documents", icon: FolderOpen },
   { title: "Agreements", url: "/portal/agreements", icon: FileSignature },
   { title: "Payments", url: "/portal/payments", icon: CreditCard },
-  { title: "Referrals", url: "/portal/referrals", icon: GitBranch },
+  { title: "Bounty", url: "/portal/referrals", icon: GitBranch },
   { title: "Add-Ons", url: "/portal/add-ons", icon: Package },
   { title: "My Project", url: "/portal/projects", icon: FolderKanban },
   { title: "Tasks", url: "/portal/tasks", icon: ListTodo },
@@ -56,7 +56,7 @@ function PortalSidebar({
 }) {
   const filteredBase = showReferrals
     ? baseNavItems
-    : baseNavItems.filter((item) => item.title !== "Referrals");
+    : baseNavItems.filter((item) => item.title !== "Bounty");
   const navItems = showIntake
     ? [...filteredBase, { title: "Intake Form", url: "/portal/intake", icon: ClipboardList }]
     : filteredBase;

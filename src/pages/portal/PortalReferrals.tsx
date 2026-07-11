@@ -140,7 +140,7 @@ const PortalReferrals = () => {
     return (
       <div className="space-y-4">
         <div>
-          <h1 className="text-2xl font-display tracking-wider mb-1">Referral Program</h1>
+          <h1 className="text-2xl font-display tracking-wider mb-1">Bounty Program</h1>
         </div>
         <div className="rounded-lg border border-border/30 bg-muted/20 px-4 py-8 text-center text-sm text-muted-foreground">
           The referral program isn't enabled for your account yet. Reach out if you'd like to
@@ -153,7 +153,7 @@ const PortalReferrals = () => {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-display tracking-wider mb-1">Referral Program</h1>
+        <h1 className="text-2xl font-display tracking-wider mb-1">Bounty Program</h1>
         <p className="text-muted-foreground text-sm">
           Refer someone to Aethyx and earn cash rewards when they sign and go live.
         </p>
