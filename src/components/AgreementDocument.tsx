@@ -2,7 +2,18 @@ import { useRef, useState, useCallback, useEffect } from "react"
 import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
-import { Printer, Loader2 } from "lucide-react"
+import { Printer, Loader2, Eye } from "lucide-react"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 interface AgreementRecord {
   id?: string
@@ -26,6 +37,8 @@ interface AgreementRecord {
   is_locked: boolean
   submitted_at?: string
   down_payment_status: string
+  sent_at?: string | null
+  unlock_count?: number
 }
 
 interface AgreementDocumentProps {
@@ -76,6 +89,12 @@ export default function AgreementDocument({
   const [idUploaded, setIdUploaded] = useState(!!record.id_document_path)
   const [saving, setSaving] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [sending, setSending] = useState(false)
+  const [unlocking, setUnlocking] = useState(false)
+  const [confirmSubmitOpen, setConfirmSubmitOpen] = useState(false)
+  const [viewIdOpen, setViewIdOpen] = useState(false)
+  const [viewIdUrl, setViewIdUrl] = useState<string | null>(null)
+  const [viewIdLoading, setViewIdLoading] = useState(false)
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -184,6 +203,57 @@ export default function AgreementDocument({
     }
   }
 
+  const handleClientSave = async () => {
+    setSaving(true)
+    try {
+      await onSave(collectClientFields())
+      toast({ title: "Progress saved" })
+    } catch {
+      toast({ title: "Save failed", variant: "destructive" })
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleSendToClient = async () => {
+    setSending(true)
+    try {
+      await onSave({ ...collectAdminFields(), sent_at: new Date().toISOString() })
+      toast({ title: "Sent to client" })
+    } catch {
+      toast({ title: "Send failed", variant: "destructive" })
+    } finally {
+      setSending(false)
+    }
+  }
+
+  const handleUnlock = async () => {
+    setUnlocking(true)
+    try {
+      await onSave({ is_locked: false, unlock_count: (record.unlock_count ?? 0) + 1 })
+      toast({ title: "Unlocked for one correction" })
+    } catch {
+      toast({ title: "Unlock failed", variant: "destructive" })
+    } finally {
+      setUnlocking(false)
+    }
+  }
+
+  const handleViewId = async () => {
+    if (!record.id_document_path) return
+    setViewIdOpen(true)
+    setViewIdLoading(true)
+    const { data, error } = await supabase.storage
+      .from("client-slot-docs")
+      .createSignedUrl(record.id_document_path, 300)
+    setViewIdLoading(false)
+    if (error || !data) {
+      toast({ title: "Could not load ID", description: error?.message, variant: "destructive" })
+      return
+    }
+    setViewIdUrl(data.signedUrl)
+  }
+
   const handleSubmit = async () => {
     setSubmitting(true)
     try {
@@ -191,12 +261,18 @@ export default function AgreementDocument({
         ...collectClientFields(),
         client_signature_data: signatureData,
         client_signed_at: new Date().toISOString(),
+        is_locked: true,
       })
       onSubmit()
     } catch {
       toast({ title: "Submission failed", variant: "destructive" })
       setSubmitting(false)
     }
+  }
+
+  const handleConfirmSubmit = () => {
+    setConfirmSubmitOpen(false)
+    handleSubmit()
   }
 
   const canSubmit =
@@ -687,8 +763,17 @@ export default function AgreementDocument({
                   </label>
                 )
               ) : record.id_document_path ? (
-                <span className="inline-flex items-center gap-1 text-sm text-green-600 font-medium">
+                <span className="inline-flex items-center gap-2 text-sm text-green-600 font-medium">
                   ID Verified ✓
+                  {modeProp === "admin" && (
+                    <button
+                      type="button"
+                      onClick={handleViewId}
+                      className="inline-flex items-center gap-1 text-gray-500 hover:text-gray-700 font-normal underline no-print"
+                    >
+                      <Eye className="h-3.5 w-3.5" /> View
+                    </button>
+                  )}
                 </span>
               ) : (
                 <span className="text-gray-400 italic text-sm">Not submitted</span>
@@ -717,31 +802,89 @@ export default function AgreementDocument({
         {/* ACTION BUTTONS */}
         <div className="no-print flex flex-wrap gap-3 mt-8 pt-6 border-t border-gray-100">
           {mode === "admin" && (
-            <Button onClick={handleSave} disabled={saving}>
-              {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              Save Agreement
-            </Button>
+            <>
+              <Button onClick={handleSave} disabled={saving}>
+                {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                Save Agreement
+              </Button>
+              {!record.sent_at && (
+                <Button variant="outline" onClick={handleSendToClient} disabled={sending}>
+                  {sending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                  Send to Client
+                </Button>
+              )}
+            </>
           )}
 
           {mode === "client" && (
-            <Button
-              onClick={handleSubmit}
-              disabled={!canSubmit || submitting}
-              className="bg-teal-600 hover:bg-teal-700 text-white"
-            >
-              {submitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              Submit Agreement
-            </Button>
+            <>
+              <Button variant="outline" onClick={handleClientSave} disabled={saving}>
+                {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                Save Progress
+              </Button>
+              <Button
+                onClick={() => setConfirmSubmitOpen(true)}
+                disabled={!canSubmit || submitting}
+                className="bg-teal-600 hover:bg-teal-700 text-white"
+              >
+                {submitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                Submit Agreement
+              </Button>
+            </>
           )}
 
-          {(mode === "view" || (mode === "admin" && record.is_locked)) && (
+          {mode === "view" && (
             <Button variant="outline" onClick={() => window.print()}>
               <Printer className="h-4 w-4 mr-2" />
               Print Agreement
             </Button>
           )}
+
+          {modeProp === "admin" && record.is_locked && (record.unlock_count ?? 0) === 0 && (
+            <Button variant="outline" onClick={handleUnlock} disabled={unlocking}>
+              {unlocking && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Unlock for Correction
+            </Button>
+          )}
         </div>
       </div>
+
+      <AlertDialog open={confirmSubmitOpen} onOpenChange={setConfirmSubmitOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Submit this agreement?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Once submitted, this agreement is final and cannot be changed. Are you sure you
+              want to continue?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmSubmit}>
+              Submit Agreement
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <Dialog open={viewIdOpen} onOpenChange={(open) => { setViewIdOpen(open); if (!open) setViewIdUrl(null) }}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Client Photo ID</DialogTitle>
+          </DialogHeader>
+          {viewIdLoading ? (
+            <div className="flex justify-center py-10">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : viewIdUrl ? (
+            record.id_document_path?.toLowerCase().endsWith(".pdf") ? (
+              <iframe src={viewIdUrl} className="w-full h-[70vh] border-0" title="Client ID document" />
+            ) : (
+              <img src={viewIdUrl} alt="Client ID document" className="w-full h-auto rounded" />
+            )
+          ) : null}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
