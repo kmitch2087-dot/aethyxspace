@@ -650,6 +650,7 @@ export type Database = {
           created_at: string
           file_url: string
           id: string
+          linked_invoice_id: string | null
           note: string | null
           parent_admin_doc_id: string | null
           title: string
@@ -661,6 +662,7 @@ export type Database = {
           created_at?: string
           file_url: string
           id?: string
+          linked_invoice_id?: string | null
           note?: string | null
           parent_admin_doc_id?: string | null
           title: string
@@ -672,13 +674,22 @@ export type Database = {
           created_at?: string
           file_url?: string
           id?: string
+          linked_invoice_id?: string | null
           note?: string | null
           parent_admin_doc_id?: string | null
           title?: string
           uploaded_by?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "client_documents_linked_invoice_id_fkey"
+            columns: ["linked_invoice_id"]
+            isOneToOne: false
+            referencedRelation: "client_invoices"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       client_intakes: {
         Row: {
@@ -738,6 +749,7 @@ export type Database = {
           description: string | null
           due_date: string | null
           email: string | null
+          hidden: boolean
           hosted_invoice_url: string | null
           id: string
           invoice_number: string | null
@@ -760,6 +772,7 @@ export type Database = {
           description?: string | null
           due_date?: string | null
           email?: string | null
+          hidden?: boolean
           hosted_invoice_url?: string | null
           id?: string
           invoice_number?: string | null
@@ -782,6 +795,7 @@ export type Database = {
           description?: string | null
           due_date?: string | null
           email?: string | null
+          hidden?: boolean
           hosted_invoice_url?: string | null
           id?: string
           invoice_number?: string | null
@@ -1362,6 +1376,7 @@ export type Database = {
           amount: number
           client_name: string
           created_at: string
+          entry_type: string
           id: string
           notes: string | null
           payment_date: string | null
@@ -1375,6 +1390,7 @@ export type Database = {
           amount?: number
           client_name: string
           created_at?: string
+          entry_type?: string
           id?: string
           notes?: string | null
           payment_date?: string | null
@@ -1388,6 +1404,7 @@ export type Database = {
           amount?: number
           client_name?: string
           created_at?: string
+          entry_type?: string
           id?: string
           notes?: string | null
           payment_date?: string | null
@@ -2024,4 +2041,3 @@ export const Constants = {
     },
   },
 } as const
-
