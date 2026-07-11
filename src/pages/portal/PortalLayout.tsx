@@ -157,73 +157,76 @@ const PortalLayout = () => {
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const { data: profile } = await supabase
-        .from("client_profiles")
-        .select("id")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      if (!profile) return;
-
-      const { data: seenRows } = await (supabase as any)
-        .from("client_portal_seen_at")
-        .select("item_type, last_seen_at")
-        .eq("client_profile_id", profile.id);
-      const seenMap: Record<string, string> = {};
-      (seenRows ?? []).forEach((r: any) => { seenMap[r.item_type] = r.last_seen_at; });
-      const epoch = "1970-01-01T00:00:00.000Z";
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const [{ count: docsCount }, { data: agreementRow }, { data: plansData }] = await Promise.all([
-        supabase
-          .from("client_documents")
-          .select("id", { count: "exact", head: true })
-          .eq("client_profile_id", profile.id)
-          .gt("created_at", seenMap.documents ?? epoch),
-        (supabase as any)
-          .from("client_agreement_records")
-          .select("sent_at")
-          .eq("client_profile_id", profile.id)
-          .maybeSingle(),
-        (supabase as any)
-          .from("client_project_plans")
+      try {
+        const { data: profile } = await supabase
+          .from("client_profiles")
           .select("id")
-          .eq("client_profile_id", profile.id),
-      ]);
+          .eq("user_id", user.id)
+          .maybeSingle();
+        if (!profile) return;
 
-      const agreementUnseen =
-        agreementRow?.sent_at && agreementRow.sent_at > (seenMap.agreements ?? epoch) ? 1 : 0;
+        const { data: seenRows } = await (supabase as any)
+          .from("client_portal_seen_at")
+          .select("item_type, last_seen_at")
+          .eq("client_profile_id", profile.id);
+        const seenMap: Record<string, string> = {};
+        (seenRows ?? []).forEach((r: any) => { seenMap[r.item_type] = r.last_seen_at; });
+        const epoch = "1970-01-01T00:00:00.000Z";
 
-      const planIds = (plansData ?? []).map((p: any) => p.id);
-      let tasksUnseen = 0;
-      if (planIds.length) {
-        const dueSoonCutoff = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
-        const [{ data: newTasks }, { data: dueSoonTasks }] = await Promise.all([
+        const [{ count: docsCount }, { data: agreementRow }, { data: plansData }] = await Promise.all([
+          supabase
+            .from("client_documents")
+            .select("id", { count: "exact", head: true })
+            .eq("client_profile_id", profile.id)
+            .gt("created_at", seenMap.documents ?? epoch),
           (supabase as any)
-            .from("client_project_tasks")
-            .select("id")
-            .in("plan_id", planIds)
-            .eq("assigned_to", "client")
-            .gt("created_at", seenMap.tasks ?? epoch),
+            .from("client_agreement_records")
+            .select("sent_at")
+            .eq("client_profile_id", profile.id)
+            .maybeSingle(),
           (supabase as any)
-            .from("client_project_tasks")
+            .from("client_project_plans")
             .select("id")
-            .in("plan_id", planIds)
-            .eq("assigned_to", "client")
-            .neq("status", "complete")
-            .lte("due_date", dueSoonCutoff),
+            .eq("client_profile_id", profile.id),
         ]);
-        const unseenIds = new Set([
-          ...(newTasks ?? []).map((t: any) => t.id),
-          ...(dueSoonTasks ?? []).map((t: any) => t.id),
-        ]);
-        tasksUnseen = unseenIds.size;
+
+        const agreementUnseen =
+          agreementRow?.sent_at && agreementRow.sent_at > (seenMap.agreements ?? epoch) ? 1 : 0;
+
+        const planIds = (plansData ?? []).map((p: any) => p.id);
+        let tasksUnseen = 0;
+        if (planIds.length) {
+          const dueSoonCutoff = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
+          const [{ data: newTasks }, { data: dueSoonTasks }] = await Promise.all([
+            (supabase as any)
+              .from("client_project_tasks")
+              .select("id")
+              .in("plan_id", planIds)
+              .eq("assigned_to", "client")
+              .gt("created_at", seenMap.tasks ?? epoch),
+            (supabase as any)
+              .from("client_project_tasks")
+              .select("id")
+              .in("plan_id", planIds)
+              .eq("assigned_to", "client")
+              .neq("status", "complete")
+              .lte("due_date", dueSoonCutoff),
+          ]);
+          const unseenIds = new Set([
+            ...(newTasks ?? []).map((t: any) => t.id),
+            ...(dueSoonTasks ?? []).map((t: any) => t.id),
+          ]);
+          tasksUnseen = unseenIds.size;
+        }
+
+        setBadgeCounts({
+          documents: docsCount ?? 0,
+          agreements: agreementUnseen,
+          tasks: tasksUnseen,
+        });
+      } catch (err) {
+        console.warn("Failed to compute portal notification badges:", err);
       }
-
-      setBadgeCounts({
-        documents: docsCount ?? 0,
-        agreements: agreementUnseen,
-        tasks: tasksUnseen,
-      });
     })();
   }, [user]);
 
