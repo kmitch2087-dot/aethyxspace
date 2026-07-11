@@ -41,10 +41,13 @@ const baseNavItems = [
   { title: "My Project", url: "/portal/projects", icon: FolderKanban },
 ];
 
-function PortalSidebar({ showIntake }: { showIntake: boolean }) {
+function PortalSidebar({ showIntake, showReferrals }: { showIntake: boolean; showReferrals: boolean }) {
+  const filteredBase = showReferrals
+    ? baseNavItems
+    : baseNavItems.filter((item) => item.title !== "Referrals");
   const navItems = showIntake
-    ? [...baseNavItems, { title: "Intake Form", url: "/portal/intake", icon: ClipboardList }]
-    : baseNavItems;
+    ? [...filteredBase, { title: "Intake Form", url: "/portal/intake", icon: ClipboardList }]
+    : filteredBase;
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const { signOut } = useAuth();
@@ -102,6 +105,7 @@ function PortalSidebar({ showIntake }: { showIntake: boolean }) {
 const PortalLayout = () => {
   const { user } = useAuth();
   const [needsIntake, setNeedsIntake] = useState(false);
+  const [referralEnabled, setReferralEnabled] = useState(false);
 
   // Notify admin once when an invited client first signs in.
   useEffect(() => {
@@ -113,12 +117,13 @@ const PortalLayout = () => {
         .then(() => supabase.functions.invoke("dispatch-doc-event", { body: { event_name: "portal_activated" } }))
         .catch(() => sessionStorage.removeItem(key));
     }
-    // Check intake status
+    // Check intake status and referral access
     supabase.from("client_profiles")
-      .select("intake_required, intake_completed_at")
+      .select("intake_required, intake_completed_at, referral_enabled")
       .eq("user_id", user.id).maybeSingle()
       .then(({ data }) => {
         if (data && !data.intake_completed_at) setNeedsIntake(true);
+        if (data?.referral_enabled) setReferralEnabled(true);
       });
   }, [user]);
 
@@ -126,7 +131,7 @@ const PortalLayout = () => {
     <SidebarProvider>
       <Seo title="Client Portal | Aethyx" description="Aethyx client portal." noindex />
       <div className="min-h-screen flex w-full bg-transparent">
-        <PortalSidebar showIntake={needsIntake} />
+        <PortalSidebar showIntake={needsIntake} showReferrals={referralEnabled} />
         <div className="flex-1 flex flex-col">
           <header className="h-12 flex items-center border-b border-border/30 px-4">
             <SidebarTrigger />

@@ -51,17 +51,24 @@ const PortalReferrals = () => {
   const [settings, setSettings] = useState<ReferralProgramSettings | null>(null);
   const [referrals, setReferrals] = useState<Referral[]>([]);
   const [copied, setCopied] = useState(false);
+  const [hasAccess, setHasAccess] = useState(false);
 
   useEffect(() => {
     if (!user) return;
     (async () => {
       const { data: profileData } = await supabase
         .from("client_profiles")
-        .select("id")
+        .select("id, referral_enabled")
         .eq("user_id", user.id)
         .maybeSingle();
 
       const pid = profileData?.id ?? null;
+      const enabled = profileData?.referral_enabled ?? false;
+
+      if (!enabled) {
+        setLoading(false);
+        return; // hasAccess stays false; loading state below renders the disabled message
+      }
 
       const [linkResult, settingsResult, referralsResult] = await Promise.all([
         pid
@@ -91,6 +98,7 @@ const PortalReferrals = () => {
       setReferralCode(code);
       setSettings((settingsResult.data as ReferralProgramSettings | null));
       setReferrals((referralsResult.data as Referral[]) || []);
+      setHasAccess(true);
       setLoading(false);
     })();
   }, [user]);
@@ -124,6 +132,20 @@ const PortalReferrals = () => {
     return (
       <div className="flex justify-center py-20">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!hasAccess) {
+    return (
+      <div className="space-y-4">
+        <div>
+          <h1 className="text-2xl font-display tracking-wider mb-1">Referral Program</h1>
+        </div>
+        <div className="rounded-lg border border-border/30 bg-muted/20 px-4 py-8 text-center text-sm text-muted-foreground">
+          The referral program isn't enabled for your account yet. Reach out if you'd like to
+          join and start earning referral rewards.
+        </div>
       </div>
     );
   }
