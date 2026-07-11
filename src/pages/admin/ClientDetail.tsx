@@ -1170,7 +1170,8 @@ const ClientDetail = () => {
         toast({ title: "Could not read source file", description: downloadError?.message, variant: "destructive" });
         return;
       }
-      const ext = assignSlotDoc.file_url.split(".").pop() || "";
+      const dotIdx = assignSlotDoc.file_url.lastIndexOf(".");
+      const ext = dotIdx !== -1 ? assignSlotDoc.file_url.slice(dotIdx + 1) : "";
       const sanitizedTitle = assignSlotDoc.title.replace(/[^\w\-. ]/g, "_");
       const originalName = ext ? `${sanitizedTitle}.${ext}` : sanitizedTitle;
       const file = new File([blob], originalName, { type: blob.type });
