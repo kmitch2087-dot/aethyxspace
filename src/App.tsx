@@ -15,6 +15,7 @@ import Services from "./pages/Services";
 import Portfolio from "./pages/Portfolio";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import Bounty from "./pages/Bounty";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import PaymentSuccess from "./pages/PaymentSuccess";
@@ -74,6 +75,7 @@ const App = () => (
             <Route path="/portfolio" element={<Portfolio />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/bounty" element={<Bounty />} />
             <Route path="/intake" element={<Intake />} />
             <Route path="/intake-success" element={<IntakeSuccess />} />
             <Route path="/blog" element={<Blog />} />

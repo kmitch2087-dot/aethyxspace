@@ -12,6 +12,7 @@ const links = [
   { to: "/blog", label: "Blog" },
   { to: "/about", label: "About" },
   { to: "/contact", label: "Contact" },
+  { to: "/bounty", label: "Bounty" },
 ];
 
 const Navbar = () => {
