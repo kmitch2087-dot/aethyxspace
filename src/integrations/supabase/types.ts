@@ -382,6 +382,88 @@ export type Database = {
         }
         Relationships: []
       }
+      client_asset_scrape_items: {
+        Row: {
+          content: string | null
+          created_at: string
+          id: string
+          kind: string
+          scrape_id: string
+          source_url: string | null
+          status: string
+          suggested_category: string
+          suggested_label: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          kind: string
+          scrape_id: string
+          source_url?: string | null
+          status?: string
+          suggested_category?: string
+          suggested_label: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          scrape_id?: string
+          source_url?: string | null
+          status?: string
+          suggested_category?: string
+          suggested_label?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_asset_scrape_items_scrape_id_fkey"
+            columns: ["scrape_id"]
+            isOneToOne: false
+            referencedRelation: "client_asset_scrapes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_asset_scrapes: {
+        Row: {
+          client_profile_id: string
+          completed_at: string | null
+          created_at: string
+          error_message: string | null
+          id: string
+          source_url: string
+          status: string
+        }
+        Insert: {
+          client_profile_id: string
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          source_url: string
+          status?: string
+        }
+        Update: {
+          client_profile_id?: string
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          source_url?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_asset_scrapes_client_profile_id_fkey"
+            columns: ["client_profile_id"]
+            isOneToOne: false
+            referencedRelation: "client_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_assets: {
         Row: {
           bg_color: string | null
@@ -1848,3 +1930,4 @@ export const Constants = {
     },
   },
 } as const
+
