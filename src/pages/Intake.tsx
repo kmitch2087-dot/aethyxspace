@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowRight, Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -46,6 +46,8 @@ const Intake = () => {
   const [submitting, setSubmitting] = useState(false);
   const [values, setValues] = useState<Record<string, string>>({});
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const referralCode = searchParams.get("ref");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -112,6 +114,7 @@ const Intake = () => {
       business_name: businessVal,
       responses,
       status: "new",
+      referral_code: referralCode || null,
     });
     setSubmitting(false);
 
@@ -119,6 +122,19 @@ const Intake = () => {
       console.error("Intake submit error:", error);
       toast({ title: "Submission failed", description: "Something went wrong. Please try again.", variant: "destructive" });
       return;
+    }
+
+    if (referralCode) {
+      supabase
+        .rpc("resolve_and_record_referral", {
+          p_code: referralCode,
+          p_intake_id: intakeId,
+          p_referred_name: fullName,
+          p_referred_email: emailVal,
+        })
+        .then(({ error: rpcError }) => {
+          if (rpcError) console.warn("Referral resolution failed:", rpcError);
+        });
     }
 
     // Notify admin (fire-and-forget — don't block the user on email failure)
