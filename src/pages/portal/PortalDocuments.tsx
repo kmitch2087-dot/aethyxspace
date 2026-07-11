@@ -350,7 +350,7 @@ const PortalDocuments = () => {
         <DialogContent className="max-w-2xl">
           <DialogHeader><DialogTitle>{viewingDoc?.title}</DialogTitle></DialogHeader>
           {viewingDoc && (
-            <DocumentViewer url={viewingDocUrl} fileName={viewingDoc.title} />
+            <DocumentViewer url={viewingDocUrl} fileName={viewingDoc.file_url} />
           )}
         </DialogContent>
       </Dialog>
