@@ -1,0 +1,7 @@
+# Jekyll config for the auto-enabled GitHub Pages build on this repo.
+# docs/ holds internal spec/plan markdown with JS/JSX code blocks (e.g. `{{ width: ... }}`)
+# that Jekyll's Liquid parser misreads as template syntax and fails on. These docs are read
+# via GitHub's normal file browser, not a Pages site, so excluding them from the Jekyll build
+# is safe.
+exclude:
+  - docs
