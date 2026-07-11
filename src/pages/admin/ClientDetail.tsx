@@ -264,6 +264,7 @@ const ClientDetail = () => {
   const [agreements, setAgreements] = useState<AgreementRow[]>([]);
   const [intakes, setIntakes] = useState<IntakeRow[]>([]);
   const [messages, setMessages] = useState<MessageRow[]>([]);
+  const [lastSignIn, setLastSignIn] = useState<string | null>(null);
   const [projects, setProjects] = useState<ProjectRow[]>([]);
 
   // Add-ons
@@ -436,7 +437,7 @@ const ClientDetail = () => {
 
     const emailLc = p.email ? p.email.toLowerCase() : null;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const [inv, dc, ag, it, ms, pr, ao, as_] = await Promise.all([
+    const [inv, dc, ag, it, ms, ls, pr, ao, as_] = await Promise.all([
       supabase.from("client_invoices").select("*").eq("client_profile_id", id).order("created_at", { ascending: false }),
       supabase.from("client_documents").select("*").or(`client_profile_id.eq.${id},user_id.eq.${p.user_id}`).order("created_at", { ascending: false }),
       emailLc
@@ -446,6 +447,8 @@ const ClientDetail = () => {
         ? supabase.from("client_intakes").select("*").or(`client_profile_id.eq.${id},email.eq.${emailLc}`).order("created_at", { ascending: false })
         : supabase.from("client_intakes").select("*").eq("client_profile_id", id).order("created_at", { ascending: false }),
       supabase.from("client_messages").select("*").or(`client_profile_id.eq.${id},user_id.eq.${p.user_id}`).order("created_at", { ascending: false }),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (supabase as any).rpc("get_client_last_sign_ins"),
       supabase.from("client_projects").select("*").eq("client_profile_id", id).order("created_at", { ascending: false }),
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (supabase as any).from("client_add_ons").select("*, catalog:add_on_catalog_id(name, type, category, display_price)").eq("client_profile_id", id).order("created_at", { ascending: false }),
@@ -458,6 +461,10 @@ const ClientDetail = () => {
     setAgreements((ag.data as AgreementRow[]) || []);
     setIntakes((it.data as IntakeRow[]) || []);
     setMessages((ms.data as MessageRow[]) || []);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const lastSignInData = (ls.data as any as Array<{ client_profile_id: string; last_sign_in_at: string | null }>) || [];
+    const thisClientLastSignIn = lastSignInData.find((r) => r.client_profile_id === id)?.last_sign_in_at || null;
+    setLastSignIn(thisClientLastSignIn);
     setProjects((pr.data as ProjectRow[]) || []);
     setAddOns((ao.data as AddOnRow[]) || []);
     const assetRows = (as_.data as ClientAsset[]) || [];
@@ -1408,6 +1415,9 @@ const ClientDetail = () => {
           </Button>
           <h1 className="text-2xl font-display tracking-wider">{profile.full_name}</h1>
           <p className="text-sm text-muted-foreground">{profile.email}</p>
+          <p className="text-xs text-muted-foreground">
+            {lastSignIn ? `Last login ${new Date(lastSignIn).toLocaleDateString()}` : "Never logged in"}
+          </p>
         </div>
         <div className="flex gap-2 flex-wrap">
           <Button
