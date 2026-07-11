@@ -114,7 +114,7 @@ interface AddOnRow {
   client_profile_id: string;
   add_on_catalog_id: string | null;
   custom_name: string | null;
-  price: number;
+  price: number | null;
   status: string;
   start_date: string | null;
   end_date: string | null;
@@ -691,7 +691,7 @@ const ClientDetail = () => {
   const openEditAddOn = (addon: AddOnRow) => {
     setEditAddOn(addon);
     setEditAddOnStatus(addon.status);
-    setEditAddOnPrice(String(addon.price));
+    setEditAddOnPrice(addon.price != null ? String(addon.price) : "");
     setEditAddOnNotes(addon.notes || "");
     setEditAddOnEndDate(addon.end_date || "");
   };
@@ -702,7 +702,7 @@ const ClientDetail = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await (supabase as any).from("client_add_ons").update({
       status: editAddOnStatus,
-      price: parseFloat(editAddOnPrice),
+      price: editAddOnPrice.trim() ? parseFloat(editAddOnPrice) : null,
       notes: editAddOnNotes.trim() || null,
       end_date: editAddOnEndDate || null,
       updated_at: new Date().toISOString(),
@@ -1689,6 +1689,9 @@ const ClientDetail = () => {
                             {addon.status === "active" && (
                               <Badge className="bg-green-100 text-green-700 border-green-200 hover:bg-green-100 text-xs">Active</Badge>
                             )}
+                            {addon.status === "requested" && (
+                              <Badge className="bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-100 text-xs">Requested</Badge>
+                            )}
                             {addon.status === "paused" && (
                               <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200 hover:bg-yellow-100 text-xs">Paused</Badge>
                             )}
@@ -1697,7 +1700,9 @@ const ClientDetail = () => {
                             )}
                           </div>
                           <div className="flex items-center gap-3 text-sm flex-wrap">
-                            <span className="font-medium">{formatAddonPrice(addon.price, type)}</span>
+                            <span className="font-medium">
+                              {addon.price != null ? formatAddonPrice(addon.price, type) : "Awaiting price"}
+                            </span>
                             {addon.start_date && (
                               <span className="text-muted-foreground">from {format(new Date(addon.start_date), "MMM d, yyyy")}</span>
                             )}
@@ -2859,6 +2864,7 @@ const ClientDetail = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent style={lightVars} className="bg-white text-black">
+                  <SelectItem value="requested">Requested</SelectItem>
                   <SelectItem value="active">Active</SelectItem>
                   <SelectItem value="paused">Paused</SelectItem>
                   <SelectItem value="cancelled">Cancelled</SelectItem>

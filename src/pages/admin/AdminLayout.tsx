@@ -1,5 +1,7 @@
+import { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import Seo from "@/components/Seo";
 import {
   Sidebar,
@@ -58,6 +60,16 @@ function AdminSidebar() {
   const location = useLocation();
   const { signOut } = useAuth();
   const navigate = useNavigate();
+  const [requestedAddOnCount, setRequestedAddOnCount] = useState(0);
+
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any)
+      .from("client_add_ons")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "requested")
+      .then(({ count }: { count: number | null }) => setRequestedAddOnCount(count ?? 0));
+  }, []);
 
   const handleSignOut = async () => {
     await signOut();
@@ -84,6 +96,11 @@ function AdminSidebar() {
                     >
                       <item.icon className="mr-2 h-4 w-4" />
                       {!collapsed && <span>{item.title}</span>}
+                      {!collapsed && item.title === "Clients" && requestedAddOnCount > 0 && (
+                        <span className="ml-auto rounded-full bg-primary text-primary-foreground text-[10px] leading-none px-1.5 py-1">
+                          {requestedAddOnCount}
+                        </span>
+                      )}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
