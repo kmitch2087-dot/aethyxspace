@@ -18,6 +18,7 @@ import {
   Eye, EyeOff, Clock, ListTodo,
 } from "lucide-react";
 import { format } from "date-fns";
+import { PROJECT_TYPES, DEFAULT_PROJECT_TYPE, getProjectTypeTemplate, type ProjectTypeKey } from "@/lib/projectTemplates";
 
 const lightVars = {
   "--background": "0 0% 100%",
@@ -151,6 +152,7 @@ interface ProjectPlan {
   start_date?: string | null;
   target_date?: string | null;
   github_url?: string | null;
+  project_type: string;
   created_at: string;
   updated_at: string;
 }
@@ -325,11 +327,16 @@ const ClientDetail = () => {
   const [editingLabelValue, setEditingLabelValue] = useState("");
 
   // Plan
-  const [plan, setPlan] = useState<ProjectPlan | null>(null);
+  // A client can have multiple project plans (one per engagement type — website build,
+  // Google Ads, etc). `plan` below is derived: whichever plan is currently selected.
+  const [allPlans, setAllPlans] = useState<ProjectPlan[]>([]);
+  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
+  const plan = allPlans.find((p) => p.id === selectedPlanId) || allPlans[0] || null;
   const [phases, setPhases] = useState<ProjectPhase[]>([]);
   const [planUpdates, setPlanUpdates] = useState<ProjectUpdate[]>([]);
   const [creatingPlan, setCreatingPlan] = useState(false);
   const [showCreatePlanDialog, setShowCreatePlanDialog] = useState(false);
+  const [newPlanType, setNewPlanType] = useState<ProjectTypeKey>(DEFAULT_PROJECT_TYPE);
   const [newPlanName, setNewPlanName] = useState("Website Project");
   const [newPlanStatus, setNewPlanStatus] = useState<"planning" | "active">("planning");
   const [newPlanStart, setNewPlanStart] = useState("");
@@ -431,23 +438,32 @@ const ClientDetail = () => {
     fetchAssetSignedUrls(assetRows.filter((a) => a.type === "file"));
   };
 
-  const fetchPlan = async () => {
+  const fetchPlan = async (preferPlanId?: string) => {
     if (!id) return;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: planData } = await (supabase as any)
+    const { data: plansData } = await (supabase as any)
       .from("client_project_plans")
       .select("*")
       .eq("client_profile_id", id)
-      .maybeSingle();
-    setPlan(planData as ProjectPlan | null);
-    if (planData) {
+      .order("created_at", { ascending: true });
+    const fetchedPlans = (plansData as ProjectPlan[]) || [];
+    setAllPlans(fetchedPlans);
+
+    // Decide which plan should be selected: an explicit request, the currently
+    // selected one if it still exists, otherwise the first plan.
+    const stillExists = selectedPlanId && fetchedPlans.some((p) => p.id === selectedPlanId);
+    const nextSelectedId = preferPlanId || (stillExists ? selectedPlanId : fetchedPlans[0]?.id) || null;
+    if (nextSelectedId !== selectedPlanId) setSelectedPlanId(nextSelectedId);
+
+    const activePlanData = fetchedPlans.find((p) => p.id === nextSelectedId) || null;
+    if (activePlanData) {
       const [{ data: phasesData }, { data: updatesData }, { data: tasksData }] = await Promise.all([
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (supabase as any).from("client_project_phases").select("*").eq("plan_id", planData.id).order("sort_order"),
+        (supabase as any).from("client_project_phases").select("*").eq("plan_id", activePlanData.id).order("sort_order"),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (supabase as any).from("client_project_updates").select("*").eq("plan_id", planData.id).order("created_at", { ascending: false }),
+        (supabase as any).from("client_project_updates").select("*").eq("plan_id", activePlanData.id).order("created_at", { ascending: false }),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (supabase as any).from("client_project_tasks").select("*").eq("plan_id", planData.id).order("sort_order"),
+        (supabase as any).from("client_project_tasks").select("*").eq("plan_id", activePlanData.id).order("sort_order"),
       ]);
       setPhases((phasesData as ProjectPhase[]) || []);
       setPlanUpdates((updatesData as ProjectUpdate[]) || []);
@@ -457,6 +473,12 @@ const ClientDetail = () => {
       setPlanUpdates([]);
       setTasks([]);
     }
+  };
+
+  // Switch which of the client's plans is displayed in the Plan tab.
+  const selectPlan = (planId: string) => {
+    setSelectedPlanId(planId);
+    fetchPlan(planId);
   };
 
   const fetchCatalog = async () => {
@@ -480,14 +502,18 @@ const ClientDetail = () => {
         SLOT_TYPES.map((t) => ({ client_profile_id: id, slot_type: t })),
         { onConflict: 'client_profile_id,slot_type', ignoreDuplicates: true },
       );
-      // Auto-create plan if none exists — there should always be one
+      // Auto-create a Website Build plan if the client doesn't have one yet — every
+      // client should have at least this one by default. Other project types (Google
+      // Ads, etc.) are added explicitly via "+ New Project" and never auto-created.
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: existingPlan } = await (supabase as any)
-        .from('client_project_plans').select('id').eq('client_profile_id', id).maybeSingle();
-      if (!existingPlan) {
+      const { data: existingWebsitePlan } = await (supabase as any)
+        .from('client_project_plans').select('id').eq('client_profile_id', id)
+        .eq('project_type', 'website_build').maybeSingle();
+      if (!existingWebsitePlan) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await (supabase as any).from('client_project_plans').insert({
-          client_profile_id: id, project_name: 'Website Project', status: 'planning', completion_percent: 0,
+          client_profile_id: id, project_name: 'Website Project', status: 'planning',
+          completion_percent: 0, project_type: 'website_build',
         });
         fetchPlan();
       }
@@ -779,30 +805,54 @@ const ClientDetail = () => {
   const createPlan = async () => {
     if (!profile) return;
     setCreatingPlan(true);
+    const template = getProjectTypeTemplate(newPlanType);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any).from("client_project_plans").insert({
+    const { data: inserted, error } = await (supabase as any).from("client_project_plans").insert({
       client_profile_id: profile.id,
-      project_name: newPlanName.trim() || "Website Project",
+      project_name: newPlanName.trim() || template.defaultProjectName,
       status: newPlanStatus,
       completion_percent: 0,
+      project_type: newPlanType,
       ...(newPlanStart ? { start_date: newPlanStart } : {}),
       ...(newPlanEnd ? { target_date: newPlanEnd } : {}),
       ...(newPlanOverview.trim() ? { overview: newPlanOverview.trim() } : {}),
       ...(newPlanGithub.trim() ? { github_url: newPlanGithub.trim() } : {}),
-    });
-    setCreatingPlan(false);
-    if (error) {
-      toast({ title: "Failed to create plan", description: error.message, variant: "destructive" });
-    } else {
-      setShowCreatePlanDialog(false);
-      setNewPlanName("Website Project");
-      setNewPlanStatus("planning");
-      setNewPlanStart("");
-      setNewPlanEnd("");
-      setNewPlanOverview("");
-      setNewPlanGithub("");
-      fetchPlan();
+    }).select().single();
+    if (error || !inserted) {
+      setCreatingPlan(false);
+      toast({ title: "Failed to create plan", description: error?.message, variant: "destructive" });
+      return;
     }
+    // Seed default phases from the chosen project type's template.
+    if (template.defaultPhases.length) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase as any).from("client_project_phases").insert(
+        template.defaultPhases.map((phase, i) => ({
+          plan_id: inserted.id,
+          name: phase.name,
+          description: phase.description || null,
+          status: "pending",
+          completion_percent: 0,
+          sort_order: i,
+        })),
+      );
+    }
+    setCreatingPlan(false);
+    setShowCreatePlanDialog(false);
+    setNewPlanType(DEFAULT_PROJECT_TYPE);
+    setNewPlanName("Website Project");
+    setNewPlanStatus("planning");
+    setNewPlanStart("");
+    setNewPlanEnd("");
+    setNewPlanOverview("");
+    setNewPlanGithub("");
+    fetchPlan(inserted.id);
+  };
+
+  // Optimistic local update for controlled inputs (paired with savePlan on blur).
+  const updatePlanLocal = (updates: Partial<ProjectPlan>) => {
+    if (!plan) return;
+    setAllPlans((prev) => prev.map((p) => (p.id === plan.id ? { ...p, ...updates } : p)));
   };
 
   const savePlan = async (updates: Partial<ProjectPlan>) => {
@@ -813,7 +863,7 @@ const ClientDetail = () => {
       .update({ ...updates, updated_at: new Date().toISOString() })
       .eq("id", plan.id);
     if (!error) {
-      setPlan((prev) => prev ? { ...prev, ...updates } : null);
+      setAllPlans((prev) => prev.map((p) => (p.id === plan.id ? { ...p, ...updates } : p)));
     }
   };
 
@@ -970,9 +1020,12 @@ const ClientDetail = () => {
 
   const updateProjectPhaseForSlot = async (slotType: string) => {
     if (!id) return;
+    // Document slots (Site Audit / Market Research / etc.) only ever map onto the
+    // client's Website Build plan — a client may also have a Google Ads (or other)
+    // plan, and slot uploads must never bleed into those.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: planData } = await (supabase as any).from('client_project_plans')
-      .select('id').eq('client_profile_id', id).maybeSingle();
+      .select('id').eq('client_profile_id', id).eq('project_type', 'website_build').maybeSingle();
     if (!planData) return;
     const phaseName = SLOT_PHASE_NAMES[slotType];
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1953,6 +2006,27 @@ const ClientDetail = () => {
               </DialogHeader>
               <div className="space-y-4 py-2">
                 <div>
+                  <label className="text-sm font-medium mb-1 block">Project Type</label>
+                  <Select
+                    value={newPlanType}
+                    onValueChange={(v: ProjectTypeKey) => {
+                      setNewPlanType(v);
+                      const wasDefault = !newPlanName.trim() || PROJECT_TYPES.some((t) => t.defaultProjectName === newPlanName);
+                      if (wasDefault) setNewPlanName(getProjectTypeTemplate(v).defaultProjectName);
+                    }}
+                  >
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent style={lightVars} className="bg-white text-black">
+                      {PROJECT_TYPES.map((t) => (
+                        <SelectItem key={t.key} value={t.key}>{t.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Seeds this plan with {getProjectTypeTemplate(newPlanType).defaultPhases.length} default phases for this project type.
+                  </p>
+                </div>
+                <div>
                   <label className="text-sm font-medium mb-1 block">Project Name</label>
                   <Input value={newPlanName} onChange={e => setNewPlanName(e.target.value)} placeholder="Website Project" />
                 </div>
@@ -1995,9 +2069,35 @@ const ClientDetail = () => {
             </DialogContent>
           </Dialog>
 
+          {/* Plan switcher — only shown once a client has more than one project */}
+          {allPlans.length > 0 && (
+            <div className="flex items-center gap-2 flex-wrap">
+              {allPlans.map((p) => {
+                const t = getProjectTypeTemplate(p.project_type);
+                const isActive = plan?.id === p.id;
+                return (
+                  <button
+                    key={p.id}
+                    onClick={() => selectPlan(p.id)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                      isActive
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-transparent border-black/15 text-muted-foreground hover:border-black/30"
+                    }`}
+                  >
+                    {p.project_name} <span className="opacity-60">· {t.label}</span>
+                  </button>
+                );
+              })}
+              <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setShowCreatePlanDialog(true)}>
+                <Plus className="h-3 w-3 mr-1" /> New Project
+              </Button>
+            </div>
+          )}
+
           {!plan ? (
             <div className="text-center py-12">
-              <p className="text-sm text-muted-foreground mb-4">No project plan yet.</p>
+              <p className="text-sm text-muted-foreground mb-4">No project plans yet.</p>
               <Button onClick={() => setShowCreatePlanDialog(true)}>
                 <Plus className="h-4 w-4 mr-2" /> Create Project Plan
               </Button>
@@ -2024,12 +2124,17 @@ const ClientDetail = () => {
                       }}
                     />
                   ) : (
-                    <button
-                      className="text-xl font-display font-medium text-left hover:text-primary transition-colors"
-                      onClick={() => { setEditingPlanName(true); setEditingPlanNameValue(plan.project_name); }}
-                    >
-                      {plan.project_name}
-                    </button>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <button
+                        className="text-xl font-display font-medium text-left hover:text-primary transition-colors"
+                        onClick={() => { setEditingPlanName(true); setEditingPlanNameValue(plan.project_name); }}
+                      >
+                        {plan.project_name}
+                      </button>
+                      <Badge variant="outline" className="text-xs font-normal text-muted-foreground">
+                        {getProjectTypeTemplate(plan.project_type).label}
+                      </Badge>
+                    </div>
                   )}
 
                   <div className="flex items-center gap-4 flex-wrap">
@@ -2126,7 +2231,7 @@ const ClientDetail = () => {
                       <Input
                         type="date"
                         value={plan.start_date || ""}
-                        onChange={(e) => setPlan((prev) => prev ? { ...prev, start_date: e.target.value } : null)}
+                        onChange={(e) => updatePlanLocal({ start_date: e.target.value })}
                         onBlur={(e) => savePlan({ start_date: e.target.value || null })}
                         className="mt-1"
                       />
@@ -2136,7 +2241,7 @@ const ClientDetail = () => {
                       <Input
                         type="date"
                         value={plan.target_date || ""}
-                        onChange={(e) => setPlan((prev) => prev ? { ...prev, target_date: e.target.value } : null)}
+                        onChange={(e) => updatePlanLocal({ target_date: e.target.value })}
                         onBlur={(e) => savePlan({ target_date: e.target.value || null })}
                         className="mt-1"
                       />
@@ -2148,7 +2253,7 @@ const ClientDetail = () => {
                     <Textarea
                       rows={3}
                       value={plan.overview || ""}
-                      onChange={(e) => setPlan((prev) => prev ? { ...prev, overview: e.target.value } : null)}
+                      onChange={(e) => updatePlanLocal({ overview: e.target.value })}
                       onBlur={(e) => savePlan({ overview: e.target.value || null })}
                       placeholder="Brief project overview..."
                       className="mt-1"
@@ -2159,7 +2264,7 @@ const ClientDetail = () => {
                     <div className="flex items-center gap-2 mt-1">
                       <Input
                         value={plan.github_url || ""}
-                        onChange={(e) => setPlan((prev) => prev ? { ...prev, github_url: e.target.value } : null)}
+                        onChange={(e) => updatePlanLocal({ github_url: e.target.value })}
                         onBlur={(e) => savePlan({ github_url: e.target.value || null })}
                         placeholder="https://github.com/username/repo"
                         className="flex-1"
