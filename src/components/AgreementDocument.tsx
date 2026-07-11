@@ -14,6 +14,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import DocumentViewer from "@/components/DocumentViewer"
 
 interface AgreementRecord {
   id?: string
@@ -873,17 +874,11 @@ export default function AgreementDocument({
           <DialogHeader>
             <DialogTitle>Client Photo ID</DialogTitle>
           </DialogHeader>
-          {viewIdLoading ? (
-            <div className="flex justify-center py-10">
-              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-            </div>
-          ) : viewIdUrl ? (
-            record.id_document_path?.toLowerCase().endsWith(".pdf") ? (
-              <iframe src={viewIdUrl} className="w-full h-[70vh] border-0" title="Client ID document" />
-            ) : (
-              <img src={viewIdUrl} alt="Client ID document" className="w-full h-auto rounded" />
-            )
-          ) : null}
+          <DocumentViewer
+            url={viewIdUrl}
+            fileName={record.id_document_path ?? ""}
+            loading={viewIdLoading}
+          />
         </DialogContent>
       </Dialog>
     </div>
