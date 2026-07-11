@@ -121,13 +121,34 @@ Deno.serve(async (req: Request) => {
       let pageResp: Response;
       try {
         pageResp = await fetch(parsedUrl.toString(), { signal: controller.signal, redirect: "manual" });
+        // Apex->www, http->https, and trailing-slash redirects are extremely common on real
+        // client sites, so rejecting every redirect outright would break the primary use case.
+        // Allow exactly one hop, but re-validate the target with the same SSRF guard the
+        // original URL went through — a public hostname redirecting to an internal address
+        // must not be able to bypass the guard above.
+        if (pageResp.type === "opaqueredirect" || (pageResp.status >= 300 && pageResp.status < 400)) {
+          const location = pageResp.headers.get("Location");
+          if (!location) throw new Error("Redirects are not followed for security reasons");
+          let redirectUrl: URL;
+          try {
+            redirectUrl = new URL(location, parsedUrl);
+          } catch {
+            throw new Error("Redirect target is not allowed");
+          }
+          if (redirectUrl.protocol !== "http:" && redirectUrl.protocol !== "https:") {
+            throw new Error("Redirect target is not allowed");
+          }
+          if (isPrivateOrLoopback(redirectUrl.hostname)) {
+            throw new Error("Redirect target is not allowed");
+          }
+          pageResp = await fetch(redirectUrl.toString(), { signal: controller.signal, redirect: "manual" });
+          // Cap at exactly one hop: reject if the validated redirect target itself redirects again.
+          if (pageResp.type === "opaqueredirect" || (pageResp.status >= 300 && pageResp.status < 400)) {
+            throw new Error("Redirects are not followed for security reasons");
+          }
+        }
       } finally {
         clearTimeout(timeout);
-      }
-      // Don't follow redirects: a public hostname redirecting to an internal address would
-      // bypass the SSRF guard above. Single-page scrape only, no crawling — reject outright.
-      if (pageResp.type === "opaqueredirect" || (pageResp.status >= 300 && pageResp.status < 400)) {
-        throw new Error("Redirects are not followed for security reasons");
       }
       if (!pageResp.ok) throw new Error(`Fetch failed: ${pageResp.status}`);
       const html = await pageResp.text();
@@ -154,10 +175,14 @@ Deno.serve(async (req: Request) => {
           const imgTimeout = setTimeout(() => imgController.abort(), FETCH_TIMEOUT_MS);
           let imgResp: Response;
           try {
-            imgResp = await fetch(imageUrls[i], { signal: imgController.signal });
+            imgResp = await fetch(imageUrls[i], { signal: imgController.signal, redirect: "manual" });
           } finally {
             clearTimeout(imgTimeout);
           }
+          // Same redirect-bypass concern as the main page fetch, but for a single candidate
+          // image it's not worth the complexity of validating and following one hop — just
+          // skip this image and keep going with the rest.
+          if (imgResp.type === "opaqueredirect" || (imgResp.status >= 300 && imgResp.status < 400)) continue;
           if (!imgResp.ok) continue;
           const blob = await imgResp.blob();
           if (blob.size === 0 || blob.size > MAX_IMAGE_BYTES) continue;
