@@ -33,6 +33,93 @@ const json = (body: unknown, status: number, corsHeaders: Record<string, string>
 /** Format a Date as YYYYMMDDTHHMMSSZ for Google Calendar template URLs. */
 const gcalStamp = (d: Date) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
 
+/** Exchange the stored OAuth refresh token for a Google access token. */
+async function getGoogleAccessToken(): Promise<string | null> {
+  const clientId = Deno.env.get("GOOGLE_OAUTH_CLIENT_ID");
+  const clientSecret = Deno.env.get("GOOGLE_OAUTH_CLIENT_SECRET");
+  const refreshToken = Deno.env.get("GOOGLE_OAUTH_REFRESH_TOKEN");
+  if (!clientId || !clientSecret || !refreshToken) return null;
+  const res = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      client_id: clientId,
+      client_secret: clientSecret,
+      refresh_token: refreshToken,
+      grant_type: "refresh_token",
+    }),
+  });
+  if (!res.ok) {
+    console.error("[schedule-consultation] google token exchange failed:", await res.text());
+    return null;
+  }
+  return (await res.json()).access_token as string;
+}
+
+interface CalendarResult {
+  eventId: string | null;
+  meetLink: string | null;
+}
+
+/**
+ * Create (or, on reschedule, update) the consultation event on Kristin's Google
+ * Calendar, inviting the client. For Google Meet consultations with no manually
+ * pasted link, Google auto-generates a Meet link which we return for the email.
+ * Failures are non-fatal — scheduling proceeds without the calendar event.
+ */
+async function upsertCalendarEvent(opts: {
+  existingEventId: string | null;
+  clientName: string;
+  clientEmail: string;
+  start: Date;
+  end: Date;
+  meetingType: string;
+  manualLink: string;
+}): Promise<CalendarResult> {
+  const accessToken = await getGoogleAccessToken();
+  if (!accessToken) return { eventId: null, meetLink: null };
+
+  const wantsMeet = opts.meetingType === "google_meet";
+  const body: Record<string, unknown> = {
+    summary: `Aethyx Consultation — ${opts.clientName}`,
+    description: opts.meetingType === "phone"
+      ? "Phone consultation — Kristin will call the number from the intake."
+      : (opts.manualLink ? `Google Meet: ${opts.manualLink}` : "Google Meet consultation."),
+    start: { dateTime: opts.start.toISOString(), timeZone: "America/New_York" },
+    end: { dateTime: opts.end.toISOString(), timeZone: "America/New_York" },
+    attendees: [{ email: opts.clientEmail }],
+  };
+  if (wantsMeet && !opts.manualLink && !opts.existingEventId) {
+    body.conferenceData = {
+      createRequest: {
+        requestId: crypto.randomUUID(),
+        conferenceSolutionKey: { type: "hangoutsMeet" },
+      },
+    };
+  }
+
+  const base = "https://www.googleapis.com/calendar/v3/calendars/primary/events";
+  const url = opts.existingEventId
+    ? `${base}/${encodeURIComponent(opts.existingEventId)}?conferenceDataVersion=1&sendUpdates=all`
+    : `${base}?conferenceDataVersion=1&sendUpdates=all`;
+
+  const res = await fetch(url, {
+    method: opts.existingEventId ? "PATCH" : "POST",
+    headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    console.error("[schedule-consultation] calendar upsert failed:", res.status, await res.text());
+    return { eventId: null, meetLink: null };
+  }
+  const event = await res.json();
+  const meetLink = event.hangoutLink ||
+    event.conferenceData?.entryPoints?.find((e: { entryPointType?: string; uri?: string }) =>
+      e.entryPointType === "video"
+    )?.uri || null;
+  return { eventId: event.id ?? null, meetLink };
+}
+
 Deno.serve(async (req) => {
   const origin = req.headers.get("origin");
   const corsHeaders = getCorsHeaders(origin);
@@ -87,7 +174,7 @@ Deno.serve(async (req) => {
     const { data: intake, error: intakeErr } = await supabaseAdmin
       .from("client_intakes")
       .select(
-        "id, email, full_name, status, meeting_reschedule_used, consultation_invoice_id, consultation_invoice_url, consultation_paid_at",
+        "id, email, full_name, status, meeting_reschedule_used, consultation_invoice_id, consultation_invoice_url, consultation_paid_at, google_event_id",
       )
       .eq("id", intakeId)
       .maybeSingle();
@@ -132,13 +219,28 @@ Deno.serve(async (req) => {
       payUrl = finalized.hosted_invoice_url || null;
     }
 
+    // Put the meeting on Kristin's Google Calendar (creates the Meet link when
+    // none was pasted manually). Non-fatal if the integration isn't configured.
+    const end = new Date(start.getTime() + 30 * 60 * 1000);
+    const calendar = await upsertCalendarEvent({
+      existingEventId: (intake.google_event_id as string | null) || null,
+      clientName: intake.full_name || "Client",
+      clientEmail: intake.email,
+      start,
+      end,
+      meetingType,
+      manualLink: cleanLink,
+    });
+    const effectiveLink = cleanLink || (meetingType === "google_meet" ? calendar.meetLink || "" : "");
+
     const updates: Record<string, unknown> = {
       meeting_scheduled_at: start.toISOString(),
       meeting_type: meetingType,
-      meeting_link: cleanLink || null,
+      meeting_link: effectiveLink || null,
       consultation_invoice_id: invoiceId,
       consultation_invoice_url: payUrl,
     };
+    if (calendar.eventId) updates.google_event_id = calendar.eventId;
     if (isReschedule) updates.meeting_reschedule_used = true;
     if (!feeSettled && (intake.status === "new" || intake.status === "reviewing")) {
       updates.status = "invoice_sent";
@@ -161,9 +263,8 @@ Deno.serve(async (req) => {
       timeZone: "America/New_York", hour: "numeric", minute: "2-digit",
     }).format(start);
 
-    const end = new Date(start.getTime() + 30 * 60 * 1000);
     const calDetails = meetingType === "google_meet"
-      ? (cleanLink ? `Join: ${cleanLink}` : "Google Meet link to follow.")
+      ? (effectiveLink ? `Join: ${effectiveLink}` : "Google Meet link to follow.")
       : "Kristin will call you at the number you provided.";
     const calendarUrl =
       "https://calendar.google.com/calendar/render?action=TEMPLATE" +
@@ -182,7 +283,7 @@ Deno.serve(async (req) => {
           meetingDate,
           meetingTime,
           meetingTypeLabel: MEETING_TYPE_LABEL[meetingType],
-          meetingLink: meetingType === "google_meet" ? cleanLink : "",
+          meetingLink: meetingType === "google_meet" ? effectiveLink : "",
           payUrl: feeSettled ? "" : payUrl || "",
           calendarUrl,
           isReschedule: !!isReschedule,
@@ -198,7 +299,11 @@ Deno.serve(async (req) => {
       );
     }
 
-    return json({ success: true, emailSent: true, payUrl }, 200, corsHeaders);
+    return json(
+      { success: true, emailSent: true, payUrl, calendarAdded: !!calendar.eventId, meetLink: effectiveLink || null },
+      200,
+      corsHeaders,
+    );
   } catch (error: unknown) {
     console.error("[schedule-consultation]", error);
     // Admin-only caller, so surfacing the underlying message is safe and aids debugging

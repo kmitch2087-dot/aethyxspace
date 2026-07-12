@@ -247,7 +247,9 @@ const Intakes = () => {
     toast({
       title: isReschedule ? "Meeting rescheduled" : "Meeting scheduled",
       description: data.emailSent
-        ? `Confirmation${isReschedule ? "" : " + $50 invoice"} emailed to ${intake.email}`
+        ? `Confirmation${isReschedule ? "" : " + $50 invoice"} emailed to ${intake.email}${
+            data.calendarAdded ? " · added to your Google Calendar" : ""
+          }`
         : "Saved, but the email failed to send — resend from the Inbox.",
     });
     setScheduleOpen(false);
@@ -609,25 +611,29 @@ const Intakes = () => {
 
               {meetingType === "google_meet" && (
                 <div>
-                  <Label htmlFor="meeting_link" className="text-black">Google Meet link</Label>
+                  <Label htmlFor="meeting_link" className="text-black">
+                    Google Meet link <span className="text-black/40 font-normal">(optional)</span>
+                  </Label>
                   <Input
                     id="meeting_link"
                     type="url"
-                    placeholder="https://meet.google.com/…"
+                    placeholder="Leave blank to auto-create"
                     value={meetingLink}
                     onChange={(e) => setMeetingLink(e.target.value)}
                     className="bg-white text-black"
                   />
                   <p className="text-xs text-black/50 mt-1.5">
+                    Left blank, the event is added to your Google Calendar with a Meet link
+                    auto-created and the client invited. Or{" "}
                     <a
                       href={gcalDraftUrl(selected)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-teal-700 underline"
                     >
-                      Open a pre-filled Google Calendar event
+                      create the event manually
                     </a>{" "}
-                    — add Meet conferencing there, save, and paste the Meet link here.
+                    and paste its Meet link here.
                   </p>
                 </div>
               )}
