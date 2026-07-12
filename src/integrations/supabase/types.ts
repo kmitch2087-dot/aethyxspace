@@ -1915,7 +1915,7 @@ export type Database = {
           p_referred_email: string
           p_referred_name: string
         }
-        Returns: undefined
+        Returns: boolean
       }
     }
     Enums: {

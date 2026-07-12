@@ -132,8 +132,30 @@ const Intake = () => {
           p_referred_name: fullName,
           p_referred_email: emailVal,
         })
-        .then(({ error: rpcError }) => {
-          if (rpcError) console.warn("Referral resolution failed:", rpcError);
+        .then(({ data: waived, error: rpcError }) => {
+          if (rpcError) {
+            console.warn("Referral resolution failed:", rpcError);
+            return;
+          }
+          // Mirror the admin's manual "waive fee" action: send the same fee-waived
+          // email whenever a valid referral/bounty code actually waives the fee here,
+          // so the client is notified consistently regardless of which path waived it.
+          if (waived) {
+            supabase.functions
+              .invoke("send-transactional-email", {
+                body: {
+                  templateName: "fee-waived",
+                  recipientEmail: emailVal,
+                  idempotencyKey: `fee-waived-${intakeId}`,
+                  templateData: {
+                    firstName: fullName.split(" ")[0] || "",
+                    originalAmount: "50.00",
+                    discountLabel: "Referral code",
+                  },
+                },
+              })
+              .catch((err) => console.warn("Fee-waived email failed:", err));
+          }
         });
     }
 
