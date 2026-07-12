@@ -67,9 +67,13 @@ Deno.serve(async (req: Request) => {
     let bucket: string;
     let docLabel = "uploaded document";
     if (sourceDocumentType === "client_documents") {
-      bucket = "client-documents";
-      const { data: doc } = await admin.from("client_documents").select("title, file_url").eq("id", sourceDocumentId).maybeSingle();
+      const { data: doc } = await admin.from("client_documents").select("title, file_url, parent_admin_doc_id").eq("id", sourceDocumentId).maybeSingle();
       if (!doc) return json({ error: "Document not found" }, 404, cors);
+      // Documents shared to a client via the admin's "Share with client(s)" action carry
+      // parent_admin_doc_id and physically live in admin-documents, not client-documents —
+      // same bucket-selection logic PortalDocuments.tsx already uses before any storage
+      // call on this column.
+      bucket = doc.parent_admin_doc_id ? "admin-documents" : "client-documents";
       // client_documents.file_url isn't always a clean relative storage path — some rows
       // store a fuller path containing a "/client-documents/" marker (same defensive
       // stripping ClientDetail.tsx and PortalDocuments.tsx already apply before any
