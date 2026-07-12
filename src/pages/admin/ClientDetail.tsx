@@ -341,6 +341,8 @@ const ClientDetail = () => {
   const [fileAssetLabel, setFileAssetLabel] = useState("");
   const [fileAssetFile, setFileAssetFile] = useState<File | null>(null);
   const [fileAssetUploading, setFileAssetUploading] = useState(false);
+  const [batchFiles, setBatchFiles] = useState<File[]>([]);
+  const [batchDragging, setBatchDragging] = useState(false);
   const [editingLabelId, setEditingLabelId] = useState<string | null>(null);
   const [editingLabelValue, setEditingLabelValue] = useState("");
   const [scrapeDialogOpen, setScrapeDialogOpen] = useState(false);
@@ -890,6 +892,62 @@ const ClientDetail = () => {
       setFileAssetCategory("logo");
       fetchAll();
     }
+  };
+
+  // Derives a sensible default label from a filename for batch uploads, where asking
+  // for a per-file label would be tedious — e.g. "brand_guide-2024.pdf" -> "Brand Guide 2024".
+  // Admin can still rename any asset afterward via the existing click-to-rename label.
+  function deriveLabelFromFilename(fileName: string): string {
+    const base = fileName.replace(/\.[^.]+$/, "");
+    return base
+      .replace(/[_-]+/g, " ")
+      .trim()
+      .split(/\s+/)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ") || fileName;
+  }
+
+  const uploadBatchFiles = async () => {
+    if (!profile || batchFiles.length === 0) return;
+    setFileAssetUploading(true);
+    let successCount = 0;
+    let existingFileCount = assets.filter((a) => a.type === "file").length;
+    for (const file of batchFiles) {
+      const storagePath = `${profile.id}/${Date.now()}_${file.name}`;
+      const { error: upErr } = await supabase.storage.from("client-assets").upload(storagePath, file);
+      if (upErr) {
+        toast({ title: `Upload failed: ${file.name}`, description: upErr.message, variant: "destructive" });
+        continue;
+      }
+      const { data: urlData } = await supabase.storage
+        .from("client-assets")
+        .createSignedUrl(storagePath, 60 * 60 * 24 * 7);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error: insErr } = await (supabase as any).from("client_assets").insert({
+        client_profile_id: profile.id,
+        plan_id: plan?.id ?? null,
+        type: "file",
+        category: fileAssetCategory,
+        label: deriveLabelFromFilename(file.name),
+        file_name: storagePath,
+        file_url: urlData?.signedUrl || "",
+        file_size: file.size,
+        sort_order: existingFileCount++,
+      });
+      if (insErr) {
+        toast({ title: `Save failed: ${file.name}`, description: insErr.message, variant: "destructive" });
+        continue;
+      }
+      successCount++;
+    }
+    setFileAssetUploading(false);
+    if (successCount > 0) {
+      toast({ title: `${successCount} of ${batchFiles.length} file(s) uploaded` });
+    }
+    setBatchFiles([]);
+    setAddFileAssetOpen(false);
+    setFileAssetCategory("logo");
+    fetchAll();
   };
 
   const fetchPendingScrapeItems = async () => {
@@ -3670,31 +3728,92 @@ const ClientDetail = () => {
                 </SelectContent>
               </Select>
             </div>
+            {batchFiles.length === 0 && (
+              <div>
+                <Label className="text-black">Label</Label>
+                <Input
+                  value={fileAssetLabel}
+                  onChange={(e) => setFileAssetLabel(e.target.value)}
+                  placeholder="e.g. Primary Logo, Brand Guide 2024"
+                  className="bg-white text-black border-black/20"
+                />
+              </div>
+            )}
             <div>
-              <Label className="text-black">Label</Label>
-              <Input
-                value={fileAssetLabel}
-                onChange={(e) => setFileAssetLabel(e.target.value)}
-                placeholder="e.g. Primary Logo, Brand Guide 2024"
-                className="bg-white text-black border-black/20"
-              />
-            </div>
-            <div>
-              <Label className="text-black">File</Label>
-              <Input
-                type="file"
-                accept="image/*,.pdf,.zip,.ttf,.otf,.woff,.woff2"
-                onChange={(e) => setFileAssetFile(e.target.files?.[0] || null)}
-                className="bg-white text-black border-black/20"
-              />
+              <Label className="text-black">{batchFiles.length === 0 ? "File" : `${batchFiles.length} files ready`}</Label>
+              <label
+                onDragOver={(e) => { e.preventDefault(); setBatchDragging(true); }}
+                onDragLeave={() => setBatchDragging(false)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setBatchDragging(false);
+                  const dropped = Array.from(e.dataTransfer.files || []);
+                  if (dropped.length === 0) return;
+                  if (dropped.length === 1) {
+                    setFileAssetFile(dropped[0]);
+                    setBatchFiles([]);
+                  } else {
+                    setFileAssetFile(null);
+                    setBatchFiles(dropped);
+                  }
+                }}
+                className={`flex flex-col items-center justify-center gap-1.5 rounded-lg border-2 border-dashed p-4 text-center cursor-pointer transition-colors ${
+                  batchDragging ? "border-teal-500 bg-teal-50" : "border-black/20 hover:border-black/30"
+                }`}
+              >
+                <Upload className="h-5 w-5 text-black/40" />
+                <span className="text-xs text-black/60">
+                  {batchFiles.length === 0
+                    ? "Drag & drop one or more files, or click to choose"
+                    : "Drop more files, or click to choose different ones"}
+                </span>
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*,.pdf,.zip,.ttf,.otf,.woff,.woff2"
+                  className="hidden"
+                  onChange={(e) => {
+                    const chosen = Array.from(e.target.files || []);
+                    if (chosen.length === 0) return;
+                    if (chosen.length === 1) {
+                      setFileAssetFile(chosen[0]);
+                      setBatchFiles([]);
+                    } else {
+                      setFileAssetFile(null);
+                      setBatchFiles(chosen);
+                    }
+                    e.target.value = "";
+                  }}
+                />
+              </label>
+              {batchFiles.length > 0 && (
+                <ul className="mt-2 max-h-28 overflow-y-auto space-y-1 text-xs text-black/70">
+                  {batchFiles.map((f, i) => (
+                    <li key={`${f.name}-${i}`} className="flex items-center justify-between gap-2">
+                      <span className="truncate">{deriveLabelFromFilename(f.name)}</span>
+                      <button
+                        type="button"
+                        className="text-black/30 hover:text-red-500 shrink-0"
+                        onClick={() => setBatchFiles((prev) => prev.filter((_, idx) => idx !== i))}
+                        title="Remove"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
             <Button
-              onClick={uploadFileAsset}
-              disabled={fileAssetUploading || !fileAssetLabel.trim() || !fileAssetFile}
+              onClick={batchFiles.length > 0 ? uploadBatchFiles : uploadFileAsset}
+              disabled={
+                fileAssetUploading ||
+                (batchFiles.length > 0 ? false : (!fileAssetLabel.trim() || !fileAssetFile))
+              }
               className="w-full"
             >
               {fileAssetUploading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Upload className="h-4 w-4 mr-2" />}
-              Upload
+              {batchFiles.length > 0 ? `Upload ${batchFiles.length} files` : "Upload"}
             </Button>
           </div>
         </DialogContent>
