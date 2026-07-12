@@ -1019,6 +1019,7 @@ export type Database = {
         Row: {
           client_profile_id: string
           completion_percent: number
+          contact_email: string | null
           created_at: string
           drive_folder_url: string | null
           github_url: string | null
@@ -1034,6 +1035,7 @@ export type Database = {
         Insert: {
           client_profile_id: string
           completion_percent?: number
+          contact_email?: string | null
           created_at?: string
           drive_folder_url?: string | null
           github_url?: string | null
@@ -1049,6 +1051,7 @@ export type Database = {
         Update: {
           client_profile_id?: string
           completion_percent?: number
+          contact_email?: string | null
           created_at?: string
           drive_folder_url?: string | null
           github_url?: string | null

@@ -162,6 +162,7 @@ interface ProjectPlan {
   created_at: string;
   updated_at: string;
   drive_folder_url?: string | null;
+  contact_email?: string | null;
 }
 
 interface ProjectPhase {
@@ -2905,6 +2906,20 @@ const ClientDetail = () => {
                         </a>
                       )}
                     </div>
+                  </div>
+                  <div>
+                    <Label className="text-xs text-muted-foreground">Contact Email (for this project)</Label>
+                    <Input
+                      type="email"
+                      value={plan.contact_email || ""}
+                      onChange={(e) => updatePlanLocal({ contact_email: e.target.value })}
+                      onBlur={(e) => savePlan({ contact_email: e.target.value.trim() || null })}
+                      placeholder="e.g. a different email for this specific business"
+                      className="mt-1"
+                    />
+                    <p className="text-xs text-muted-foreground/70 mt-1">
+                      For multi-business clients — correspondence about this project goes here instead of the client's main login email.
+                    </p>
                   </div>
                 </CardContent>
               </Card>
