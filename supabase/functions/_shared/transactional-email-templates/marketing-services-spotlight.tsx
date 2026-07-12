@@ -1,6 +1,6 @@
 import * as React from 'npm:react@18.3.1'
 import {
-  Body, Container, Head, Heading, Html, Preview, Section, Text, Hr, Link, Row, Column,
+  Body, Container, Head, Heading, Html, Img, Preview, Section, Text, Hr, Link, Row, Column,
 } from 'npm:@react-email/components@0.0.22'
 import type { TemplateEntry } from './registry.ts'
 
@@ -18,6 +18,7 @@ const ServicesSpotlightEmail = ({ firstName, unsubscribeUrl }: ServicesSpotlight
 
         {/* Header */}
         <Section style={header}>
+          <Img src="https://aethyx.space/aethyx-logo.png" width="120" alt="Aethyx" style={logo} />
           <Text style={wordmark}>AETHYX</Text>
           <Text style={tagline}>Web Design &amp; Creative Strategy</Text>
         </Section>
@@ -115,6 +116,7 @@ const main = { backgroundColor: '#0a0a14', fontFamily: 'Inter, Arial, sans-serif
 const container = { maxWidth: '600px', margin: '0 auto', padding: '0' }
 
 const header = { padding: '40px 48px 32px', textAlign: 'center' as const }
+const logo = { margin: '0 auto 16px' }
 const wordmark = { fontSize: '22px', fontWeight: 800, color: '#ffffff', letterSpacing: '0.18em', margin: '0 0 4px', textTransform: 'uppercase' as const }
 const tagline = { fontSize: '11px', color: '#00B8AC', letterSpacing: '0.1em', textTransform: 'uppercase' as const, margin: '0' }
 
