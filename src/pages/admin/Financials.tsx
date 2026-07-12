@@ -27,6 +27,7 @@ interface FinancialRecord {
   stripe_session_id: string | null;
   notes: string | null;
   created_at: string;
+  entry_type: "income" | "expense";
 }
 
 const emptyForm = {
@@ -37,6 +38,7 @@ const emptyForm = {
   payment_date: "",
   stripe_session_id: "",
   notes: "",
+  entry_type: "income" as "income" | "expense",
 };
 
 const Financials = () => {
@@ -48,6 +50,7 @@ const Financials = () => {
   const [syncing, setSyncing] = useState(false);
   const [openInvoicesTotal, setOpenInvoicesTotal] = useState(0);
   const [openInvoicesCount, setOpenInvoicesCount] = useState(0);
+  const [entryTypeFilter, setEntryTypeFilter] = useState<"all" | "income" | "expense">("all");
 
   const handleStripeSync = async () => {
     setSyncing(true);
@@ -104,6 +107,7 @@ const Financials = () => {
       payment_date: r.payment_date ? r.payment_date.split("T")[0] : "",
       stripe_session_id: r.stripe_session_id || "",
       notes: r.notes || "",
+      entry_type: (r.entry_type as "income" | "expense") || "income",
     });
     setEditorOpen(true);
   };
@@ -121,6 +125,7 @@ const Financials = () => {
       payment_date: form.payment_date ? new Date(form.payment_date).toISOString() : null,
       stripe_session_id: form.stripe_session_id || null,
       notes: form.notes || null,
+      entry_type: form.entry_type,
     };
 
     if (editing) {
@@ -143,7 +148,10 @@ const Financials = () => {
     fetchRecords();
   };
 
-  const totalPaid = records.filter((r) => r.payment_status === "paid").reduce((s, r) => s + Number(r.amount), 0);
+  const filteredRecords = records.filter((r) => entryTypeFilter === "all" || r.entry_type === entryTypeFilter);
+  const totalIncome = records.filter((r) => r.entry_type !== "expense" && r.payment_status === "paid").reduce((s, r) => s + Number(r.amount), 0);
+  const totalExpenses = records.filter((r) => r.entry_type === "expense" && r.payment_status === "paid").reduce((s, r) => s + Number(r.amount), 0);
+  const totalPaid = totalIncome - totalExpenses;
   const totalPending = openInvoicesTotal;
 
   const statusBadge = (status: string) => {
@@ -168,28 +176,41 @@ const Financials = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="rounded-lg border border-border/30 p-4">
-          <p className="text-xs text-muted-foreground uppercase tracking-wider">Total Paid</p>
+          <p className="text-xs text-muted-foreground uppercase tracking-wider">Net (Income − Expenses)</p>
           <p className="text-2xl font-bold text-emerald-400">${totalPaid.toLocaleString()}</p>
+          <p className="text-xs text-muted-foreground mt-1">${totalIncome.toLocaleString()} income · ${totalExpenses.toLocaleString()} expenses</p>
         </div>
         <div className="rounded-lg border border-border/30 p-4">
           <p className="text-xs text-muted-foreground uppercase tracking-wider">Pending (Open Invoices)</p>
           <p className="text-2xl font-bold text-yellow-400">${totalPending.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
           <p className="text-xs text-muted-foreground mt-1">{openInvoicesCount} unpaid invoice{openInvoicesCount === 1 ? "" : "s"}</p>
         </div>
+        <div className="rounded-lg border border-border/30 p-4 flex flex-col justify-center">
+          <Label className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Filter</Label>
+          <Select value={entryTypeFilter} onValueChange={(v) => setEntryTypeFilter(v as typeof entryTypeFilter)}>
+            <SelectTrigger className="h-8 text-sm"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="income">Income only</SelectItem>
+              <SelectItem value="expense">Expenses only</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {loading ? (
         <div className="flex justify-center py-10"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" /></div>
-      ) : records.length === 0 ? (
+      ) : filteredRecords.length === 0 ? (
         <p className="text-muted-foreground text-center py-10">No financial records yet.</p>
       ) : (
         <div className="rounded-lg border border-border/30 overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Client</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Client / Vendor</TableHead>
                 <TableHead className="hidden md:table-cell">Service</TableHead>
                 <TableHead>Amount</TableHead>
                 <TableHead>Status</TableHead>
@@ -198,8 +219,13 @@ const Financials = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {records.map((r) => (
+              {filteredRecords.map((r) => (
                 <TableRow key={r.id}>
+                  <TableCell>
+                    <span className={`text-xs px-2 py-1 rounded-full ${r.entry_type === "expense" ? "bg-red-500/20 text-red-400" : "bg-blue-500/20 text-blue-400"}`}>
+                      {r.entry_type === "expense" ? "Expense" : "Income"}
+                    </span>
+                  </TableCell>
                   <TableCell className="font-medium">{r.client_name}</TableCell>
                   <TableCell className="hidden md:table-cell text-muted-foreground">{r.service_name || "—"}</TableCell>
                   <TableCell>${Number(r.amount).toLocaleString()}</TableCell>
@@ -228,9 +254,25 @@ const Financials = () => {
           <div className="space-y-4 mt-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Client Name *</Label>
-                <Input value={form.client_name} onChange={(e) => setForm((f) => ({ ...f, client_name: e.target.value }))} />
+                <Label>Type</Label>
+                <Select value={form.entry_type} onValueChange={(v) => setForm((f) => ({ ...f, entry_type: v as "income" | "expense" }))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="income">Income</SelectItem>
+                    <SelectItem value="expense">Expense</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
+              <div className="space-y-2">
+                <Label>{form.entry_type === "expense" ? "Vendor *" : "Client Name *"}</Label>
+                <Input
+                  value={form.client_name}
+                  onChange={(e) => setForm((f) => ({ ...f, client_name: e.target.value }))}
+                  placeholder={form.entry_type === "expense" ? "e.g. Anthropic" : undefined}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Service</Label>
                 <Input value={form.service_name} onChange={(e) => setForm((f) => ({ ...f, service_name: e.target.value }))} />
