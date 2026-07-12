@@ -542,6 +542,7 @@ export type Database = {
           file_size: number | null
           file_url: string | null
           id: string
+          in_use: boolean
           label: string
           plan_id: string | null
           sort_order: number
@@ -558,6 +559,7 @@ export type Database = {
           file_size?: number | null
           file_url?: string | null
           id?: string
+          in_use?: boolean
           label: string
           plan_id?: string | null
           sort_order?: number
@@ -574,6 +576,7 @@ export type Database = {
           file_size?: number | null
           file_url?: string | null
           id?: string
+          in_use?: boolean
           label?: string
           plan_id?: string | null
           sort_order?: number
@@ -1011,6 +1014,7 @@ export type Database = {
           client_profile_id: string
           completion_percent: number
           created_at: string
+          drive_folder_url: string | null
           github_url: string | null
           id: string
           overview: string | null
@@ -1025,6 +1029,7 @@ export type Database = {
           client_profile_id: string
           completion_percent?: number
           created_at?: string
+          drive_folder_url?: string | null
           github_url?: string | null
           id?: string
           overview?: string | null
@@ -1039,6 +1044,7 @@ export type Database = {
           client_profile_id?: string
           completion_percent?: number
           created_at?: string
+          drive_folder_url?: string | null
           github_url?: string | null
           id?: string
           overview?: string | null
