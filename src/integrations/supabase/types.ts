@@ -489,7 +489,9 @@ export type Database = {
           id: string
           keywords: string | null
           plan_id: string | null
-          source_url: string
+          source_document_id: string | null
+          source_document_type: string | null
+          source_url: string | null
           status: string
         }
         Insert: {
@@ -500,7 +502,9 @@ export type Database = {
           id?: string
           keywords?: string | null
           plan_id?: string | null
-          source_url: string
+          source_document_id?: string | null
+          source_document_type?: string | null
+          source_url?: string | null
           status?: string
         }
         Update: {
@@ -511,7 +515,9 @@ export type Database = {
           id?: string
           keywords?: string | null
           plan_id?: string | null
-          source_url?: string
+          source_document_id?: string | null
+          source_document_type?: string | null
+          source_url?: string | null
           status?: string
         }
         Relationships: [
