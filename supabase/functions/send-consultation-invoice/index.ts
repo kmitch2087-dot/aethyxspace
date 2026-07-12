@@ -113,7 +113,7 @@ Deno.serve(async (req) => {
 
     await stripe.invoiceItems.create({
       customer: customerId,
-      price: CONSULTATION_PRICE_ID,
+      pricing: { price: CONSULTATION_PRICE_ID },
       invoice: invoice.id,
     });
 

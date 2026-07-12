@@ -122,7 +122,7 @@ Deno.serve(async (req) => {
       });
       await stripe.invoiceItems.create({
         customer: customerId,
-        price: CONSULTATION_PRICE_ID,
+        pricing: { price: CONSULTATION_PRICE_ID },
         invoice: invoice.id,
       });
       // Finalize only — the branded consultation-scheduled email below carries the
@@ -201,6 +201,8 @@ Deno.serve(async (req) => {
     return json({ success: true, emailSent: true, payUrl }, 200, corsHeaders);
   } catch (error: unknown) {
     console.error("[schedule-consultation]", error);
-    return json({ error: "Failed to schedule the consultation. Please try again." }, 500, corsHeaders);
+    // Admin-only caller, so surfacing the underlying message is safe and aids debugging
+    const detail = error instanceof Error ? error.message : String(error);
+    return json({ error: `Failed to schedule the consultation: ${detail}` }, 500, corsHeaders);
   }
 });
