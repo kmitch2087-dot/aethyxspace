@@ -893,7 +893,7 @@ const ClientDetail = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: scrapes } = await (supabase as any)
       .from("client_asset_scrapes")
-      .select("id, plan_id")
+      .select("id, plan_id, source_url, source_document_type")
       .eq("client_profile_id", id);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const scrapeRows = (scrapes || []) as any[];
@@ -904,7 +904,15 @@ const ClientDetail = () => {
       return;
     }
     const scrapePlanById: Record<string, string | null> = {};
-    scrapeRows.forEach((s) => { scrapePlanById[s.id] = s.plan_id ?? null; });
+    const scrapeSourceById: Record<string, string> = {};
+    scrapeRows.forEach((s) => {
+      scrapePlanById[s.id] = s.plan_id ?? null;
+      scrapeSourceById[s.id] = s.source_url
+        ? s.source_url
+        : s.source_document_type === "admin_documents"
+        ? "an uploaded document (from your library)"
+        : "an uploaded document";
+    });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: items } = await (supabase as any)
       .from("client_asset_scrape_items")
@@ -916,6 +924,7 @@ const ClientDetail = () => {
     const rows = ((items || []) as any[]).map((item) => ({
       ...item,
       scrape_plan_id: scrapePlanById[item.scrape_id] ?? null,
+      scrape_source: scrapeSourceById[item.scrape_id] ?? "unknown source",
     }));
     setPendingScrapeItems(rows);
     setScrapeItemsLoading(false);
@@ -964,6 +973,32 @@ const ClientDetail = () => {
     setScrapeDialogOpen(false);
     setScrapeUrl("");
     setScrapeKeywords("");
+    fetchPendingScrapeItems();
+  };
+
+  const [extractingDocId, setExtractingDocId] = useState<string | null>(null);
+
+  const extractDocumentInfo = async (doc: DocRow) => {
+    if (!profile) return;
+    setExtractingDocId(doc.id);
+    const { data, error } = await supabase.functions.invoke("extract-document-assets", {
+      body: {
+        clientProfileId: profile.id,
+        sourceDocumentId: doc.id,
+        sourceDocumentType: "client_documents",
+        planId: plan?.id ?? null,
+      },
+    });
+    setExtractingDocId(null);
+    if (error || !data?.ok) {
+      toast({ title: "Extraction failed", description: data?.error || error?.message, variant: "destructive" });
+      return;
+    }
+    if (data.textCount === 0 && data.geminiError) {
+      toast({ title: "Extraction found nothing", description: data.geminiError });
+    } else {
+      toast({ title: "Extraction complete", description: `Found ${data.textCount} item(s) for review.` });
+    }
     fetchPendingScrapeItems();
   };
 
@@ -1815,6 +1850,16 @@ const ClientDetail = () => {
                       </div>
                     </button>
                     <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {fileExt(d.file_url) === "pdf" && (
+                        <button
+                          className="p-1 rounded-full bg-white/80 hover:bg-purple-50 text-black/40 hover:text-purple-600 disabled:opacity-50"
+                          onClick={(e) => { e.stopPropagation(); extractDocumentInfo(d); }}
+                          disabled={extractingDocId === d.id}
+                          title="Extract info with AI"
+                        >
+                          {extractingDocId === d.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+                        </button>
+                      )}
                       {slotCapablePlan && (
                         <button
                           className="p-1 rounded-full bg-white/80 hover:bg-teal-50 text-black/40 hover:text-teal-600"
@@ -2187,6 +2232,7 @@ const ClientDetail = () => {
                     <div className="flex-1 min-w-0">
                       <Badge variant="outline" className="text-xs mb-1">{assetCategoryInfo(item.suggested_category).label}</Badge>
                       <p className="text-sm font-medium truncate">{item.suggested_label}</p>
+                      <p className="text-xs text-muted-foreground truncate" title={item.scrape_source}>from: {item.scrape_source}</p>
                     </div>
                     <div className="flex gap-1 shrink-0">
                       <Button
