@@ -1,6 +1,6 @@
 import * as React from 'npm:react@18.3.1'
 import {
-  Body, Container, Head, Heading, Html, Preview, Section, Text, Hr, Link,
+  Body, Container, Head, Heading, Html, Img, Preview, Section, Text, Hr, Link,
 } from 'npm:@react-email/components@0.0.22'
 import type { TemplateEntry } from './registry.ts'
 
@@ -20,6 +20,7 @@ const PortalActivationEmail = ({
     <Preview>{clientName || 'A client'} just signed into the Aethyx portal</Preview>
     <Body style={main}>
       <Container style={container}>
+        <Img src="https://aethyx.space/aethyx-logo.png" width="120" alt="Aethyx" style={logo} />
         <Heading style={h1}>Portal activated</Heading>
         <Text style={text}>
           {clientName || 'A new client'} just signed into their Aethyx client portal
@@ -56,6 +57,7 @@ export const template = {
 
 const main = { backgroundColor: '#ffffff', fontFamily: 'Inter, Arial, sans-serif' }
 const container = { padding: '40px 32px', maxWidth: '560px' }
+const logo = { marginBottom: '20px' }
 const h1 = { fontSize: '24px', fontWeight: 600, color: '#0a0a14', margin: '0 0 20px', letterSpacing: '-0.02em' }
 const text = { fontSize: '15px', color: '#3a3a45', lineHeight: '1.7', margin: '0 0 18px' }
 const meta = { backgroundColor: '#f6f6f8', padding: '16px 20px', borderRadius: '6px', margin: '0 0 24px' }

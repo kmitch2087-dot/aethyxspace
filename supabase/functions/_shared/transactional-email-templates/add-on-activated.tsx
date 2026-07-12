@@ -1,6 +1,6 @@
 import * as React from 'npm:react@18.3.1'
 import {
-  Body, Container, Head, Heading, Html, Preview, Section, Text, Hr, Row, Column, Link,
+  Body, Container, Head, Heading, Html, Img, Preview, Section, Text, Hr, Row, Column, Link,
 } from 'npm:@react-email/components@0.0.22'
 import type { TemplateEntry } from './registry.ts'
 
@@ -30,6 +30,7 @@ const AddOnActivatedEmail = ({
       <Preview>Your {addOnName} is now active — Aethyx</Preview>
       <Body style={main}>
         <Container style={container}>
+          <Img src="https://aethyx.space/aethyx-logo.png" width="120" alt="Aethyx" style={logo} />
           <Heading style={h1}>You're all set, {firstName}!</Heading>
           <Text style={text}>
             Your {addOnName} {serviceLabel} is now active as of {startDate}.
@@ -93,6 +94,7 @@ export const template = {
 
 const main = { backgroundColor: '#ffffff', fontFamily: 'Inter, Arial, sans-serif' }
 const container = { padding: '40px 32px', maxWidth: '560px' }
+const logo = { marginBottom: '20px' }
 const h1 = { fontSize: '26px', fontWeight: 600, color: '#0a0a14', margin: '0 0 20px', letterSpacing: '-0.02em' }
 const text = { fontSize: '15px', color: '#3a3a45', lineHeight: '1.7', margin: '0 0 28px' }
 const detailsBox = { backgroundColor: '#f9f9fb', borderRadius: '10px', padding: '24px 28px', margin: '0 0 28px' }

@@ -1,6 +1,6 @@
 import * as React from 'npm:react@18.3.1'
 import {
-  Body, Container, Head, Heading, Html, Preview, Section, Text, Hr,
+  Body, Container, Head, Heading, Html, Img, Preview, Section, Text, Hr,
 } from 'npm:@react-email/components@0.0.22'
 import type { TemplateEntry } from './registry.ts'
 
@@ -24,6 +24,7 @@ const IntakeNotificationEmail = ({
     <Preview>New intake form from {fullName || 'a client'}</Preview>
     <Body style={main}>
       <Container style={container}>
+        <Img src="https://aethyx.space/aethyx-logo.png" width="120" alt="Aethyx" style={logo} />
         <Heading style={h1}>New Intake Submission</Heading>
         <Text style={subtitle}>A client has completed the intake form.</Text>
 
@@ -80,6 +81,7 @@ export const template = {
 
 const main = { backgroundColor: '#ffffff', fontFamily: 'Inter, Arial, sans-serif' }
 const container = { padding: '32px 28px', maxWidth: '560px' }
+const logo = { marginBottom: '20px' }
 const h1 = { fontSize: '24px', fontWeight: 600, color: '#0a0a14', margin: '0 0 8px' }
 const subtitle = { fontSize: '14px', color: '#666', margin: '0 0 24px' }
 const card = { backgroundColor: '#f7f7f9', borderRadius: '8px', padding: '20px 22px', margin: '0 0 8px' }

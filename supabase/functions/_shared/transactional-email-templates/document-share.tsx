@@ -1,6 +1,6 @@
 import * as React from 'npm:react@18.3.1'
 import {
-  Body, Button, Container, Head, Heading, Html, Preview, Section, Text,
+  Body, Button, Container, Head, Heading, Html, Img, Preview, Section, Text,
 } from 'npm:@react-email/components@0.0.22'
 import type { TemplateEntry } from './registry.ts'
 
@@ -20,6 +20,7 @@ const DocumentShareEmail = ({ recipientName, documentTitle, message, downloadUrl
     <Preview>{documentTitle ? `${documentTitle} from ${SITE_NAME}` : `A document from ${SITE_NAME}`}</Preview>
     <Body style={main}>
       <Container style={container}>
+        <Img src="https://aethyx.space/aethyx-logo.png" width="120" alt="Aethyx" style={logo} />
         <Heading style={h1}>{recipientName ? `Hi ${recipientName},` : 'Hi,'}</Heading>
         <Text style={text}>
           {message?.trim() ||
@@ -53,6 +54,7 @@ export const template = {
 
 const main = { backgroundColor: '#ffffff', fontFamily: 'Inter, Arial, sans-serif' }
 const container = { padding: '32px 28px', maxWidth: '560px' }
+const logo = { marginBottom: '20px' }
 const h1 = { fontSize: '22px', fontWeight: '600', color: '#0a0a14', margin: '0 0 16px' }
 const text = { fontSize: '15px', color: '#3a3a44', lineHeight: '1.6', margin: '0 0 16px', whiteSpace: 'pre-wrap' as const }
 const card = { background: '#f6f6fa', borderRadius: '10px', padding: '14px 18px', margin: '8px 0 0' }
