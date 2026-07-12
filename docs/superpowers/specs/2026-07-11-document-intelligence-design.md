@@ -10,11 +10,11 @@ The just-shipped **AI Asset Scraping** feature already solves the identical unde
 
 ## 1. Trigger
 
-Manual, per-document — matching the existing "Scrape from URL" button's UX rather than running automatically on every upload (avoids unexpected Gemini API costs and keeps Kristin in control of what gets processed, and when). A new "Extract info" button/icon appears next to each row in:
-- `ClientDetail.tsx`'s client-uploaded documents list (backed by `client_documents`)
-- `ClientDetail.tsx`'s admin-uploaded documents list (backed by `admin_documents`)
+Manual, per-document — matching the existing "Scrape from URL" button's UX rather than running automatically on every upload (avoids unexpected Gemini API costs and keeps Kristin in control of what gets processed, and when).
 
-Clicking it kicks off extraction for that one document immediately (no dialog/config needed — there's nothing to configure beyond "this document, go").
+**`client_documents` (client-uploaded, from `ClientDetail.tsx`)**: a new "Extract info" button next to each document row. Clicking it kicks off extraction immediately — no dialog needed, since the client (and therefore the target `client_profile_id` for the resulting suggestions) is already unambiguous from the page you're on.
+
+**`admin_documents` (Kristin's global document library, `src/pages/admin/Documents.tsx`, no client link at all)**: this table has no `client_profile_id`, so extracting from one of these documents needs an explicit target client. Reuses the existing `openAction(doc, mode)` / `actionDoc` / `actionClientIds` dialog-and-checkbox-list pattern already built for that page's "Share with client(s)" / "Email now" / "Schedule send" actions — adds a fourth mode, `"extract"`, using the same client-checkbox list UI but requiring exactly one client selected (not multiple, since a scrape's suggestions land in exactly one client's review queue).
 
 ## 2. Extraction method
 
@@ -46,6 +46,10 @@ A `client_asset_scrapes` row is now either URL-sourced (existing behavior, uncha
 ## 4. New edge function: `extract-document-assets`
 
 Mirrors `scrape-client-assets`'s structure closely: admin-auth check, create a `client_asset_scrapes` row (with `source_document_id`/`source_document_type` instead of `source_url`), fetch the file from Storage, call Gemini with the same extraction prompt (image-free variant of the current prompt — this pass has no "extract logo/photo" step the way URL-scraping does, since a business PDF isn't a source of downloadable brand images), insert `client_asset_scrape_items` rows, mark `client_asset_scrapes.status` complete/error. Reuses the existing `GEMINI_API_KEY` secret and the same admin-role check pattern already established for `scrape-client-assets`.
+
+Takes `clientProfileId` explicitly in its request body in both cases (resolved automatically from the page context for `client_documents`, resolved from the admin's client-picker selection for `admin_documents`) — the function itself doesn't need to know or care which source table the caller used to arrive at that id.
+
+**A technical divergence from `scrape-client-assets`, deliberate**: the URL-scraping function calls Gemini via its OpenAI-compatible chat-completions shim (`.../v1beta/openai/chat/completions`) with a plain text prompt — that endpoint isn't a reliable way to send PDF file content. This function instead calls Gemini's native `generateContent` endpoint (`.../v1beta/models/gemini-2.5-flash:generateContent`) with a `contents: [{ parts: [{ text: prompt }, { inline_data: { mime_type: "application/pdf", data: base64Data } }] }]` body — Gemini's documented, supported way to send file input. Same API key, same model, different endpoint shape because the payload is fundamentally different (file bytes, not scraped text).
 
 ## 5. Review UI — no changes needed
 
