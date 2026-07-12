@@ -121,7 +121,7 @@ const About = () => (
 
         <div className="mt-12 pt-8 border-t border-border/20">
           <Link
-            to="/contact"
+            to="/intake"
             className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-primary-foreground font-semibold tracking-wide uppercase text-sm hover:bg-primary/90 transition-all hover:-translate-y-0.5"
           >
             Start a Project <ArrowRight className="h-4 w-4" />

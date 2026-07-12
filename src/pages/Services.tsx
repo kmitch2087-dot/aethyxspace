@@ -111,13 +111,13 @@ const Services = () => (
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
-            to="/contact"
+            to="/intake"
             className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-primary-foreground font-semibold tracking-wide uppercase text-sm hover:bg-primary/90 transition-all hover:-translate-y-0.5"
           >
             Start a Project <ArrowRight className="h-4 w-4" />
           </Link>
           <Link
-            to="/contact"
+            to="/intake"
             className="inline-flex items-center gap-2 px-8 py-4 rounded-full border border-primary/40 text-primary font-semibold tracking-wide uppercase text-sm hover:bg-primary/10 transition-all"
           >
             Request a Consultation
@@ -278,7 +278,7 @@ const Services = () => (
           Every build is tailored to your goals — reach out & I'll scope a solution that fits.
         </p>
         <Link
-          to="/contact"
+          to="/intake"
           className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-primary-foreground font-semibold tracking-wide uppercase text-sm hover:bg-primary/90 transition-all hover:-translate-y-0.5"
         >
           Request a Custom Quote <ArrowRight className="h-4 w-4" />
@@ -332,7 +332,7 @@ const Services = () => (
                 ))}
               </ul>
               <Link
-                to="/contact"
+                to="/intake"
                 className="text-center py-3 rounded-full border border-primary/40 text-primary text-sm uppercase tracking-widest hover:bg-primary/10 transition-colors"
               >
                 Get Started
@@ -448,7 +448,7 @@ const Services = () => (
           I build digital systems designed to support your business long-term.
         </p>
         <Link
-          to="/contact"
+          to="/intake"
           className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-primary-foreground font-semibold tracking-wide uppercase text-sm hover:bg-primary/90 transition-all hover:-translate-y-0.5"
         >
           Book a Consultation <ArrowRight className="h-4 w-4" />

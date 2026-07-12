@@ -321,7 +321,7 @@ const Intake = () => {
                   )}
                 </Button>
                 <p className="text-xs text-muted-foreground mt-4">
-                  Free to submit. No payment required at this step.
+                  Submitting this form is free. If we're a good fit, your next step is the $50 strategy consultation.
                 </p>
               </div>
             </form>

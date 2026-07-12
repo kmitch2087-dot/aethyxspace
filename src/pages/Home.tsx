@@ -262,7 +262,7 @@ const Home = () => {
         <p className="text-primary text-xs tracking-[0.4em] uppercase mb-4">Ready to Shift?</p>
         <h2 className="font-display text-3xl md:text-5xl mb-6 tracking-tight">Let's build something they can't ignore.</h2>
         <p className="text-muted-foreground text-lg max-w-xl mx-auto mb-10">
-          Free to submit, no payment required at this time.
+          Submitting the form is free. If we're a good fit, the next step is a focused $50 strategy consultation.
         </p>
         <Link
           to="/intake"

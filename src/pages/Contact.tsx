@@ -33,7 +33,7 @@ const Contact = () => {
               Let's Connect
             </h2>
             <p className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto mb-8">
-              Free to submit, no payment required at this time.
+              Submitting the form is free. If we're a good fit, the next step is a focused $50 strategy consultation.
             </p>
             <Link
               to="/intake"
