@@ -316,7 +316,11 @@ export default function ReferralProgram() {
 
   const handleW9Upload = async (applicant: BountyApplicant, file: File) => {
     setW9UploadingId(applicant.id);
-    const path = `${applicant.id}/${Date.now()}_${file.name}`;
+    // Strip to a basename before building the storage key — file.name is
+    // attacker-controlled input (a filename the browser reports as-is), and a name
+    // containing "/" would otherwise create an unexpected nested path.
+    const safeName = file.name.replace(/^.*[/\\]/, "");
+    const path = `${applicant.id}/${Date.now()}_${safeName}`;
     const { error: uploadError } = await supabase.storage.from("bounty-documents").upload(path, file);
     if (uploadError) {
       setW9UploadingId(null);

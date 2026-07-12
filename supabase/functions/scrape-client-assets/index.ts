@@ -60,13 +60,37 @@ function extractImages(html: string, baseUrl: string): string[] {
   return Array.from(urls).slice(0, MAX_IMAGES);
 }
 
+// Derives a storage-safe file extension from an image URL's actual path segment, not
+// the whole URL string — splitting the entire URL on "." (as a naive .split(".").pop()
+// would) picks up dots from the hostname (e.g. "cdn.example.com") and, for an
+// extensionless path, can even pick up a "/" from the path itself, producing an
+// unintended nested storage subfolder. Defaults to "png" when no real extension exists.
+function extFromUrl(url: string): string {
+  try {
+    const pathname = new URL(url).pathname;
+    const lastSegment = pathname.split("/").pop() || "";
+    const dotIdx = lastSegment.lastIndexOf(".");
+    if (dotIdx === -1) return "png";
+    const ext = lastSegment.slice(dotIdx + 1).slice(0, 5).toLowerCase();
+    return ext || "png";
+  } catch {
+    return "png";
+  }
+}
+
 function extractOgTags(html: string): Record<string, string> {
   const tags: Record<string, string> = {};
   const re1 = /<meta[^>]+(?:property|name)=["']og:(title|description|image)["'][^>]+content=["']([^"']+)["']/gi;
   let m: RegExpExecArray | null;
   while ((m = re1.exec(html))) tags[m[1]] = m[2];
+  // Second pass covers the reverse attribute ordering (content before property/name) —
+  // only fills in tags the first pass didn't already find, so a page using both
+  // orderings for the same tag keeps whichever form was matched first, not whichever
+  // regex happened to run last.
   const re2 = /<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name)=["']og:(title|description|image)["']/gi;
-  while ((m = re2.exec(html))) tags[m[2]] = m[1];
+  while ((m = re2.exec(html))) {
+    if (!(m[2] in tags)) tags[m[2]] = m[1];
+  }
   return tags;
 }
 
@@ -188,7 +212,7 @@ Deno.serve(async (req: Request) => {
           if (!imgResp.ok) continue;
           const blob = await imgResp.blob();
           if (blob.size === 0 || blob.size > MAX_IMAGE_BYTES) continue;
-          const ext = (imageUrls[i].split(".").pop() || "png").split("?")[0].slice(0, 5);
+          const ext = extFromUrl(imageUrls[i]);
           const storagePath = `_scrapes/${scrapeId}/${i}.${ext}`;
           const { error: upErr } = await admin.storage.from("client-assets").upload(storagePath, blob);
           if (upErr) continue;

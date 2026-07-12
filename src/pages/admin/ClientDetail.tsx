@@ -1088,6 +1088,16 @@ const ClientDetail = () => {
       const { data: urlData } = await supabase.storage
         .from("client-assets")
         .createSignedUrl(item.content!, 60 * 60 * 24 * 7);
+      // uploadFileAsset (the direct-upload path) sets file_size from the File object
+      // directly; this approve-from-scrape path never had that available, so it was
+      // silently omitted. Look the size up from storage metadata instead — harmless if
+      // it fails (file_size is nullable), just falls back to not setting it.
+      let scrapedFileSize: number | null = null;
+      const lastSlash = item.content!.lastIndexOf("/");
+      const dir = lastSlash === -1 ? "" : item.content!.slice(0, lastSlash);
+      const fileName = lastSlash === -1 ? item.content! : item.content!.slice(lastSlash + 1);
+      const { data: listData } = await supabase.storage.from("client-assets").list(dir, { search: fileName });
+      scrapedFileSize = listData?.find((f) => f.name === fileName)?.metadata?.size ?? null;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error } = await (supabase as any).from("client_assets").insert({
         client_profile_id: profile.id,
@@ -1097,6 +1107,7 @@ const ClientDetail = () => {
         label: item.suggested_label,
         file_name: item.content,
         file_url: urlData?.signedUrl || "",
+        file_size: scrapedFileSize,
         sort_order: assets.filter((a) => a.type === "file").length,
       });
       if (error) {
