@@ -115,6 +115,20 @@ Deno.serve(async (req) => {
       const finalized = await stripe.invoices.finalizeInvoice(sid);
       await syncRow(admin, row.id, finalized);
 
+      // System-generated document-list entry — created here (not at draft-creation time)
+      // so the client never sees/can pay a draft before the admin actually sends it.
+      // Same sentinel pattern as create-admin-invoice: file_url is NOT NULL in the schema.
+      if (row.client_profile_id && row.user_id) {
+        await admin.from("client_documents").insert({
+          client_profile_id: row.client_profile_id,
+          user_id: row.user_id,
+          title: `Invoice ${finalized.number || ""}`.trim(),
+          file_url: "",
+          uploaded_by: "admin",
+          linked_invoice_id: row.id,
+        });
+      }
+
       if (row.email) {
         let recipientName = "";
         if (row.client_profile_id) {

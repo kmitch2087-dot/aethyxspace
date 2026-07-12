@@ -91,26 +91,29 @@ Deno.serve(async (req) => {
       email: profile.email,
     }, { onConflict: "stripe_invoice_id" }).select().single();
 
-    // System-generated document-list entry — no real file, just a pointer so the
-    // invoice shows up in the client's Documents list with an inline pay prompt.
-    if (localInv?.id) {
-      // NB: client_documents.file_url is NOT NULL in the schema (Task 1's migration only
-      // added linked_invoice_id — it didn't relax file_url) — use "" as the "no real file"
-      // sentinel instead of null. All rendering branches on linked_invoice_id, not file_url,
-      // so this has no effect on the portal/admin UI.
-      await admin.from("client_documents").insert({
-        client_profile_id: profileId,
-        user_id: profile.user_id,
-        title: `Invoice ${finalized.number || ""}`.trim(),
-        file_url: "",
-        uploaded_by: "admin",
-        linked_invoice_id: localInv.id,
-      });
-    }
-
     // Notify client (branded email — link to portal payment page, not Stripe) — only
-    // when actually finalizing. A draft save has nothing to notify the client about yet.
+    // when actually finalizing. A draft save has nothing to notify the client about yet,
+    // and must not be document-list-visible either (that would make it payable via the
+    // portal's auto-finalize-on-pay behavior before the admin ever chose to send it).
     if (shouldFinalize) {
+      // System-generated document-list entry — no real file, just a pointer so the
+      // invoice shows up in the client's Documents list with an inline pay prompt.
+      // Only created here (not for drafts) so a saved-but-unsent draft is never
+      // client-visible or payable.
+      if (localInv?.id) {
+        // NB: client_documents.file_url is NOT NULL in the schema (Task 1's migration only
+        // added linked_invoice_id — it didn't relax file_url) — use "" as the "no real file"
+        // sentinel instead of null. All rendering branches on linked_invoice_id, not file_url,
+        // so this has no effect on the portal/admin UI.
+        await admin.from("client_documents").insert({
+          client_profile_id: profileId,
+          user_id: profile.user_id,
+          title: `Invoice ${finalized.number || ""}`.trim(),
+          file_url: "",
+          uploaded_by: "admin",
+          linked_invoice_id: localInv.id,
+        });
+      }
       const portalPaymentUrl = `${origin}/portal/pay/${localInv?.id || ""}`;
       await admin.functions.invoke("send-transactional-email", {
         body: {
