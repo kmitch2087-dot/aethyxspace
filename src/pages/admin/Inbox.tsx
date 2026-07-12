@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Send, Loader2, Inbox as InboxIcon, ChevronDown, ChevronUp } from "lucide-react";
 import { format } from "date-fns";
@@ -128,6 +131,52 @@ const Inbox = () => {
     }));
   })();
 
+  const [composeOpen, setComposeOpen] = useState(false);
+  const [composeClients, setComposeClients] = useState<{ id: string; full_name: string; first_name: string | null; email: string | null }[]>([]);
+  const [composeSelectedIds, setComposeSelectedIds] = useState<string[]>([]);
+  const [composeSubject, setComposeSubject] = useState("");
+  const [composeMessage, setComposeMessage] = useState("");
+  const [composeSending, setComposeSending] = useState(false);
+
+  const openCompose = async () => {
+    setComposeOpen(true);
+    setComposeSelectedIds([]);
+    setComposeSubject("");
+    setComposeMessage("");
+    const { data } = await supabase
+      .from("client_profiles")
+      .select("id, full_name, first_name, email")
+      .order("full_name");
+    setComposeClients((data || []) as typeof composeClients);
+  };
+
+  const sendCompose = async () => {
+    if (composeSelectedIds.length === 0 || !composeSubject.trim() || !composeMessage.trim()) return;
+    setComposeSending(true);
+    const batchId = crypto.randomUUID();
+    const targets = composeClients.filter((c) => composeSelectedIds.includes(c.id) && c.email);
+    let successCount = 0;
+    for (const target of targets) {
+      const { data, error } = await supabase.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "admin-compose",
+          recipientEmail: target.email,
+          templateData: { firstName: target.first_name || "", subject: composeSubject.trim(), message: composeMessage.trim() },
+          metadata: { batch_id: batchId },
+        },
+      });
+      if (!error && data?.success !== false) successCount++;
+    }
+    setComposeSending(false);
+    if (successCount === 0) {
+      toast({ title: "Send failed", description: "No emails were sent — check the recipients and try again.", variant: "destructive" });
+      return;
+    }
+    toast({ title: `Sent to ${successCount} of ${targets.length} client(s)` });
+    setComposeOpen(false);
+    loadSent();
+  };
+
   const sendReply = async () => {
     if (!selectedClient || !reply.trim()) return;
     setSending(true);
@@ -156,9 +205,14 @@ const Inbox = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-display tracking-wider mb-6 flex items-center gap-2">
-        <InboxIcon className="h-6 w-6 text-primary" /> Inbox
-      </h1>
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+        <h1 className="text-2xl font-display tracking-wider flex items-center gap-2">
+          <InboxIcon className="h-6 w-6 text-primary" /> Inbox
+        </h1>
+        <Button size="sm" onClick={openCompose}>
+          <Send className="h-4 w-4 mr-2" /> Compose email
+        </Button>
+      </div>
 
       <Tabs defaultValue="messages">
         <TabsList className="mb-4">
@@ -277,6 +331,48 @@ const Inbox = () => {
           )}
         </TabsContent>
       </Tabs>
+
+      <Dialog open={composeOpen} onOpenChange={setComposeOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader><DialogTitle>Compose email</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label>Recipients</Label>
+              <div className="border rounded p-2 max-h-40 overflow-y-auto space-y-1 mt-1">
+                {composeClients.map((c) => (
+                  <label key={c.id} className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={composeSelectedIds.includes(c.id)}
+                      disabled={!c.email}
+                      onChange={(e) =>
+                        setComposeSelectedIds((ids) => (e.target.checked ? [...ids, c.id] : ids.filter((id) => id !== c.id)))
+                      }
+                    />
+                    {c.full_name} <span className="text-muted-foreground">({c.email || "no email"})</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            <div>
+              <Label>Subject</Label>
+              <Input value={composeSubject} onChange={(e) => setComposeSubject(e.target.value)} />
+            </div>
+            <div>
+              <Label>Message</Label>
+              <Textarea rows={6} value={composeMessage} onChange={(e) => setComposeMessage(e.target.value)} />
+            </div>
+            <Button
+              onClick={sendCompose}
+              disabled={composeSending || composeSelectedIds.length === 0 || !composeSubject.trim() || !composeMessage.trim()}
+              className="w-full"
+            >
+              {composeSending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Send className="h-4 w-4 mr-2" />}
+              Send
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
