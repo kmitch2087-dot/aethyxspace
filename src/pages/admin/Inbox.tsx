@@ -4,8 +4,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Send, Loader2, Inbox as InboxIcon } from "lucide-react";
+import { Send, Loader2, Inbox as InboxIcon, ChevronDown, ChevronUp } from "lucide-react";
 import { format } from "date-fns";
 
 interface ThreadClient {
@@ -22,6 +23,23 @@ interface Message {
   created_at: string;
 }
 
+interface SentEmail {
+  id: string;
+  message_id: string | null;
+  template_name: string;
+  recipient_email: string;
+  status: string;
+  metadata: { batch_id?: string } | null;
+  created_at: string;
+}
+
+interface SentGroup {
+  key: string;
+  templateName: string;
+  createdAt: string;
+  emails: SentEmail[];
+}
+
 const Inbox = () => {
   const { toast } = useToast();
   const [clients, setClients] = useState<ThreadClient[]>([]);
@@ -30,6 +48,9 @@ const Inbox = () => {
   const [loading, setLoading] = useState(true);
   const [reply, setReply] = useState("");
   const [sending, setSending] = useState(false);
+  const [sentEmails, setSentEmails] = useState<SentEmail[]>([]);
+  const [sentLoading, setSentLoading] = useState(true);
+  const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -68,8 +89,20 @@ const Inbox = () => {
     setLoading(false);
   };
 
+  const loadSent = async () => {
+    setSentLoading(true);
+    const { data } = await supabase
+      .from("email_send_log")
+      .select("id, message_id, template_name, recipient_email, status, metadata, created_at")
+      .order("created_at", { ascending: false })
+      .limit(200);
+    setSentEmails((data || []) as SentEmail[]);
+    setSentLoading(false);
+  };
+
   useEffect(() => {
     load();
+    loadSent();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -79,6 +112,21 @@ const Inbox = () => {
     : [];
 
   const needsReply = (clientId: string) => messagesByClient[clientId]?.[0]?.sender === "client";
+
+  const sentGroups: SentGroup[] = (() => {
+    const byKey: Record<string, SentEmail[]> = {};
+    for (const email of sentEmails) {
+      const key = email.metadata?.batch_id || email.id;
+      if (!byKey[key]) byKey[key] = [];
+      byKey[key].push(email);
+    }
+    return Object.entries(byKey).map(([key, emails]) => ({
+      key,
+      templateName: emails[0].template_name,
+      createdAt: emails[0].created_at,
+      emails,
+    }));
+  })();
 
   const sendReply = async () => {
     if (!selectedClient || !reply.trim()) return;
@@ -112,6 +160,13 @@ const Inbox = () => {
         <InboxIcon className="h-6 w-6 text-primary" /> Inbox
       </h1>
 
+      <Tabs defaultValue="messages">
+        <TabsList className="mb-4">
+          <TabsTrigger value="messages">Messages</TabsTrigger>
+          <TabsTrigger value="sent">Sent</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="messages">
       {clients.length === 0 ? (
         <p className="text-sm text-muted-foreground py-8 text-center">No client messages yet.</p>
       ) : (
@@ -174,6 +229,54 @@ const Inbox = () => {
           </div>
         </div>
       )}
+        </TabsContent>
+
+        <TabsContent value="sent">
+          {sentLoading ? (
+            <div className="flex justify-center py-10">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : sentGroups.length === 0 ? (
+            <p className="text-sm text-muted-foreground py-8 text-center">No emails sent yet.</p>
+          ) : (
+            <div className="space-y-2">
+              {sentGroups.map((group) => {
+                const isExpanded = expandedGroup === group.key;
+                const isBatch = group.emails.length > 1;
+                return (
+                  <Card key={group.key}>
+                    <CardContent
+                      className="pt-4 flex items-center justify-between gap-3 cursor-pointer"
+                      onClick={() => setExpandedGroup(isExpanded ? null : group.key)}
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium truncate">{group.templateName}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {isBatch ? `Sent to ${group.emails.length} clients` : group.emails[0].recipient_email} ·{" "}
+                          {format(new Date(group.createdAt), "MMM d, yyyy h:mm a")}
+                        </p>
+                      </div>
+                      {isBatch && (isExpanded ? <ChevronUp className="h-4 w-4 text-muted-foreground shrink-0" /> : <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />)}
+                    </CardContent>
+                    {isBatch && isExpanded && (
+                      <div className="border-t border-border/30 px-4 py-2 space-y-1">
+                        {group.emails.map((email) => (
+                          <div key={email.id} className="flex items-center justify-between text-xs">
+                            <span className="text-muted-foreground">{email.recipient_email}</span>
+                            <Badge variant={email.status === "sent" ? "default" : "destructive"} className="text-xs capitalize">
+                              {email.status}
+                            </Badge>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </Card>
+                );
+              })}
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
