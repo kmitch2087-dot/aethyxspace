@@ -1,9 +1,26 @@
 import { useEffect, useMemo, useState } from "react";
-import { Loader2, Mail, Phone, Building2, ExternalLink, FileText, Trash2, Gift } from "lucide-react";
+import { Loader2, Mail, Phone, Building2, ExternalLink, FileText, Trash2, Gift, CalendarClock, Video, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Sheet,
   SheetContent,
@@ -44,7 +61,21 @@ type Intake = {
   notes: string | null;
   created_at: string;
   referral_code: string | null;
+  meeting_scheduled_at: string | null;
+  meeting_type: "phone" | "google_meet" | null;
+  meeting_link: string | null;
+  meeting_reschedule_used: boolean;
+  consultation_paid_at: string | null;
 };
+
+const MEETING_TYPE_LABEL = { phone: "Phone call", google_meet: "Google Meet" } as const;
+
+const formatMeetingTime = (iso: string) =>
+  new Date(iso).toLocaleString("en-US", {
+    timeZone: "America/New_York",
+    weekday: "short", month: "short", day: "numeric",
+    hour: "numeric", minute: "2-digit",
+  }) + " ET";
 
 const STATUS_LABEL: Record<IntakeStatus, string> = {
   new: "New",
@@ -73,6 +104,11 @@ const Intakes = () => {
   const [actionLoading, setActionLoading] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [referrerNames, setReferrerNames] = useState<Record<string, string>>({});
+  const [scheduleOpen, setScheduleOpen] = useState(false);
+  const [meetingDate, setMeetingDate] = useState("");
+  const [meetingTime, setMeetingTime] = useState("");
+  const [meetingType, setMeetingType] = useState<"phone" | "google_meet">("google_meet");
+  const [meetingLink, setMeetingLink] = useState("");
 
   const load = async () => {
     setLoading(true);
@@ -147,18 +183,87 @@ const Intakes = () => {
     setConfirmDelete(false);
   };
 
-  const sendInvoice = async (intake: Intake) => {
+  const openSchedule = (intake: Intake) => {
+    const preferred = Object.values(intake.responses || {}).find((r) =>
+      r.label.toLowerCase().includes("how would you like to meet"),
+    )?.value;
+    setMeetingType(
+      intake.meeting_type ||
+        (preferred === "Google Meet" ? "google_meet" : preferred === "Phone call" ? "phone" : "google_meet"),
+    );
+    if (intake.meeting_scheduled_at) {
+      const d = new Date(intake.meeting_scheduled_at);
+      setMeetingDate(
+        `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`,
+      );
+      setMeetingTime(`${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`);
+    } else {
+      setMeetingDate("");
+      setMeetingTime("");
+    }
+    setMeetingLink(intake.meeting_link || "");
+    setScheduleOpen(true);
+  };
+
+  const gcalDraftUrl = (intake: Intake) => {
+    const base = "https://calendar.google.com/calendar/render?action=TEMPLATE";
+    const text = encodeURIComponent(`Aethyx Consultation — ${intake.full_name}`);
+    let dates = "";
+    if (meetingDate && meetingTime) {
+      const start = new Date(`${meetingDate}T${meetingTime}`);
+      const end = new Date(start.getTime() + 30 * 60 * 1000);
+      const stamp = (d: Date) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+      dates = `&dates=${stamp(start)}/${stamp(end)}`;
+    }
+    return `${base}&text=${text}${dates}&add=${encodeURIComponent(intake.email)}`;
+  };
+
+  const scheduleMeeting = async (intake: Intake) => {
+    if (!meetingDate || !meetingTime) {
+      toast({ title: "Pick a date and time", variant: "destructive" });
+      return;
+    }
+    const start = new Date(`${meetingDate}T${meetingTime}`);
+    if (isNaN(start.getTime()) || start.getTime() < Date.now()) {
+      toast({ title: "Meeting time must be in the future", variant: "destructive" });
+      return;
+    }
+    const isReschedule = !!intake.meeting_scheduled_at;
     setActionLoading(true);
-    const { data, error } = await supabase.functions.invoke("send-consultation-invoice", {
-      body: { email: intake.email, name: intake.full_name, intakeId: intake.id },
+    const { data, error } = await supabase.functions.invoke("schedule-consultation", {
+      body: {
+        intakeId: intake.id,
+        scheduledAt: start.toISOString(),
+        meetingType,
+        meetingLink: meetingType === "google_meet" ? meetingLink.trim() : "",
+        isReschedule,
+      },
     });
     setActionLoading(false);
     if (error || !data?.success) {
-      toast({ title: "Invoice failed", description: error?.message || data?.error || "Try again", variant: "destructive" });
+      toast({ title: "Scheduling failed", description: error?.message || data?.error || "Try again", variant: "destructive" });
       return;
     }
-    toast({ title: "Invoice sent", description: `$50 invoice emailed to ${intake.email}` });
-    await updateStatus(intake.id, "invoice_sent");
+    toast({
+      title: isReschedule ? "Meeting rescheduled" : "Meeting scheduled",
+      description: data.emailSent
+        ? `Confirmation${isReschedule ? "" : " + $50 invoice"} emailed to ${intake.email}`
+        : "Saved, but the email failed to send — resend from the Inbox.",
+    });
+    setScheduleOpen(false);
+    await load();
+    setSelected((s) =>
+      s && s.id === intake.id
+        ? {
+            ...s,
+            meeting_scheduled_at: start.toISOString(),
+            meeting_type: meetingType,
+            meeting_link: meetingType === "google_meet" ? meetingLink.trim() || null : null,
+            meeting_reschedule_used: s.meeting_reschedule_used || isReschedule,
+            status: s.status === "new" || s.status === "reviewing" ? "invoice_sent" : s.status,
+          }
+        : s,
+    );
   };
 
   const waiveFee = async (intake: Intake) => {
@@ -197,7 +302,7 @@ const Intakes = () => {
       <div>
         <h1 className="font-display text-3xl tracking-tight">Client Intakes</h1>
         <p className="text-sm text-black/60 mt-1">
-          Submissions from <code>/intake</code>. Review, then send a $50 invoice or waive the fee.
+          Submissions from <code>/intake</code>. Review, then schedule the consultation (sends the $50 invoice) or waive the fee.
         </p>
       </div>
 
@@ -301,6 +406,36 @@ const Intakes = () => {
                 )}
               </div>
 
+              {selected.meeting_scheduled_at && (
+                <div className="mt-4 rounded-lg border border-black/10 bg-black/[0.03] px-4 py-3 text-sm space-y-1">
+                  <div className="flex items-center gap-2 font-medium text-black">
+                    <CalendarClock className="h-4 w-4" />
+                    {formatMeetingTime(selected.meeting_scheduled_at)}
+                    <span className="text-black/50 font-normal">
+                      · {MEETING_TYPE_LABEL[selected.meeting_type || "phone"]}
+                    </span>
+                  </div>
+                  {selected.meeting_link && (
+                    <a
+                      href={selected.meeting_link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-teal-700 hover:underline"
+                    >
+                      <Video className="h-4 w-4" /> {selected.meeting_link}
+                    </a>
+                  )}
+                  <div className="text-xs text-black/50">
+                    {selected.consultation_paid_at || selected.status === "paid"
+                      ? "✓ Consultation fee paid"
+                      : selected.status === "waived"
+                        ? "Fee waived"
+                        : "Awaiting $50 payment"}
+                    {selected.meeting_reschedule_used && " · reschedule used"}
+                  </div>
+                </div>
+              )}
+
               <div className="mt-6 flex flex-wrap gap-2">
                 <Button
                   size="sm"
@@ -311,13 +446,24 @@ const Intakes = () => {
                 >
                   Mark Reviewing
                 </Button>
-                <Button
-                  size="sm"
-                  disabled={actionLoading || selected.status === "invoice_sent" || selected.status === "paid" || selected.status === "waived"}
-                  onClick={() => sendInvoice(selected)}
-                >
-                  Send $50 Invoice
-                </Button>
+                {!selected.meeting_scheduled_at ? (
+                  <Button size="sm" disabled={actionLoading} onClick={() => openSchedule(selected)}>
+                    <CalendarClock className="h-3.5 w-3.5 mr-1.5" />
+                    Schedule Meeting
+                  </Button>
+                ) : (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={actionLoading || selected.meeting_reschedule_used}
+                    onClick={() => openSchedule(selected)}
+                    className="border-black/20 text-black hover:bg-black/5"
+                    title={selected.meeting_reschedule_used ? "The one included reschedule has been used" : undefined}
+                  >
+                    <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
+                    {selected.meeting_reschedule_used ? "Reschedule Used" : "Reschedule"}
+                  </Button>
+                )}
                 <Button
                   size="sm"
                   variant="outline"
@@ -404,6 +550,108 @@ const Intakes = () => {
           )}
         </SheetContent>
       </Sheet>
+
+      <Dialog open={scheduleOpen} onOpenChange={setScheduleOpen}>
+        <DialogContent className="bg-white text-black sm:max-w-md" style={lightVars}>
+          {selected && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="font-display text-black">
+                  {selected.meeting_scheduled_at ? "Reschedule consultation" : "Schedule consultation"}
+                </DialogTitle>
+                <DialogDescription className="text-black/50">
+                  {selected.meeting_scheduled_at
+                    ? "Sends an updated confirmation email. This uses their one included reschedule."
+                    : `Sends ${selected.full_name.split(" ")[0]} a confirmation email with the meeting details${
+                        selected.status === "waived" || selected.status === "paid" ? "" : " and the $50 invoice"
+                      }.`}
+                </DialogDescription>
+              </DialogHeader>
+
+              {(() => {
+                const preferred = Object.values(selected.responses || {}).find((r) =>
+                  r.label.toLowerCase().includes("how would you like to meet"),
+                )?.value;
+                const windows = Object.values(selected.responses || {}).find((r) =>
+                  r.label.toLowerCase().includes("best days and times"),
+                )?.value;
+                return (preferred || windows) ? (
+                  <div className="rounded-md bg-black/[0.04] px-3 py-2 text-xs text-black/60 space-y-0.5">
+                    {preferred && <p>Prefers: <span className="font-medium text-black/80">{preferred}</span></p>}
+                    {windows && <p>Their availability: <span className="font-medium text-black/80">{windows}</span></p>}
+                  </div>
+                ) : null;
+              })()}
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label htmlFor="meeting_date" className="text-black">Date</Label>
+                  <Input id="meeting_date" type="date" value={meetingDate} onChange={(e) => setMeetingDate(e.target.value)} className="bg-white text-black" />
+                </div>
+                <div>
+                  <Label htmlFor="meeting_time" className="text-black">Time (your local time)</Label>
+                  <Input id="meeting_time" type="time" value={meetingTime} onChange={(e) => setMeetingTime(e.target.value)} className="bg-white text-black" />
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-black">Meeting type</Label>
+                <Select value={meetingType} onValueChange={(v) => setMeetingType(v as "phone" | "google_meet")}>
+                  <SelectTrigger className="bg-white text-black">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="google_meet">Google Meet</SelectItem>
+                    <SelectItem value="phone">Phone call</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {meetingType === "google_meet" && (
+                <div>
+                  <Label htmlFor="meeting_link" className="text-black">Google Meet link</Label>
+                  <Input
+                    id="meeting_link"
+                    type="url"
+                    placeholder="https://meet.google.com/…"
+                    value={meetingLink}
+                    onChange={(e) => setMeetingLink(e.target.value)}
+                    className="bg-white text-black"
+                  />
+                  <p className="text-xs text-black/50 mt-1.5">
+                    <a
+                      href={gcalDraftUrl(selected)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-teal-700 underline"
+                    >
+                      Open a pre-filled Google Calendar event
+                    </a>{" "}
+                    — add Meet conferencing there, save, and paste the Meet link here.
+                  </p>
+                </div>
+              )}
+
+              {selected.meeting_scheduled_at &&
+                new Date(selected.meeting_scheduled_at).getTime() - Date.now() < 4 * 60 * 60 * 1000 && (
+                  <p className="text-xs text-amber-700 bg-amber-50 rounded-md px-3 py-2">
+                    Heads up: this is inside the 4-hour reschedule window. Allowing it is your call.
+                  </p>
+                )}
+
+              <DialogFooter>
+                <Button variant="ghost" onClick={() => setScheduleOpen(false)} className="text-black">
+                  Cancel
+                </Button>
+                <Button disabled={actionLoading} onClick={() => scheduleMeeting(selected)}>
+                  {actionLoading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                  {selected.meeting_scheduled_at ? "Reschedule & Email" : "Schedule & Email"}
+                </Button>
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

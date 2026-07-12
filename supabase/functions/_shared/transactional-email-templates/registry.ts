@@ -29,6 +29,7 @@ import { template as referralPayout } from './referral-payout.tsx'
 import { template as addOnActivated } from './add-on-activated.tsx'
 import { template as bountyApproved } from './bounty-approved.tsx'
 import { template as adminCompose } from './admin-compose.tsx'
+import { template as consultationScheduled } from './consultation-scheduled.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'inquiry-notification': inquiryNotification,
@@ -49,4 +50,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'add-on-activated': addOnActivated,
   'bounty-approved': bountyApproved,
   'admin-compose': adminCompose,
+  'consultation-scheduled': consultationScheduled,
 }

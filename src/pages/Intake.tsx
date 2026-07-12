@@ -321,7 +321,7 @@ const Intake = () => {
                   )}
                 </Button>
                 <p className="text-xs text-muted-foreground mt-4">
-                  Submitting this form is free. If we're a good fit, your next step is the $50 strategy consultation.
+                  Submitting this form is free. If we're a good fit, your next step is the $50 strategy consultation — non-refundable, credited toward your project, one reschedule included with 4+ hours' notice.
                 </p>
               </div>
             </form>

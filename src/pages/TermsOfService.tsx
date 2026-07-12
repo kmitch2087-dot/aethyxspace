@@ -28,7 +28,7 @@ const TermsOfService = () => (
 
           <section>
             <h2 className="font-display text-xl text-foreground mb-3">Payments</h2>
-            <p>The $50 consultation fee is non-refundable but is credited toward the final project total. Project payments follow the terms outlined in each signed client agreement.</p>
+            <p>The $50 consultation fee is non-refundable but is credited toward the final project total. Each scheduled consultation includes one reschedule, provided Aethyx is notified at least 4 hours before the scheduled meeting time. Project payments follow the terms outlined in each signed client agreement.</p>
           </section>
 
           <section>

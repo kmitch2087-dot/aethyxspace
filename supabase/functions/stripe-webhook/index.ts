@@ -151,6 +151,13 @@ Deno.serve(async (req) => {
       case "invoice.paid":
       case "invoice.payment_succeeded": {
         const inv = event.data.object as Stripe.Invoice;
+        // Consultation-fee invoices are tied to an intake, not a client profile
+        if (inv.metadata?.type === "consultation_invoice" && inv.metadata?.intake_id) {
+          await admin
+            .from("client_intakes")
+            .update({ consultation_paid_at: new Date().toISOString(), status: "paid" })
+            .eq("id", inv.metadata.intake_id);
+        }
         const profile = await upsertInvoice(inv);
         if (profile?.email) {
           await admin.functions.invoke("send-transactional-email", {
