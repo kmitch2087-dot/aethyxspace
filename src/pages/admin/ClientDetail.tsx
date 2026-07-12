@@ -16,7 +16,7 @@ import {
   ArrowLeft, Loader2, Save, Upload, Mail, Plus, ExternalLink,
   AlertTriangle, CheckCircle2, Trash2, RefreshCcw, FileText, Bell, Pencil, XCircle,
   ChevronDown, ChevronUp, Download, ArrowUp, ArrowDown,
-  Eye, EyeOff, Clock, ListTodo, FolderInput, Sparkles, Send,
+  Eye, EyeOff, Clock, ListTodo, FolderInput, Sparkles, Send, Tag,
 } from "lucide-react";
 import { format } from "date-fns";
 import { PROJECT_TYPES, DEFAULT_PROJECT_TYPE, getProjectTypeTemplate, type ProjectTypeKey, type SlotTemplate } from "@/lib/projectTemplates";
@@ -1082,6 +1082,17 @@ const ClientDetail = () => {
   const saveAssetBgColor = async (asset: ClientAsset, color: string | null) => {
     await (supabase as any).from("client_assets").update({ bg_color: color }).eq("id", asset.id);
     setAssets((prev) => prev.map((a) => a.id === asset.id ? { ...a, bg_color: color } : a));
+  };
+
+  const saveAssetCategory = async (asset: ClientAsset, category: AssetCategory) => {
+    if (category === asset.category) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any).from("client_assets").update({ category }).eq("id", asset.id);
+    if (error) {
+      toast({ title: "Failed to update category", description: error.message, variant: "destructive" });
+      return;
+    }
+    setAssets((prev) => prev.map((a) => a.id === asset.id ? { ...a, category } : a));
   };
 
   const assignAssetToPlan = async (asset: ClientAsset) => {
@@ -2292,7 +2303,25 @@ const ClientDetail = () => {
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                              <Badge className={`${classes} hover:${classes} text-xs`}>{catLabel}</Badge>
+                              <Select value={asset.category} onValueChange={(v) => saveAssetCategory(asset, v as AssetCategory)}>
+                                <SelectTrigger
+                                  className={`h-auto w-auto gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold [&>svg]:h-3 [&>svg]:w-3 [&>svg]:opacity-50 ${classes}`}
+                                  title="Change category"
+                                >
+                                  <SelectValue>{catLabel}</SelectValue>
+                                </SelectTrigger>
+                                <SelectContent style={lightVars} className="bg-white text-black">
+                                  <SelectItem value="brand_voice">Brand Voice</SelectItem>
+                                  <SelectItem value="tagline">Tagline</SelectItem>
+                                  <SelectItem value="motto">Motto</SelectItem>
+                                  <SelectItem value="mission">Mission Statement</SelectItem>
+                                  <SelectItem value="values">Brand Values</SelectItem>
+                                  <SelectItem value="contact_info">Contact Info</SelectItem>
+                                  <SelectItem value="hours">Hours</SelectItem>
+                                  <SelectItem value="staff">Staff</SelectItem>
+                                  <SelectItem value="other">Other</SelectItem>
+                                </SelectContent>
+                              </Select>
                               <span className="font-medium text-sm">{asset.label}</span>
                               {!asset.in_use && (
                                 <Badge className="bg-gray-200 text-gray-500 border-gray-300 hover:bg-gray-200 text-xs">Not in use</Badge>
@@ -2474,6 +2503,17 @@ const ClientDetail = () => {
                           <span className="text-[10px] text-gray-400">Not in use</span>
                         )}
                       </div>
+                      <Select value={asset.category} onValueChange={(v) => saveAssetCategory(asset, v as AssetCategory)}>
+                        <SelectTrigger className="h-6 w-6 shrink-0 p-0 border-none [&>svg]:hidden" title={`Category: ${assetCategoryInfo(asset.category).label} — click to change`}>
+                          <Tag className="h-3 w-3 text-black/30 hover:text-teal-600" />
+                        </SelectTrigger>
+                        <SelectContent style={lightVars} className="bg-white text-black">
+                          <SelectItem value="logo">Logo</SelectItem>
+                          <SelectItem value="guideline">Brand Guideline</SelectItem>
+                          <SelectItem value="font">Font</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
                       {signedUrl && (
                         <a
                           href={signedUrl}
