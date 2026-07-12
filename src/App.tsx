@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import GlobalBackground from "@/components/GlobalBackground";
 import ScrollToTop from "@/components/ScrollToTop";
+import PageViewTracker from "@/components/PageViewTracker";
 import AdminRoute from "@/components/AdminRoute";
 import ClientRoute from "@/components/ClientRoute";
 import CookieConsent from "@/components/CookieConsent";
@@ -70,6 +71,7 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <ScrollToTop />
+          <PageViewTracker />
           <GlobalBackground />
           <div className="relative z-10">
           <Routes>
