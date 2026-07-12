@@ -56,6 +56,7 @@ import PortalPayments from "./pages/portal/PortalPayments";
 import PortalPay from "./pages/portal/PortalPay";
 import PortalIntake from "./pages/portal/PortalIntake";
 import PortalProjects from "./pages/portal/PortalProjects";
+import PortalAssets from "@/pages/portal/PortalAssets";
 import PortalTasks from "./pages/portal/PortalTasks";
 
 const queryClient = new QueryClient();
@@ -132,6 +133,7 @@ const App = () => (
               <Route path="add-ons" element={<PortalAddOns />} />
               <Route path="projects" element={<PortalProjects />} />
               <Route path="tasks" element={<PortalTasks />} />
+              <Route path="assets" element={<PortalAssets />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
