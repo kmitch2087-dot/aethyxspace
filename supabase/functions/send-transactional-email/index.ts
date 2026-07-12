@@ -27,11 +27,13 @@ Deno.serve(async (req) => {
   let templateName: string
   let recipientEmail: string
   let templateData: Record<string, any> = {}
+  let metadata: Record<string, any> | null = null
   try {
     const body = await req.json()
     templateName = body.templateName || body.template_name
     recipientEmail = body.recipientEmail || body.recipient_email
     if (body.templateData && typeof body.templateData === 'object') templateData = body.templateData
+    if (body.metadata && typeof body.metadata === 'object') metadata = body.metadata
   } catch {
     return new Response(JSON.stringify({ error: 'Invalid JSON' }), {
       status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -107,6 +109,7 @@ Deno.serve(async (req) => {
     recipient_email: to,
     status: res.ok ? 'sent' : 'failed',
     error_message: res.ok ? null : JSON.stringify(resBody),
+    metadata,
   })
 
   if (!res.ok) {
