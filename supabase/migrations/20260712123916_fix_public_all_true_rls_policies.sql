@@ -43,20 +43,3 @@ DROP POLICY IF EXISTS "ref_service_role" ON referrals;
 CREATE POLICY "ref_admin" ON referrals FOR ALL TO authenticated
   USING (has_role(auth.uid(), 'admin'::app_role))
   WITH CHECK (has_role(auth.uid(), 'admin'::app_role));
-
--- Two real-usage gaps discovered while verifying the above didn't break legitimate
--- client-facing flows (confirmed via direct code search of src/pages/portal/*):
-
--- PortalReferrals.tsx inserts a client's own referral_links row directly (client-side,
--- authenticated non-admin) to generate their referral code on first visit. This
--- previously worked only via the removed public "true" policy.
-CREATE POLICY "rl_client_insert" ON referral_links FOR INSERT TO authenticated
-  WITH CHECK (client_profile_id IN (SELECT id FROM client_profiles WHERE user_id = auth.uid()));
-
--- PortalReferrals.tsx reads referral_program_settings (reward amounts, commission rate,
--- eligibility notes) directly as an authenticated non-admin client to display the
--- program's terms. This table has no client_profile_id (a singleton settings row), so
--- there's no ownership predicate to scope to — every authenticated client legitimately
--- needs read access. Writes remain admin-only via rps_admin.
-CREATE POLICY "rps_authenticated_read" ON referral_program_settings FOR SELECT TO authenticated
-  USING (true);
