@@ -143,7 +143,7 @@ export default function PortalProjects() {
         </div>
       ) : (
         plans.map((plan) => {
-          const { status, expectedPct } = calcSchedule(plan);
+          const { status } = calcSchedule(plan);
           const completionPct = plan?.completion_percent ?? 0;
           const planPhases = phases.filter((p) => p.plan_id === plan.id);
           const planUpdates = updates.filter((u) => u.plan_id === plan.id);

@@ -218,7 +218,9 @@ const IMAGE_EXTS = new Set(["jpg", "jpeg", "png", "gif", "webp", "svg", "avif"])
 
 function fileExt(path: string | null): string {
   if (!path) return "";
-  return (path.split(".").pop() || "").toLowerCase();
+  const idx = path.lastIndexOf(".");
+  if (idx === -1) return "";
+  return path.slice(idx + 1).toLowerCase();
 }
 
 function formatAddonPrice(price: number, type: string): string {
@@ -769,7 +771,10 @@ const ClientDetail = () => {
     });
     setAssignSaving(false);
     if (error) {
-      toast({ title: "Failed to assign", description: error.message, variant: "destructive" });
+      const friendly = error.code === "23505"
+        ? "This client already has an active or requested add-on for that catalog item."
+        : error.message;
+      toast({ title: "Failed to assign", description: friendly, variant: "destructive" });
     } else {
       toast({ title: "Add-on assigned" });
       setAssignOpen(false);

@@ -72,7 +72,9 @@ function AdminSidebar() {
       .select("id", { count: "exact", head: true })
       .eq("status", "requested")
       .then(({ count }: { count: number | null }) => setRequestedAddOnCount(count ?? 0));
-  }, []);
+    // Re-fetch on every route change (not just on mount) so the badge reflects add-ons
+    // requested/resolved elsewhere without requiring a hard reload.
+  }, [location.pathname]);
 
   const handleSignOut = async () => {
     await signOut();
