@@ -45,6 +45,8 @@ const Footer = () => (
       <Link to="/about" className="hover:text-primary transition-colors">About</Link>
       <Link to="/blog" className="hover:text-primary transition-colors">Blog</Link>
       <Link to="/contact" className="hover:text-primary transition-colors">Contact</Link>
+      <Link to="/bounty" className="hover:text-primary transition-colors">Bounty Program</Link>
+      <Link to="/advertise" className="hover:text-primary transition-colors">Advertise</Link>
     </nav>
 
     <div className="mt-6 text-center">
