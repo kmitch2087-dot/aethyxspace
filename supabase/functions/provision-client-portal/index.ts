@@ -64,11 +64,15 @@ Deno.serve(async (req) => {
       await admin.from("client_intakes").update({ client_profile_id: profileId, linked_user_id: authUserId }).is("client_profile_id", null).ilike("email", cleanEmail);
     }
 
-    // Generate password recovery link via Supabase
+    // Generate password recovery link via Supabase. Redirects to /reset-password (not
+    // straight to /portal) so the client actually gets prompted to set a real password —
+    // previously this landed them on /portal directly with no way to ever learn or change
+    // the random temp password createUser() assigned, meaning the very first login (via
+    // this recovery link's auto-established session) was also their only reliable one.
     const { data: linkData, error: linkErr } = await admin.auth.admin.generateLink({
       type: "recovery",
       email: cleanEmail,
-      options: { redirectTo: `${origin}/portal` },
+      options: { redirectTo: `${origin}/reset-password` },
     });
     if (linkErr) throw linkErr;
     const actionLink = linkData.properties?.action_link;

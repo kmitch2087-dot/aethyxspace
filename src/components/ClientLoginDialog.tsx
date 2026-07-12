@@ -71,6 +71,23 @@ const ClientLoginDialog = ({ open, onClose }: ClientLoginDialogProps) => {
     navigate(isAdmin ? "/admin" : "/portal");
   };
 
+  const handleForgotPassword = async () => {
+    if (!loginEmail.trim()) {
+      toast({ title: "Enter your email first", description: "Type your email above, then click \"Forgot password?\" again.", variant: "destructive" });
+      return;
+    }
+    setLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(loginEmail.trim(), {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setLoading(false);
+    if (error) {
+      toast({ title: "Couldn't send reset email", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({ title: "Check your email", description: "We sent a password reset link to " + loginEmail.trim() });
+  };
+
   const handleGoogle = async () => {
     setLoading(true);
     const { error } = await supabase.auth.signInWithOAuth({
@@ -159,6 +176,14 @@ const ClientLoginDialog = ({ open, onClose }: ClientLoginDialogProps) => {
                 <Label>Password</Label>
                 <Input type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} required />
               </div>
+              <button
+                type="button"
+                onClick={handleForgotPassword}
+                disabled={loading}
+                className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2"
+              >
+                Forgot password?
+              </button>
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Log In"}
               </Button>
