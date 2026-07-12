@@ -18,7 +18,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { Upload, Download, Trash2, FileText, Search, MoreHorizontal, Share2, Mail, Clock, Users } from "lucide-react";
+import { Upload, Download, Trash2, FileText, Search, MoreHorizontal, Share2, Mail, Clock, Users, Sparkles } from "lucide-react";
 
 interface Doc {
   id: string;
@@ -79,7 +79,7 @@ const Documents = () => {
 
   // Action dialogs
   const [actionDoc, setActionDoc] = useState<Doc | null>(null);
-  const [actionMode, setActionMode] = useState<"share" | "email" | "schedule" | null>(null);
+  const [actionMode, setActionMode] = useState<"share" | "email" | "schedule" | "extract" | null>(null);
   const [actionClientIds, setActionClientIds] = useState<string[]>([]);
   const [actionMessage, setActionMessage] = useState("");
   const [actionSubject, setActionSubject] = useState("");
@@ -158,7 +158,7 @@ const Documents = () => {
     fetchAll();
   };
 
-  const openAction = (doc: Doc, mode: "share" | "email" | "schedule") => {
+  const openAction = (doc: Doc, mode: "share" | "email" | "schedule" | "extract") => {
     setActionDoc(doc);
     setActionMode(mode);
     setActionClientIds([]);
@@ -173,7 +173,26 @@ const Documents = () => {
     if (!actionDoc || !actionMode) return;
     setActionBusy(true);
     try {
-      if (actionMode === "share" || actionMode === "email") {
+      if (actionMode === "extract") {
+        if (actionClientIds.length !== 1) {
+          toast({ title: "Select exactly one client", variant: "destructive" });
+          setActionBusy(false); return;
+        }
+        const { data, error } = await supabase.functions.invoke("extract-document-assets", {
+          body: {
+            clientProfileId: actionClientIds[0],
+            sourceDocumentId: actionDoc.id,
+            sourceDocumentType: "admin_documents",
+            planId: null,
+          },
+        });
+        if (error || !data?.ok) throw new Error(data?.error || error?.message || "Extraction failed");
+        if (data.textCount === 0 && data.geminiError) {
+          toast({ title: "Extraction found nothing", description: data.geminiError });
+        } else {
+          toast({ title: "Extraction complete", description: `Found ${data.textCount} item(s) for review on that client's profile.` });
+        }
+      } else if (actionMode === "share" || actionMode === "email") {
         if (actionClientIds.length === 0) {
           toast({ title: "Select at least one client", variant: "destructive" });
           setActionBusy(false); return;
@@ -366,6 +385,9 @@ const Documents = () => {
                                   <DropdownMenuItem onClick={() => openAction(doc, "share")}><Share2 className="h-4 w-4 mr-2" />Share with client(s)</DropdownMenuItem>
                                   <DropdownMenuItem onClick={() => openAction(doc, "email")}><Mail className="h-4 w-4 mr-2" />Email now</DropdownMenuItem>
                                   <DropdownMenuItem onClick={() => openAction(doc, "schedule")}><Clock className="h-4 w-4 mr-2" />Schedule send</DropdownMenuItem>
+                                  {doc.file_name.toLowerCase().endsWith(".pdf") && (
+                                    <DropdownMenuItem onClick={() => openAction(doc, "extract")}><Sparkles className="h-4 w-4 mr-2" />Extract info</DropdownMenuItem>
+                                  )}
                                   <DropdownMenuSeparator />
                                   <DropdownMenuItem onClick={() => handleDelete(doc)} className="text-destructive"><Trash2 className="h-4 w-4 mr-2" />Delete</DropdownMenuItem>
                                 </DropdownMenuContent>
@@ -468,6 +490,7 @@ const Documents = () => {
               {actionMode === "share" && "Share with clients"}
               {actionMode === "email" && "Email to clients"}
               {actionMode === "schedule" && "Schedule document send"}
+              {actionMode === "extract" && "Extract info — choose a client"}
             </DialogTitle>
           </DialogHeader>
           {actionDoc && (
@@ -533,14 +556,24 @@ const Documents = () => {
                 </>
               )}
 
-              {(actionMode === "share" || actionMode === "email" || (actionMode === "schedule" && schedTargetType === "specific")) && (
+              {(actionMode === "share" || actionMode === "email" || actionMode === "extract" || (actionMode === "schedule" && schedTargetType === "specific")) && (
                 <div className="space-y-2">
-                  <Label>Clients</Label>
+                  <Label>{actionMode === "extract" ? "Client (pick one)" : "Clients"}</Label>
                   <div className="border rounded p-2 max-h-40 overflow-y-auto space-y-1">
                     {clients.map((c) => (
                       <label key={c.id} className="flex items-center gap-2 text-sm">
-                        <input type="checkbox" checked={actionClientIds.includes(c.id)}
-                          onChange={(e) => setActionClientIds((ids) => e.target.checked ? [...ids, c.id] : ids.filter((i) => i !== c.id))} />
+                        <input
+                          type={actionMode === "extract" ? "radio" : "checkbox"}
+                          name={actionMode === "extract" ? "extract-client" : undefined}
+                          checked={actionClientIds.includes(c.id)}
+                          onChange={(e) => {
+                            if (actionMode === "extract") {
+                              setActionClientIds(e.target.checked ? [c.id] : []);
+                            } else {
+                              setActionClientIds((ids) => e.target.checked ? [...ids, c.id] : ids.filter((i) => i !== c.id));
+                            }
+                          }}
+                        />
                         {c.full_name} <span className="text-black/40">({c.email || "no email"})</span>
                       </label>
                     ))}
