@@ -145,6 +145,7 @@ interface ClientAsset {
   created_at: string;
   bg_color?: string | null;
   plan_id: string | null;
+  in_use: boolean;
 }
 
 interface ProjectPlan {
@@ -160,6 +161,7 @@ interface ProjectPlan {
   project_type: string;
   created_at: string;
   updated_at: string;
+  drive_folder_url?: string | null;
 }
 
 interface ProjectPhase {
@@ -2048,6 +2050,16 @@ const ClientDetail = () => {
             </p>
           ) : (
             <>
+              {plan.drive_folder_url && (
+                <div className="flex items-center gap-2 text-sm bg-teal-50 border border-teal-200 rounded-lg px-3 py-2">
+                  <ExternalLink className="h-4 w-4 text-teal-700 shrink-0" />
+                  <span className="text-teal-800">Client-shared Drive folder for {plan.project_name}:</span>
+                  <a href={plan.drive_folder_url} target="_blank" rel="noreferrer" className="text-teal-700 font-medium hover:underline truncate">
+                    {plan.drive_folder_url}
+                  </a>
+                </div>
+              )}
+
               {unassignedAssets.length > 0 && (
                 <div className="border border-amber-300 bg-amber-50 rounded-xl p-4">
                   <h3 className="font-display text-sm tracking-wider text-amber-800 mb-3">
@@ -2210,13 +2222,16 @@ const ClientDetail = () => {
                 {textAssets.map((asset) => {
                   const { classes, label: catLabel } = assetCategoryInfo(asset.category);
                   return (
-                    <Card key={asset.id}>
+                    <Card key={asset.id} className={asset.in_use ? "" : "opacity-50"}>
                       <CardContent className="pt-4 group">
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                               <Badge className={`${classes} hover:${classes} text-xs`}>{catLabel}</Badge>
                               <span className="font-medium text-sm">{asset.label}</span>
+                              {!asset.in_use && (
+                                <Badge className="bg-gray-200 text-gray-500 border-gray-300 hover:bg-gray-200 text-xs">Not in use</Badge>
+                              )}
                             </div>
                             <p className="text-sm text-black/80 whitespace-pre-wrap">{asset.content}</p>
                           </div>
@@ -2302,7 +2317,7 @@ const ClientDetail = () => {
                 const thumbBg = storedBg ? storedBg.cls : autoBg;
                 const isEditing = editingLabelId === asset.id;
                 return (
-                  <div key={`${keyPrefix}-${asset.id}`} className="group relative rounded-lg border border-black/10 bg-white overflow-hidden flex flex-col">
+                  <div key={`${keyPrefix}-${asset.id}`} className={`group relative rounded-lg border border-black/10 bg-white overflow-hidden flex flex-col ${asset.in_use ? "" : "opacity-50"}`}>
                     <div className={`relative aspect-square ${thumbBg} flex items-center justify-center overflow-hidden`}>
                       {isImage && signedUrl ? (
                         <img src={signedUrl} alt={asset.label} className="w-full h-full object-contain p-1" />
@@ -2363,6 +2378,9 @@ const ClientDetail = () => {
                           >
                             {asset.label}
                           </p>
+                        )}
+                        {!asset.in_use && (
+                          <span className="text-[10px] text-gray-400">Not in use</span>
                         )}
                       </div>
                       {signedUrl && (
