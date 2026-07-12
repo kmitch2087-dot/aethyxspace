@@ -646,6 +646,33 @@ const ClientDetail = () => {
     else toast({ title: "Portal invite sent" });
   };
 
+  const [composeOpen, setComposeOpen] = useState(false);
+  const [composeSubject, setComposeSubject] = useState("");
+  const [composeMessage, setComposeMessage] = useState("");
+  const [composeSending, setComposeSending] = useState(false);
+
+  const sendComposeEmail = async () => {
+    if (!profile?.email || !composeSubject.trim() || !composeMessage.trim()) return;
+    setComposeSending(true);
+    const { data, error } = await supabase.functions.invoke("send-transactional-email", {
+      body: {
+        templateName: "admin-compose",
+        recipientEmail: profile.email,
+        templateData: { firstName: profile.first_name || "", subject: composeSubject.trim(), message: composeMessage.trim() },
+        metadata: { batch_id: crypto.randomUUID() },
+      },
+    });
+    setComposeSending(false);
+    if (error || data?.success === false) {
+      toast({ title: "Send failed", description: error?.message || "Could not send email", variant: "destructive" });
+      return;
+    }
+    toast({ title: "Email sent" });
+    setComposeOpen(false);
+    setComposeSubject("");
+    setComposeMessage("");
+  };
+
   const handleUploadDoc = async () => {
     if (!profile || !docFile || !docTitle.trim()) return;
     setUploading(true);
@@ -1649,6 +1676,11 @@ const ClientDetail = () => {
           {profile.email && (
             <Button variant="outline" size="sm" onClick={handleResendInvite}>
               <Mail className="h-4 w-4 mr-2" /> Resend invite
+            </Button>
+          )}
+          {profile.email && (
+            <Button variant="outline" size="sm" onClick={() => setComposeOpen(true)}>
+              <Send className="h-4 w-4 mr-2" /> Compose email
             </Button>
           )}
           <Button size="sm" onClick={saveProfile} disabled={saving}>
@@ -3840,6 +3872,30 @@ const ClientDetail = () => {
             >
               {fileAssetUploading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Upload className="h-4 w-4 mr-2" />}
               {batchFiles.length > 0 ? `Upload ${batchFiles.length} files` : "Upload"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={composeOpen} onOpenChange={setComposeOpen}>
+        <DialogContent className="sm:max-w-lg" style={lightVars}>
+          <DialogHeader><DialogTitle>Compose email to {profile.full_name}</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label>Subject</Label>
+              <Input value={composeSubject} onChange={(e) => setComposeSubject(e.target.value)} />
+            </div>
+            <div>
+              <Label>Message</Label>
+              <Textarea rows={6} value={composeMessage} onChange={(e) => setComposeMessage(e.target.value)} />
+            </div>
+            <Button
+              onClick={sendComposeEmail}
+              disabled={composeSending || !composeSubject.trim() || !composeMessage.trim()}
+              className="w-full"
+            >
+              {composeSending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Send className="h-4 w-4 mr-2" />}
+              Send
             </Button>
           </div>
         </DialogContent>
