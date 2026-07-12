@@ -1096,6 +1096,20 @@ const ClientDetail = () => {
     fetchAll();
   };
 
+  // Reassign an already-plan-scoped asset to a DIFFERENT plan (multi-plan clients only —
+  // assignAssetToPlan above only ever moves an unassigned asset into the current plan).
+  const moveAssetToPlan = async (asset: ClientAsset, targetPlanId: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any).from("client_assets").update({ plan_id: targetPlanId }).eq("id", asset.id);
+    if (error) {
+      toast({ title: "Failed to move", description: error.message, variant: "destructive" });
+      return;
+    }
+    const targetPlan = allPlans.find((p) => p.id === targetPlanId);
+    toast({ title: `Moved to ${targetPlan?.project_name ?? "project"}` });
+    fetchAll();
+  };
+
   // Plan handlers
   const createPlan = async () => {
     if (!profile) return;
@@ -2286,13 +2300,27 @@ const ClientDetail = () => {
                             </div>
                             <p className="text-sm text-black/80 whitespace-pre-wrap">{asset.content}</p>
                           </div>
-                          <button
-                            className="p-1 rounded hover:bg-red-50 text-black/30 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5"
-                            onClick={() => deleteAsset(asset)}
-                            title="Delete"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </button>
+                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5">
+                            {allPlans.length > 1 && (
+                              <Select value="" onValueChange={(v) => moveAssetToPlan(asset, v)}>
+                                <SelectTrigger className="h-6 w-6 p-0 border-none [&>svg]:hidden" title="Move to a different project">
+                                  <FolderInput className="h-3.5 w-3.5 text-black/30 hover:text-teal-600" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {allPlans.filter((p) => p.id !== asset.plan_id).map((p) => (
+                                    <SelectItem key={p.id} value={p.id}>Move to {p.project_name}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            )}
+                            <button
+                              className="p-1 rounded hover:bg-red-50 text-black/30 hover:text-red-500"
+                              onClick={() => deleteAsset(asset)}
+                              title="Delete"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
@@ -2385,6 +2413,18 @@ const ClientDetail = () => {
                               title="Download">
                               <Download className="h-3.5 w-3.5" />
                             </a>
+                          )}
+                          {allPlans.length > 1 && (
+                            <Select value="" onValueChange={(v) => moveAssetToPlan(asset, v)}>
+                              <SelectTrigger className="h-7 w-7 p-0 rounded-full bg-white/90 border-none justify-center [&>svg]:hidden" title="Move to a different project">
+                                <FolderInput className="h-3.5 w-3.5 text-black/70 hover:text-teal-600" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {allPlans.filter((p) => p.id !== asset.plan_id).map((p) => (
+                                  <SelectItem key={p.id} value={p.id}>Move to {p.project_name}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           )}
                           <button
                             className="p-1.5 rounded-full bg-white/90 text-black/70 hover:text-red-500 transition-colors"
