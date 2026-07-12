@@ -337,7 +337,23 @@ const Inbox = () => {
           <DialogHeader><DialogTitle>Compose email</DialogTitle></DialogHeader>
           <div className="space-y-3">
             <div>
-              <Label>Recipients</Label>
+              <div className="flex items-center justify-between">
+                <Label>Recipients</Label>
+                <label className="flex items-center gap-1.5 text-xs text-muted-foreground cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={
+                      composeClients.some((c) => c.email) &&
+                      composeClients.filter((c) => c.email).every((c) => composeSelectedIds.includes(c.id))
+                    }
+                    onChange={(e) => {
+                      const emailableIds = composeClients.filter((c) => c.email).map((c) => c.id);
+                      setComposeSelectedIds(e.target.checked ? emailableIds : []);
+                    }}
+                  />
+                  Select all
+                </label>
+              </div>
               <div className="border rounded p-2 max-h-40 overflow-y-auto space-y-1 mt-1">
                 {composeClients.map((c) => (
                   <label key={c.id} className="flex items-center gap-2 text-sm">
