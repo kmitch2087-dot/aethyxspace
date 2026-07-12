@@ -75,7 +75,7 @@ interface Invoice {
   review_reason: string | null;
 }
 
-interface DocRow { id: string; title: string; file_url: string; created_at: string; parent_admin_doc_id: string | null; }
+interface DocRow { id: string; title: string; file_url: string | null; created_at: string; parent_admin_doc_id: string | null; linked_invoice_id: string | null; }
 interface AgreementRow { id: string; service_name: string | null; status: string; amount: number | null; agreement_url: string | null; created_at: string; }
 interface IntakeRow {
   id: string;
@@ -214,7 +214,8 @@ function getNonAgreementSlotKeys(plan: ProjectPlan | null): string[] {
 
 const IMAGE_EXTS = new Set(["jpg", "jpeg", "png", "gif", "webp", "svg", "avif"]);
 
-function fileExt(path: string): string {
+function fileExt(path: string | null): string {
+  if (!path) return "";
   return (path.split(".").pop() || "").toLowerCase();
 }
 
@@ -400,15 +401,16 @@ const ClientDetail = () => {
 
   const fetchSignedUrls = async (rows: DocRow[]) => {
     if (!rows.length) { setDocUrls({}); return; }
-    const clientBucketRows = rows.filter((d) => !d.parent_admin_doc_id);
-    const adminBucketRows = rows.filter((d) => d.parent_admin_doc_id);
+    // Invoice-linked entries (Task 4) are pointer-only rows with no file_url — skip them here.
+    const clientBucketRows = rows.filter((d) => d.file_url && !d.parent_admin_doc_id);
+    const adminBucketRows = rows.filter((d) => d.file_url && d.parent_admin_doc_id);
     const map: Record<string, string> = {};
     const [clientSigned, adminSigned] = await Promise.all([
       clientBucketRows.length
-        ? supabase.storage.from("client-documents").createSignedUrls(clientBucketRows.map((d) => d.file_url), 3600)
+        ? supabase.storage.from("client-documents").createSignedUrls(clientBucketRows.map((d) => d.file_url as string), 3600)
         : Promise.resolve({ data: [] as { path: string | null; signedUrl: string }[] }),
       adminBucketRows.length
-        ? supabase.storage.from("admin-documents").createSignedUrls(adminBucketRows.map((d) => d.file_url), 3600)
+        ? supabase.storage.from("admin-documents").createSignedUrls(adminBucketRows.map((d) => d.file_url as string), 3600)
         : Promise.resolve({ data: [] as { path: string | null; signedUrl: string }[] }),
     ]);
     (clientSigned.data || []).forEach((item) => {
@@ -1807,6 +1809,7 @@ const ClientDetail = () => {
                           <p className="font-medium text-sm text-black truncate">{d.title}</p>
                         )}
                         <p className="text-xs text-black/50 mt-0.5">{format(new Date(d.created_at), "MMM d, yyyy")}</p>
+                        {d.linked_invoice_id && <Badge variant="outline" className="text-xs mt-1">Invoice</Badge>}
                       </div>
                     </button>
                     <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">

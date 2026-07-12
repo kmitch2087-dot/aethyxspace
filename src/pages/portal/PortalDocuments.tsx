@@ -31,6 +31,7 @@ const PortalDocuments = () => {
   const { user } = useAuth();
   const { profile: resolvedProfile, loading: profileLoading, isViewingAsAdmin } = usePortalClientProfile();
   const [documents, setDocuments] = useState<any[]>([]);
+  const [linkedInvoices, setLinkedInvoices] = useState<Record<string, any>>({});
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
@@ -91,7 +92,20 @@ const PortalDocuments = () => {
       .select("*")
       .or(filter)
       .order("created_at", { ascending: false });
-    setDocuments(data || []);
+    const docRows = data || [];
+    setDocuments(docRows);
+
+    // Invoice-linked entries need their invoice's amount/status for the inline pay prompt.
+    const invoiceIds = docRows.filter((d: any) => d.linked_invoice_id).map((d: any) => d.linked_invoice_id);
+    if (invoiceIds.length) {
+      const { data: invData } = await supabase
+        .from("client_invoices")
+        .select("id, amount_due, status")
+        .in("id", invoiceIds);
+      const map: Record<string, any> = {};
+      (invData || []).forEach((i) => { map[i.id] = i; });
+      setLinkedInvoices(map);
+    }
     setLoading(false);
 
     if (profileId && !isViewingAsAdmin) {
@@ -349,24 +363,48 @@ const PortalDocuments = () => {
         <p className="text-muted-foreground text-sm">No documents have been shared with you yet.</p>
       ) : (
         <div className="space-y-3">
-          {documents.map((doc) => (
-            <div key={doc.id} className="flex items-center gap-3 p-4 rounded-lg border border-border/30 bg-card hover:border-primary/30 transition-colors">
-              <FileText className="h-5 w-5 text-primary shrink-0" />
-              <button onClick={() => handleView(doc)} className="flex-1 min-w-0 text-left">
-                <p className="text-sm font-medium truncate">{doc.title}</p>
-                <p className="text-xs text-muted-foreground">
-                  {format(new Date(doc.created_at), "MMM d, yyyy")} • Uploaded by {doc.uploaded_by}
-                </p>
-                {doc.note && <p className="text-xs text-muted-foreground italic mt-1 line-clamp-2">"{doc.note}"</p>}
-              </button>
-              <Button variant="ghost" size="sm" onClick={() => openThread(doc)} title="Message about this document">
-                <MessageSquare className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="sm" onClick={() => handleDownload(doc)} disabled={downloadingId === doc.id}>
-                {downloadingId === doc.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-              </Button>
-            </div>
-          ))}
+          {documents.map((doc) => {
+            if (doc.linked_invoice_id) {
+              const inv = linkedInvoices[doc.linked_invoice_id];
+              const isPaid = inv?.status === "paid";
+              return (
+                <div key={doc.id} className="flex items-center gap-3 p-4 rounded-lg border border-border/30 bg-card">
+                  <FileText className="h-5 w-5 text-primary shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{doc.title}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {inv ? `$${Number(inv.amount_due).toFixed(2)}` : ""} · {format(new Date(doc.created_at), "MMM d, yyyy")}
+                    </p>
+                  </div>
+                  {isPaid ? (
+                    <span className="text-xs text-emerald-500 font-medium px-2">Paid</span>
+                  ) : (
+                    <Button size="sm" asChild>
+                      <a href={`/portal/pay/${doc.linked_invoice_id}`}>Pay Now</a>
+                    </Button>
+                  )}
+                </div>
+              );
+            }
+            return (
+              <div key={doc.id} className="flex items-center gap-3 p-4 rounded-lg border border-border/30 bg-card hover:border-primary/30 transition-colors">
+                <FileText className="h-5 w-5 text-primary shrink-0" />
+                <button onClick={() => handleView(doc)} className="flex-1 min-w-0 text-left">
+                  <p className="text-sm font-medium truncate">{doc.title}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {format(new Date(doc.created_at), "MMM d, yyyy")} • Uploaded by {doc.uploaded_by}
+                  </p>
+                  {doc.note && <p className="text-xs text-muted-foreground italic mt-1 line-clamp-2">"{doc.note}"</p>}
+                </button>
+                <Button variant="ghost" size="sm" onClick={() => openThread(doc)} title="Message about this document">
+                  <MessageSquare className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => handleDownload(doc)} disabled={downloadingId === doc.id}>
+                  {downloadingId === doc.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+                </Button>
+              </div>
+            );
+          })}
         </div>
       )}
 
