@@ -1,6 +1,8 @@
 # SPA fallbacks for dynamic route trees only. All static public routes are
 # prerendered to real files by scripts/prerender-heads.mjs; anything else
 # falls through to 404.html with a genuine 404 status.
-/admin/* /index.html 200
-/portal/* /index.html 200
-/blog/* /index.html 200
+# Note: the rewrite target must be `/` — `/index.html` is rejected by Pages'
+# infinite-loop detection and the whole rule gets ignored.
+/admin/* / 200
+/portal/* / 200
+/blog/* / 200
