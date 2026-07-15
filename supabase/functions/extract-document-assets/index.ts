@@ -1,7 +1,8 @@
 // supabase/functions/extract-document-assets/index.ts
-// Admin-only: extract structured business info from an uploaded PDF (client_documents
-// or admin_documents), staging results as pending client_asset_scrape_items for review —
-// mirrors scrape-client-assets' review-queue pattern, source is a document, not a URL.
+// Admin-only: extract structured business info from an uploaded PDF (client_documents,
+// admin_documents, or client_document_slots), staging results as pending
+// client_asset_scrape_items for review — mirrors scrape-client-assets' review-queue
+// pattern, source is a document, not a URL.
 import { createClient } from "npm:@supabase/supabase-js@2.49.4";
 import { getCors } from "../_shared/admin-cors.ts";
 
@@ -58,8 +59,8 @@ Deno.serve(async (req: Request) => {
     if (!clientProfileId || !sourceDocumentId) {
       return json({ error: "clientProfileId and sourceDocumentId required" }, 400, cors);
     }
-    if (sourceDocumentType !== "client_documents" && sourceDocumentType !== "admin_documents") {
-      return json({ error: "sourceDocumentType must be client_documents or admin_documents" }, 400, cors);
+    if (!["client_documents", "admin_documents", "client_document_slots"].includes(sourceDocumentType)) {
+      return json({ error: "sourceDocumentType must be client_documents, admin_documents, or client_document_slots" }, 400, cors);
     }
 
     // Resolve the document's storage path + a human-readable label from the right table.
@@ -85,6 +86,14 @@ Deno.serve(async (req: Request) => {
         if (idx !== -1) storagePath = storagePath.substring(idx + marker.length);
       }
       docLabel = doc.title || docLabel;
+    } else if (sourceDocumentType === "client_document_slots") {
+      // Project document slots (plan/agreement/audit uploads) live in client-slot-docs
+      // with a clean relative storage_path.
+      bucket = "client-slot-docs";
+      const { data: doc } = await admin.from("client_document_slots").select("storage_path, file_name").eq("id", sourceDocumentId).maybeSingle();
+      if (!doc) return json({ error: "Document not found" }, 404, cors);
+      storagePath = doc.storage_path;
+      docLabel = doc.file_name || docLabel;
     } else {
       bucket = "admin-documents";
       const { data: doc } = await admin.from("admin_documents").select("title, file_path").eq("id", sourceDocumentId).maybeSingle();
@@ -115,7 +124,13 @@ Deno.serve(async (req: Request) => {
 
     try {
       const { data: fileBlob, error: dlErr } = await admin.storage.from(bucket).download(storagePath);
-      if (dlErr || !fileBlob) throw new Error(`Could not download document: ${dlErr?.message || "unknown error"}`);
+      if (dlErr || !fileBlob) {
+        // StorageError.message is often an unhelpful "{}" — log and surface the full
+        // error plus the exact bucket/path so failures are actually diagnosable.
+        console.error("[extract-document-assets] download failed", { bucket, storagePath, dlErr });
+        const detail = dlErr ? `${dlErr.message || ""} ${JSON.stringify(dlErr)}`.trim() : "unknown error";
+        throw new Error(`Could not download ${bucket}/${storagePath}: ${detail}`);
+      }
       if (fileBlob.size > MAX_FILE_BYTES) {
         throw new Error(`File too large (${(fileBlob.size / 1024 / 1024).toFixed(1)}MB, max 15MB)`);
       }

@@ -1069,6 +1069,20 @@ const ClientDetail = () => {
 
   const [extractingDocId, setExtractingDocId] = useState<string | null>(null);
 
+  // functions.invoke buries the response body of a non-2xx reply in error.context —
+  // error.message is just "Edge Function returned a non-2xx status code". Dig out the
+  // function's actual { error } so failure toasts say what went wrong.
+  const edgeErrorMessage = async (error: unknown): Promise<string | undefined> => {
+    const ctx = (error as { context?: Response } | null)?.context;
+    if (ctx && typeof ctx.clone === "function") {
+      try {
+        const body = await ctx.clone().json();
+        if (body?.error) return String(body.error);
+      } catch { /* fall through to generic message */ }
+    }
+    return (error as { message?: string } | null)?.message;
+  };
+
   const extractDocumentInfo = async (doc: DocRow) => {
     if (!profile) return;
     setExtractingDocId(doc.id);
@@ -1082,7 +1096,33 @@ const ClientDetail = () => {
     });
     setExtractingDocId(null);
     if (error || !data?.ok) {
-      toast({ title: "Extraction failed", description: data?.error || error?.message, variant: "destructive" });
+      toast({ title: "Extraction failed", description: data?.error || await edgeErrorMessage(error), variant: "destructive" });
+      return;
+    }
+    if (data.textCount === 0 && data.geminiError) {
+      toast({ title: "Extraction found nothing", description: data.geminiError });
+    } else {
+      toast({ title: "Extraction complete", description: `Found ${data.textCount} item(s) for review.` });
+    }
+    fetchPendingScrapeItems();
+  };
+
+  const [extractingSlotId, setExtractingSlotId] = useState<string | null>(null);
+
+  const extractSlotInfo = async (slot: DocumentSlot) => {
+    if (!profile) return;
+    setExtractingSlotId(slot.id);
+    const { data, error } = await supabase.functions.invoke("extract-document-assets", {
+      body: {
+        clientProfileId: profile.id,
+        sourceDocumentId: slot.id,
+        sourceDocumentType: "client_document_slots",
+        planId: plan?.id ?? null,
+      },
+    });
+    setExtractingSlotId(null);
+    if (error || !data?.ok) {
+      toast({ title: "Extraction failed", description: data?.error || await edgeErrorMessage(error), variant: "destructive" });
       return;
     }
     if (data.textCount === 0 && data.geminiError) {
@@ -1822,6 +1862,46 @@ const ClientDetail = () => {
 
                     <div className="flex gap-2 ml-auto flex-wrap items-center">
                       {isUploading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+
+                      {/* AI extraction works on any uploaded PDF slot doc */}
+                      {slot?.storage_path && fileExt(slot.storage_path) === "pdf" && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 text-xs"
+                          disabled={extractingSlotId === slot.id}
+                          onClick={() => extractSlotInfo(slot)}
+                        >
+                          {extractingSlotId === slot.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+                          <span className="ml-1">Extract with AI</span>
+                        </Button>
+                      )}
+
+                      {/* Make this uploaded PDF the signable agreement document (replaces
+                          the built-in agreement text in the client's Agreements tab) */}
+                      {slot?.storage_path && fileExt(slot.storage_path) === "pdf" && agreementRecord && !agreementRecord.is_locked && (
+                        agreementRecord.document_path === slot.storage_path ? (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-700 border border-teal-200">Agreement Doc ✓</span>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 text-xs"
+                            onClick={async () => {
+                              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                              const { error } = await (supabase as any)
+                                .from("client_agreement_records")
+                                .update({ document_path: slot.storage_path })
+                                .eq("id", agreementRecord.id);
+                              if (error) { toast({ title: "Failed to attach", description: error.message, variant: "destructive" }); return; }
+                              setAgreementRecord((prev: typeof agreementRecord) => prev ? { ...prev, document_path: slot.storage_path } : prev);
+                              toast({ title: "Set as agreement document", description: "The client's Agreements tab now shows this PDF for signing." });
+                            }}
+                          >
+                            Use as Agreement
+                          </Button>
+                        )
+                      )}
 
                       {/* Non-agreement slot controls */}
                       {!isAgreement && status === 'pending' && !isUploading && (

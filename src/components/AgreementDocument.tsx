@@ -41,6 +41,10 @@ interface AgreementRecord {
   down_payment_status: string
   sent_at?: string | null
   unlock_count?: number
+  /** When set, this uploaded PDF (path in client-slot-docs) IS the agreement — it renders
+   * in place of the built-in sections, with the signature page kept at the end. */
+  document_path?: string | null
+  down_payment_invoice_id?: string | null
 }
 
 interface AgreementDocumentProps {
@@ -170,6 +174,29 @@ export default function AgreementDocument({
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Custom-document mode: the uploaded PDF replaces the built-in sections.
+  const isDocumentAgreement = !!record.document_path
+  const [docUrl, setDocUrl] = useState<string | null>(null)
+  const [docUrlLoading, setDocUrlLoading] = useState(isDocumentAgreement)
+  useEffect(() => {
+    if (!record.document_path) return
+    let cancelled = false
+    setDocUrlLoading(true)
+    supabase.storage
+      .from("client-slot-docs")
+      .createSignedUrl(record.document_path, 60 * 60 * 24)
+      .then(({ data, error }) => {
+        if (cancelled) return
+        setDocUrlLoading(false)
+        if (error || !data) {
+          toast({ title: "Could not load agreement document", description: error?.message, variant: "destructive" })
+          return
+        }
+        setDocUrl(data.signedUrl)
+      })
+    return () => { cancelled = true }
+  }, [record.document_path, toast])
 
   const collectAdminFields = useCallback((): Partial<AgreementRecord> => ({
     project_scope: projectScope,
@@ -406,6 +433,23 @@ export default function AgreementDocument({
 
         <hr className="border-gray-300 mb-8" />
 
+        {/* CUSTOM DOCUMENT MODE — the uploaded PDF is the agreement body; everything
+            below it is just the signature page. */}
+        {isDocumentAgreement && (
+          <div className={sectionClass}>
+            <DocumentViewer
+              url={docUrl}
+              fileName={record.document_path ?? ""}
+              loading={docUrlLoading}
+            />
+            <p className={bodyText + " mt-4"}>
+              Please review the full agreement above, then complete and sign below.
+            </p>
+          </div>
+        )}
+
+        {!isDocumentAgreement && (
+        <>
         {/* PARTIES */}
         <div className={sectionClass}>
           <p className={bodyText + " mb-4"}>
@@ -711,10 +755,12 @@ export default function AgreementDocument({
             through good-faith negotiation between the parties.
           </p>
         </div>
+        </>
+        )}
 
         {/* SECTION 12 — SIGNATURES */}
         <div className={sectionClass}>
-          <h2 className={sectionTitle}>12. Agreement &amp; Signatures</h2>
+          <h2 className={sectionTitle}>{isDocumentAgreement ? "Agreement & Signatures" : "12. Agreement & Signatures"}</h2>
           <p className={bodyText + " mb-6"}>
             By signing below, both parties confirm they have read, understood, and agree to all
             terms outlined in this Service Agreement.
