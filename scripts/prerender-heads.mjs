@@ -14,59 +14,69 @@ const DIST = "dist";
 const ROUTES = [
   {
     path: "/",
+    og: "home",
     title: "Aethyx — Premium Web Design & Branding | Rhode Island",
     description:
       "Premium web design, brand identity, and SEO architecture for ambitious businesses. Founder-led studio in Rhode Island, serving the USA. Book a consultation.",
   },
   {
     path: "/services",
+    og: "services",
     title: "Services — Web Design, Branding & Digital Platforms | Aethyx",
     description:
       "Custom website design, branding, e-commerce, booking systems, automation, and AI-ready digital platforms — built for ambitious businesses across the USA.",
   },
   {
     path: "/portfolio",
+    og: "portfolio",
     title: "Portfolio — Aethyx Web Design Case Studies",
     description:
       "Selected work from Aethyx — wellness retreat brands, hospitality websites, and full brand evolutions. Real projects with real results.",
   },
   {
     path: "/about",
+    og: "about",
     title: "About Aethyx — Founder-Led Premium Web Design by Kristin Mitchell",
     description:
       "Aethyx is a one-woman studio led by Kristin Mitchell. Direct, founder-led web design and digital systems for businesses ready to evolve.",
   },
   {
     path: "/contact",
+    og: "contact",
     title: "Contact Aethyx — Let's Connect",
     description:
       "Start your project with a short form. Aethyx personally reviews every submission and follows up to discuss next steps — backed by real research.",
   },
   {
     path: "/medspa",
+    og: "medspa",
     title: "Med Spa Web Design — Premium Websites for Aesthetic Clinics | Aethyx",
     description:
       "Luxury website design for med spas, aesthetic clinics, and wellness brands. Custom booking integrations, brand-aligned visuals, and SEO built for the aesthetics industry.",
   },
   {
     path: "/blog",
+    og: "blog",
     title: "Aethyx Blog — Web Design, Branding & Digital Strategy Insights",
     description:
       "Insights on web design, brand strategy, SEO, and growing your digital presence — written for ambitious businesses by the Aethyx team.",
   },
   {
     path: "/bounty",
+    og: "bounty",
     title: "Bounty Program | Aethyx",
     description: "Refer clients to Aethyx and earn cash rewards. Apply to join our bounty program.",
   },
   {
     path: "/advertise",
+    og: "advertise",
     title: "Advertise with Aethyx — Partner Ad Space",
     description:
       "Put your brand in front of founders and business owners. Live, transparent first-party traffic stats and premium ad placements on aethyx.space.",
   },
   {
     path: "/intake",
+    og: "intake",
     title: "Let's Connect — Aethyx",
     description:
       "Share a few details about your brand. Aethyx personally reviews every submission and follows up to discuss next steps.",
@@ -124,6 +134,12 @@ for (const r of ROUTES) {
         /<meta name="twitter:description" content="[^"]*"\s*\/?>/,
         `<meta name="twitter:description" content="${esc(r.description)}">`,
       );
+  }
+  if (r.og) {
+    const img = `${SITE}/og/${r.og}.png`;
+    html = html
+      .replace(/<meta property="og:image" content="[^"]*"\s*\/?>/, `<meta property="og:image" content="${img}">`)
+      .replace(/<meta name="twitter:image" content="[^"]*"\s*\/?>/, `<meta name="twitter:image" content="${img}" />`);
   }
   const extra = [`<link rel="canonical" href="${url}" />`];
   if (r.noindex) extra.push(`<meta name="robots" content="noindex, nofollow" />`);
