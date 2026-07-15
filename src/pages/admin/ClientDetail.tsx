@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { ToastAction } from "@/components/ui/toast";
 import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -264,6 +265,18 @@ const ClientDetail = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const initialTab = searchParams.get("tab") || "profile";
+  // Controlled so toast actions (e.g. "Review items" after an AI extraction) can
+  // jump straight to a tab; still follows ?tab= deep-links.
+  const [activeTab, setActiveTab] = useState(initialTab);
+  useEffect(() => {
+    const t = searchParams.get("tab");
+    if (t) setActiveTab(t);
+  }, [searchParams]);
+
+  const goToScrapeReview = () => {
+    setActiveTab("assets");
+    setTimeout(() => document.getElementById("scrape-review")?.scrollIntoView({ behavior: "smooth", block: "start" }), 150);
+  };
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -1059,6 +1072,7 @@ const ClientDetail = () => {
       toast({
         title: "Scrape complete",
         description: `Found ${data.imageCount} image(s) and ${data.textCount} text item(s) for review.`,
+        action: <ToastAction altText="Review items" onClick={goToScrapeReview}>Review items</ToastAction>,
       });
     }
     setScrapeDialogOpen(false);
@@ -1102,7 +1116,7 @@ const ClientDetail = () => {
     if (data.textCount === 0 && data.geminiError) {
       toast({ title: "Extraction found nothing", description: data.geminiError });
     } else {
-      toast({ title: "Extraction complete", description: `Found ${data.textCount} item(s) for review.` });
+      toast({ title: "Extraction complete", description: `Found ${data.textCount} item(s) for review.`, action: <ToastAction altText="Review items" onClick={goToScrapeReview}>Review items</ToastAction> });
     }
     fetchPendingScrapeItems();
   };
@@ -1128,7 +1142,7 @@ const ClientDetail = () => {
     if (data.textCount === 0 && data.geminiError) {
       toast({ title: "Extraction found nothing", description: data.geminiError });
     } else {
-      toast({ title: "Extraction complete", description: `Found ${data.textCount} item(s) for review.` });
+      toast({ title: "Extraction complete", description: `Found ${data.textCount} item(s) for review.`, action: <ToastAction altText="Review items" onClick={goToScrapeReview}>Review items</ToastAction> });
     }
     fetchPendingScrapeItems();
   };
@@ -1730,7 +1744,7 @@ const ClientDetail = () => {
         </div>
       </div>
 
-      <Tabs defaultValue={initialTab}>
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="flex-wrap h-auto">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="invoices">Invoices ({invoices.length})</TabsTrigger>
@@ -2413,7 +2427,7 @@ const ClientDetail = () => {
           </div>
 
           {/* AI Asset Scraping */}
-          <div className="flex items-center justify-between">
+          <div id="scrape-review" className="flex items-center justify-between scroll-mt-24">
             <h3 className="font-display text-base tracking-wider">Scrape Website</h3>
             <Button size="sm" variant="outline" onClick={() => setScrapeDialogOpen(true)}>
               <Sparkles className="h-4 w-4 mr-2" /> Scrape from URL
