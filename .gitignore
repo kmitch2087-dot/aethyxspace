@@ -25,3 +25,4 @@ dist-ssr
 
 # Supabase CLI local scratch (project link cache, version info) — machine-local, not shared state
 supabase/.temp/
+.wrangler/
