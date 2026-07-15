@@ -80,6 +80,7 @@ function Field({
   isLocked,
   mode,
   onBlurSave,
+  disabled = false,
 }: {
   label?: string
   value: string
@@ -90,6 +91,9 @@ function Field({
   isLocked: boolean
   mode: "admin" | "client" | "view"
   onBlurSave: () => void
+  /** Render the editable control but inert — used by the admin's View-as-Client
+   * preview so the real client UI is visible without being usable. */
+  disabled?: boolean
 }) {
   const editable =
     !isLocked &&
@@ -104,7 +108,8 @@ function Field({
           value={value}
           onChange={e => onChange(e.target.value)}
           onBlur={onBlurSave}
-          className="w-full border-b border-gray-300 focus:border-teal-500 outline-none bg-yellow-50 rounded px-1 py-0.5 min-h-[80px] text-sm resize-y"
+          disabled={disabled}
+          className="w-full border-b border-gray-300 focus:border-teal-500 outline-none bg-yellow-50 rounded px-1 py-0.5 min-h-[80px] text-sm resize-y disabled:opacity-70 disabled:cursor-not-allowed"
           placeholder={label}
         />
       )
@@ -115,7 +120,8 @@ function Field({
         value={value}
         onChange={e => onChange(e.target.value)}
         onBlur={onBlurSave}
-        className="border-b border-gray-300 focus:border-teal-500 outline-none bg-yellow-50 rounded px-1 py-0.5 w-full text-sm"
+        disabled={disabled}
+        className="border-b border-gray-300 focus:border-teal-500 outline-none bg-yellow-50 rounded px-1 py-0.5 w-full text-sm disabled:opacity-70 disabled:cursor-not-allowed"
         placeholder={label}
       />
     )
@@ -139,7 +145,11 @@ export default function AgreementDocument({
   onSubmit,
 }: AgreementDocumentProps) {
   const { toast } = useToast()
-  const mode = (record.is_locked || readOnly) ? "view" : modeProp
+  // View-as-Client on an unsigned agreement renders the real client signing UI
+  // (fields, canvas, ID button) in a disabled state so the admin can verify what
+  // the client will see; a locked agreement is always plain "view".
+  const isClientPreview = readOnly && !record.is_locked && modeProp === "client"
+  const mode = record.is_locked ? "view" : readOnly && !isClientPreview ? "view" : modeProp
 
   const [projectScope, setProjectScope] = useState(record.project_scope || "")
   const [servicesIncluded, setServicesIncluded] = useState(record.services_included || "")
@@ -222,7 +232,7 @@ export default function AgreementDocument({
   }), [clientLegalName, clientCompany, clientAddress])
 
   const triggerAutoSave = useCallback(() => {
-    if (mode === "view") return
+    if (mode === "view" || isClientPreview) return
     if (debounceRef.current) clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(() => {
       const fields = mode === "admin"
@@ -230,7 +240,7 @@ export default function AgreementDocument({
         : collectClientFields()
       onSave(fields).catch(() => {})
     }, 500)
-  }, [mode, collectAdminFields, collectClientFields, onSave])
+  }, [mode, isClientPreview, collectAdminFields, collectClientFields, onSave])
 
   useEffect(() => {
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
@@ -248,6 +258,7 @@ export default function AgreementDocument({
   }
 
   const startDraw = (e: React.MouseEvent | React.TouchEvent) => {
+    if (isClientPreview) return
     e.preventDefault()
     const canvas = canvasRef.current; if (!canvas) return
     const ctx = canvas.getContext("2d"); if (!ctx) return
@@ -279,6 +290,7 @@ export default function AgreementDocument({
   }
 
   const handleIdUpload = async (file: File) => {
+    if (isClientPreview) return
     const path = `${clientProfileId}/id/${Date.now()}_${file.name}`
     const { error } = await supabase.storage.from("client-slot-docs").upload(path, file)
     if (!error) {
@@ -409,6 +421,12 @@ export default function AgreementDocument({
 
       <div className="max-w-4xl mx-auto bg-white text-gray-900 p-8 md:p-12 shadow-sm rounded-lg print:shadow-none print:p-0">
 
+        {isClientPreview && (
+          <div className="no-print mb-6 rounded-md border border-amber-300 bg-amber-50 px-4 py-2 text-sm text-amber-800">
+            Admin preview — this is exactly what the client sees. Signing is disabled while viewing as client.
+          </div>
+        )}
+
         {/* HEADER */}
         <div className="flex items-center justify-center gap-6 mb-6">
           {logoUrl ? (
@@ -467,6 +485,7 @@ export default function AgreementDocument({
                   value={clientLegalName}
                   onChange={setClientLegalName}
                   editableIn="client"
+                  disabled={isClientPreview}
                   isLocked={record.is_locked}
                   mode={mode}
                   onBlurSave={triggerAutoSave}
@@ -481,6 +500,7 @@ export default function AgreementDocument({
                 value={clientCompany}
                 onChange={setClientCompany}
                 editableIn="client"
+                disabled={isClientPreview}
                 isLocked={record.is_locked}
                 mode={mode}
                 onBlurSave={triggerAutoSave}
@@ -493,6 +513,7 @@ export default function AgreementDocument({
                 value={clientAddress}
                 onChange={setClientAddress}
                 editableIn="client"
+                disabled={isClientPreview}
                 isLocked={record.is_locked}
                 mode={mode}
                 onBlurSave={triggerAutoSave}
@@ -778,6 +799,7 @@ export default function AgreementDocument({
                   value={clientLegalName}
                   onChange={setClientLegalName}
                   editableIn="client"
+                  disabled={isClientPreview}
                   isLocked={record.is_locked}
                   mode={mode}
                   onBlurSave={triggerAutoSave}
@@ -790,6 +812,7 @@ export default function AgreementDocument({
                   value={clientCompany}
                   onChange={setClientCompany}
                   editableIn="client"
+                  disabled={isClientPreview}
                   isLocked={record.is_locked}
                   mode={mode}
                   onBlurSave={triggerAutoSave}
@@ -802,6 +825,7 @@ export default function AgreementDocument({
                   value={clientAddress}
                   onChange={setClientAddress}
                   editableIn="client"
+                  disabled={isClientPreview}
                   isLocked={record.is_locked}
                   mode={mode}
                   onBlurSave={triggerAutoSave}
@@ -817,7 +841,7 @@ export default function AgreementDocument({
                     ref={canvasRef}
                     width={500}
                     height={150}
-                    className="border border-gray-300 rounded bg-white touch-none cursor-crosshair w-full"
+                    className={`border border-gray-300 rounded bg-white touch-none w-full ${isClientPreview ? "cursor-not-allowed opacity-70" : "cursor-crosshair"}`}
                     onMouseDown={startDraw}
                     onMouseMove={draw}
                     onMouseUp={stopDraw}
@@ -828,7 +852,8 @@ export default function AgreementDocument({
                   />
                   <button
                     onClick={clearSig}
-                    className="mt-1 text-xs text-gray-400 hover:text-red-500 underline"
+                    disabled={isClientPreview}
+                    className="mt-1 text-xs text-gray-400 hover:text-red-500 underline disabled:cursor-not-allowed disabled:hover:text-gray-400"
                   >
                     Clear signature
                   </button>
@@ -865,7 +890,7 @@ export default function AgreementDocument({
                     ID Verified ✓
                   </span>
                 ) : (
-                  <label className="cursor-pointer inline-flex items-center gap-2 text-sm border border-gray-300 rounded px-3 py-1.5 hover:bg-gray-50">
+                  <label className={`inline-flex items-center gap-2 text-sm border border-gray-300 rounded px-3 py-1.5 ${isClientPreview ? "cursor-not-allowed opacity-70" : "cursor-pointer hover:bg-gray-50"}`}>
                     <span>Upload Photo ID</span>
                     <input
                       type="file"
@@ -934,13 +959,13 @@ export default function AgreementDocument({
 
           {mode === "client" && (
             <>
-              <Button variant="outline" onClick={handleClientSave} disabled={saving}>
+              <Button variant="outline" onClick={handleClientSave} disabled={saving || isClientPreview}>
                 {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                 Save Progress
               </Button>
               <Button
                 onClick={() => setConfirmSubmitOpen(true)}
-                disabled={!canSubmit || submitting}
+                disabled={!canSubmit || submitting || isClientPreview}
                 className="bg-teal-600 hover:bg-teal-700 text-white"
               >
                 {submitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
