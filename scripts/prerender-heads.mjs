@@ -6,7 +6,7 @@
 // Titles/descriptions mirror each page's <Seo> props — keep them in sync when
 // a page's Seo changes.
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 
 const SITE = "https://aethyx.space";
 const DIST = "dist";
@@ -129,9 +129,12 @@ for (const r of ROUTES) {
   if (r.noindex) extra.push(`<meta name="robots" content="noindex, nofollow" />`);
   html = html.replace("</head>", `    ${extra.join("\n    ")}\n  </head>`);
 
-  const outDir = r.path === "/" ? DIST : join(DIST, r.path.slice(1));
-  mkdirSync(outDir, { recursive: true });
-  writeFileSync(join(outDir, "index.html"), html);
+  // Flat `<route>.html` files: Cloudflare Pages serves /services from
+  // services.html with no redirect (a services/index.html directory would
+  // 308-redirect /services -> /services/, contradicting the canonical).
+  const outFile = r.path === "/" ? join(DIST, "index.html") : join(DIST, `${r.path.slice(1)}.html`);
+  mkdirSync(dirname(outFile), { recursive: true });
+  writeFileSync(outFile, html);
   written++;
 }
 
