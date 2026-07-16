@@ -131,6 +131,49 @@ const Inbox = () => {
     }));
   })();
 
+  // Sent-email viewer + forward. Content comes from email-actions (cached in
+  // email_send_log or fetched from Resend by message_id for older sends).
+  const [viewerEmail, setViewerEmail] = useState<SentEmail | null>(null);
+  const [viewerLoading, setViewerLoading] = useState(false);
+  const [viewerSubject, setViewerSubject] = useState("");
+  const [viewerHtml, setViewerHtml] = useState<string | null>(null);
+  const [forwardTo, setForwardTo] = useState("");
+  const [forwarding, setForwarding] = useState(false);
+
+  const openEmail = async (email: SentEmail) => {
+    setViewerEmail(email);
+    setViewerLoading(true);
+    setViewerHtml(null);
+    setViewerSubject("");
+    setForwardTo("");
+    const { data, error } = await supabase.functions.invoke("email-actions", {
+      body: { action: "get", logId: email.id },
+    });
+    setViewerLoading(false);
+    if (error || !data?.ok) {
+      toast({ title: "Could not load email", description: data?.error || error?.message, variant: "destructive" });
+      return;
+    }
+    setViewerSubject(data.subject);
+    setViewerHtml(data.html);
+  };
+
+  const handleForward = async () => {
+    if (!viewerEmail || !forwardTo.trim()) return;
+    setForwarding(true);
+    const { data, error } = await supabase.functions.invoke("email-actions", {
+      body: { action: "forward", logId: viewerEmail.id, recipientEmail: forwardTo.trim() },
+    });
+    setForwarding(false);
+    if (error || !data?.ok) {
+      toast({ title: "Forward failed", description: data?.error || error?.message, variant: "destructive" });
+      return;
+    }
+    toast({ title: `Forwarded to ${forwardTo.trim()}` });
+    setForwardTo("");
+    loadSent();
+  };
+
   const [composeOpen, setComposeOpen] = useState(false);
   const [composeClients, setComposeClients] = useState<{ id: string; full_name: string; first_name: string | null; email: string | null }[]>([]);
   const [composeSelectedIds, setComposeSelectedIds] = useState<string[]>([]);
@@ -301,7 +344,7 @@ const Inbox = () => {
                   <Card key={group.key}>
                     <CardContent
                       className="pt-4 flex items-center justify-between gap-3 cursor-pointer"
-                      onClick={() => setExpandedGroup(isExpanded ? null : group.key)}
+                      onClick={() => (isBatch ? setExpandedGroup(isExpanded ? null : group.key) : openEmail(group.emails[0]))}
                     >
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-medium truncate">{group.templateName}</p>
@@ -315,7 +358,11 @@ const Inbox = () => {
                     {isBatch && isExpanded && (
                       <div className="border-t border-border/30 px-4 py-2 space-y-1">
                         {group.emails.map((email) => (
-                          <div key={email.id} className="flex items-center justify-between text-xs">
+                          <div
+                            key={email.id}
+                            className="flex items-center justify-between text-xs cursor-pointer hover:bg-muted/30 rounded px-1 py-0.5"
+                            onClick={() => openEmail(email)}
+                          >
                             <span className="text-muted-foreground">{email.recipient_email}</span>
                             <Badge variant={email.status === "sent" ? "default" : "destructive"} className="text-xs capitalize">
                               {email.status}
@@ -331,6 +378,54 @@ const Inbox = () => {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Sent email viewer + forward */}
+      <Dialog open={!!viewerEmail} onOpenChange={(v) => { if (!v) setViewerEmail(null); }}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="pr-6 truncate">{viewerSubject || viewerEmail?.template_name || "Email"}</DialogTitle>
+          </DialogHeader>
+          {viewerEmail && (
+            <div className="space-y-4">
+              <div className="text-xs text-muted-foreground flex flex-wrap gap-x-4 gap-y-1">
+                <span>To: <span className="text-foreground">{viewerEmail.recipient_email}</span></span>
+                <span>{format(new Date(viewerEmail.created_at), "MMM d, yyyy h:mm a")}</span>
+                <Badge variant={viewerEmail.status === "sent" ? "default" : "destructive"} className="text-xs capitalize">
+                  {viewerEmail.status}
+                </Badge>
+              </div>
+              {viewerLoading ? (
+                <div className="flex justify-center py-16">
+                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                </div>
+              ) : viewerHtml ? (
+                <iframe
+                  srcDoc={viewerHtml}
+                  sandbox=""
+                  title="Sent email"
+                  className="w-full h-[50vh] rounded-lg border border-border/30 bg-white"
+                />
+              ) : (
+                <p className="text-sm text-muted-foreground py-8 text-center">Content unavailable.</p>
+              )}
+              <div className="flex gap-2 items-center pt-1">
+                <Input
+                  placeholder="Forward to email…"
+                  type="email"
+                  value={forwardTo}
+                  onChange={(e) => setForwardTo(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") handleForward(); }}
+                  disabled={!viewerHtml}
+                />
+                <Button onClick={handleForward} disabled={!viewerHtml || !forwardTo.trim() || forwarding} className="shrink-0">
+                  {forwarding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4 mr-1.5" />}
+                  Forward
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={composeOpen} onOpenChange={setComposeOpen}>
         <DialogContent className="sm:max-w-lg">
