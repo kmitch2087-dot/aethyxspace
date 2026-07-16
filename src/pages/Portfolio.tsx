@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ExternalLink } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import AdSlot from "@/components/AdSlot";
 import Seo from "@/components/Seo";
 import { breadcrumb } from "@/lib/seoSchemas";
 import LightboxGallery from "@/components/LightboxGallery";
@@ -159,6 +160,8 @@ const Portfolio = () => {
           </div>
         </div>
       </div>
+
+      <AdSlot />
 
       <Footer />
     </div>

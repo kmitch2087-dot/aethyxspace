@@ -4,6 +4,7 @@ import { ArrowRight, Globe, Palette, Layers } from "lucide-react";
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import AdSlot from "@/components/AdSlot";
 import Seo from "@/components/Seo";
 import { organizationSchema, websiteSchema } from "@/lib/seoSchemas";
 
@@ -271,6 +272,8 @@ const Home = () => {
           Let's Connect <ArrowRight className="h-4 w-4" />
         </Link>
       </section>
+
+      <AdSlot />
 
       <Footer />
     </div>

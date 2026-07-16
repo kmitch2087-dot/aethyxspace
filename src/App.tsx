@@ -26,6 +26,7 @@ const About = lazy(() => import("./pages/About"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Bounty = lazy(() => import("./pages/Bounty"));
 const Advertise = lazy(() => import("./pages/Advertise"));
+const Barter = lazy(() => import("./pages/Barter"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
@@ -97,6 +98,7 @@ const App = () => (
             <Route path="/contact" element={<Contact />} />
             <Route path="/bounty" element={<Bounty />} />
             <Route path="/advertise" element={<Advertise />} />
+            <Route path="/barter" element={<Barter />} />
             <Route path="/intake" element={<Intake />} />
             <Route path="/intake-success" element={<IntakeSuccess />} />
             <Route path="/blog" element={<Blog />} />

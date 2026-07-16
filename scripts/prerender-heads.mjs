@@ -118,6 +118,13 @@ const ROUTES = [
       "Put your brand in front of founders and business owners. Live, transparent first-party traffic stats and premium ad placements on aethyx.space.",
   },
   {
+    path: "/barter",
+    og: "advertise",
+    title: "Barter for Ad Space — Trade With Aethyx",
+    description:
+      "Trade ad space, products, or services for placement on aethyx.space. Open to related, non-conflicting brands — pitch your trade.",
+  },
+  {
     path: "/intake",
     og: "intake",
     title: "Let's Connect — Aethyx",

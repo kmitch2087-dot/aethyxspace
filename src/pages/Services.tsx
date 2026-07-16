@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Check, Star, Globe, Diamond, Play, Shield, Search, Layers, Zap, TrendingUp, Lock, ChevronRight, Bot, Video, Eye } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import AdSlot from "@/components/AdSlot";
 import Seo from "@/components/Seo";
 import { breadcrumb, serviceSchema } from "@/lib/seoSchemas";
 import { QUICK_SERVICES, ADD_ONS, APP_DEVELOPMENT } from "@/lib/stripePrices";
@@ -455,6 +456,8 @@ const Services = () => (
         </Link>
       </div>
     </section>
+
+    <AdSlot />
 
     <Footer />
   </div>

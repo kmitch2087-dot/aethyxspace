@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import AdSlot from "@/components/AdSlot";
 import Seo from "@/components/Seo";
 import { breadcrumb } from "@/lib/seoSchemas";
 import { format } from "date-fns";
@@ -89,6 +90,7 @@ const Blog = () => {
                 </div>
               </Link>
             ))}
+            <AdSlot variant="card" />
           </div>
         )}
       </main>
