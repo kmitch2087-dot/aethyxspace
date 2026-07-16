@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight, BarChart3, Eye, Loader2, Sparkles, Users } from "lucide-react";
+import { ArrowRight, BarChart3, Eye, Handshake, Loader2, Sparkles, Users } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Seo from "@/components/Seo";
@@ -112,6 +112,18 @@ const Advertise = () => {
   }, []);
 
   const setVal = (key: keyof typeof emptyForm, v: string) => setValues((s) => ({ ...s, [key]: v }));
+
+  // "Barter" CTA: pre-fill the message so barter proposals are identifiable in
+  // the admin Inquiries list, then bring the visitor to the same inquiry form.
+  const startBarterInquiry = () => {
+    setValues((s) => ({
+      ...s,
+      message: s.message.trim()
+        ? s.message
+        : "[Barter proposal] I'd like to trade ad space / services instead of paying cash. Here's what my brand does and what I can offer in exchange: ",
+    }));
+    document.getElementById("inquire")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -328,6 +340,35 @@ const Advertise = () => {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Barter */}
+      <section className="py-24 px-6 border-t border-border/20">
+        <div className="max-w-3xl mx-auto text-center">
+          <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
+            <Handshake className="h-6 w-6 text-primary" />
+          </div>
+          <p className="text-primary text-xs tracking-[0.4em] uppercase mb-4">Trade With Us</p>
+          <h2 className="font-display text-3xl md:text-5xl mb-6 tracking-tight">
+            Interested in bartering for ad space?
+          </h2>
+          <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
+            Cash isn't the only way in. If you're in a related field with no direct conflicts — and
+            our audiences would genuinely benefit from each other — I'm open to trading placements:
+            your ad space for mine, or space in exchange for products and services. Pitch me.
+          </p>
+          <Button
+            onClick={startBarterInquiry}
+            size="lg"
+            className="rounded-full px-8 tracking-widest uppercase text-sm"
+          >
+            Submit a barter inquiry
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+          <p className="text-muted-foreground/70 text-xs mt-4">
+            Tell me about your brand and what you'd offer in trade — every proposal gets a real look.
+          </p>
         </div>
       </section>
 
