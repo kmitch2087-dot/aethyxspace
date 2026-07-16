@@ -20,6 +20,15 @@ interface TrafficStats {
   sources: { source: string; clicks: number }[];
 }
 
+interface CloudflareStats {
+  available: boolean;
+  page_views_30d: number;
+  unique_visitors_30d: number;
+  requests_30d: number;
+  since: string;
+  until: string;
+}
+
 const inputClass =
   "rounded-xl bg-muted/50 border-border text-foreground placeholder:text-muted-foreground/40 focus:border-primary/40";
 
@@ -109,6 +118,17 @@ const Advertise = () => {
       cancelled = true;
       clearInterval(interval);
     };
+  }, []);
+
+  // Independently-measured stats from Cloudflare's edge (10-min server cache) —
+  // section renders only when the data source is configured and healthy.
+  const [cfStats, setCfStats] = useState<CloudflareStats | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    supabase.functions.invoke("cloudflare-stats").then(({ data }) => {
+      if (!cancelled && data?.available) setCfStats(data as CloudflareStats);
+    }).catch(() => {});
+    return () => { cancelled = true; };
   }, []);
 
   const setVal = (key: keyof typeof emptyForm, v: string) => setValues((s) => ({ ...s, [key]: v }));
@@ -214,9 +234,13 @@ const Advertise = () => {
             <p className="text-primary text-xs tracking-[0.4em] uppercase">Live Site Traffic</p>
           </div>
           <h2 className="font-display text-3xl md:text-5xl text-center mb-6 tracking-tight">Real numbers, updating in real time</h2>
-          <p className="text-muted-foreground text-base md:text-lg text-center max-w-2xl mx-auto mb-16 leading-relaxed">
+          <p className="text-muted-foreground text-base md:text-lg text-center max-w-2xl mx-auto mb-4 leading-relaxed">
             Every figure below is first-party data measured directly on this site — no estimates, no
             third-party scripts. It refreshes automatically while you're reading this.
+          </p>
+          <p className="text-muted-foreground/70 text-sm text-center max-w-2xl mx-auto mb-16">
+            Counting began when this tracking launched on <span className="text-foreground/80">July 12, 2026</span> —
+            these totals reflect traffic since that date only, so they'll only go up from here.
           </p>
 
           {stats ? (
@@ -300,6 +324,43 @@ const Advertise = () => {
           )}
         </div>
       </section>
+
+      {/* Independently verified stats (Cloudflare edge measurement) */}
+      {cfStats && (
+        <section className="py-24 px-6 border-t border-border/20">
+          <div className="max-w-6xl mx-auto">
+            <p className="text-primary text-xs tracking-[0.4em] uppercase text-center mb-4">Independently Measured</p>
+            <h2 className="font-display text-3xl md:text-5xl text-center mb-6 tracking-tight">
+              Don't take our word for it
+            </h2>
+            <p className="text-muted-foreground text-base md:text-lg text-center max-w-2xl mx-auto mb-16 leading-relaxed">
+              The numbers above are our own measurement. These are Cloudflare's — recorded at their
+              global network edge before traffic ever reaches this site, so nothing in our code can
+              inflate them. Last 30 days.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              {[
+                { label: "Page views · 30 days", value: cfStats.page_views_30d },
+                { label: "Unique visitors · 30 days", value: cfStats.unique_visitors_30d },
+                { label: "Total requests · 30 days", value: cfStats.requests_30d },
+              ].map((tile) => (
+                <div
+                  key={tile.label}
+                  className="rounded-2xl border border-border/40 bg-card/40 backdrop-blur-sm p-8 text-center hover:border-primary/50 transition-all"
+                >
+                  <p className="font-display font-black text-4xl md:text-5xl text-primary mb-3">
+                    <CountUp value={tile.value} />
+                  </p>
+                  <p className="text-muted-foreground text-xs tracking-[0.2em] uppercase">{tile.label}</p>
+                </div>
+              ))}
+            </div>
+            <p className="text-muted-foreground/70 text-xs text-center mt-6">
+              Source: Cloudflare network analytics for aethyx.space · updated every 10 minutes
+            </p>
+          </div>
+        </section>
+      )}
 
       {/* Why advertise */}
       <section className="py-24 px-6 border-t border-border/20">
