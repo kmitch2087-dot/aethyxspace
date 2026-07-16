@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { Plus, Pencil, Trash2, RefreshCw, Mail, ExternalLink } from "lucide-react";
+import { Plus, Pencil, Trash2, RefreshCw, Mail, ExternalLink, Settings2, Loader2 } from "lucide-react";
 
 interface FinancialRecord {
   id: string;
@@ -57,6 +57,62 @@ const Financials = () => {
   const [consentUrl, setConsentUrl] = useState<string | null>(null);
   const [authCode, setAuthCode] = useState("");
   const [connectingGmail, setConnectingGmail] = useState(false);
+
+  interface ExpenseVendor { id: string; vendor_name: string; sender_domain: string; active: boolean }
+  const [vendorsOpen, setVendorsOpen] = useState(false);
+  const [vendors, setVendors] = useState<ExpenseVendor[]>([]);
+  const [vendorsLoading, setVendorsLoading] = useState(false);
+  const [newVendorName, setNewVendorName] = useState("");
+  const [newVendorDomain, setNewVendorDomain] = useState("");
+  const [savingVendor, setSavingVendor] = useState(false);
+
+  const fetchVendors = async () => {
+    setVendorsLoading(true);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data } = await (supabase as any)
+      .from("expense_email_senders").select("*").order("vendor_name");
+    setVendors((data as ExpenseVendor[]) || []);
+    setVendorsLoading(false);
+  };
+
+  const addVendor = async () => {
+    const name = newVendorName.trim();
+    // Accept a bare domain or a full email/URL — keep just the domain part.
+    const domain = newVendorDomain.trim().toLowerCase()
+      .replace(/^https?:\/\//, "").replace(/^.*@/, "").split("/")[0];
+    if (!name || !domain.includes(".")) {
+      toast({ title: "Enter a vendor name and a sender domain like canva.com", variant: "destructive" });
+      return;
+    }
+    setSavingVendor(true);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any)
+      .from("expense_email_senders").insert({ vendor_name: name, sender_domain: domain });
+    setSavingVendor(false);
+    if (error) {
+      toast({ title: "Could not add vendor", description: error.message, variant: "destructive" });
+      return;
+    }
+    setNewVendorName("");
+    setNewVendorDomain("");
+    fetchVendors();
+  };
+
+  const toggleVendor = async (v: ExpenseVendor) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any).from("expense_email_senders").update({ active: !v.active }).eq("id", v.id);
+    setVendors((s) => s.map((x) => x.id === v.id ? { ...x, active: !x.active } : x));
+  };
+
+  const removeVendor = async (v: ExpenseVendor) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any).from("expense_email_senders").delete().eq("id", v.id);
+    if (error) {
+      toast({ title: "Could not remove vendor", description: error.message, variant: "destructive" });
+      return;
+    }
+    setVendors((s) => s.filter((x) => x.id !== v.id));
+  };
 
   // Scan Gmail for subscription receipts (Claude, Canva, ChatGPT, …) and post
   // them as expenses. First run walks through a one-time Google consent.
@@ -227,6 +283,9 @@ const Financials = () => {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-display tracking-wider">Financials</h1>
         <div className="flex items-center gap-2">
+          <Button onClick={() => { setVendorsOpen(true); fetchVendors(); }} size="sm" variant="ghost" title="Manage receipt vendors">
+            <Settings2 className="h-4 w-4 mr-1" /> Vendors
+          </Button>
           <Button onClick={handleScanInbox} size="sm" variant="outline" disabled={scanningInbox}>
             <Mail className={`h-4 w-4 mr-1 ${scanningInbox ? "animate-pulse" : ""}`} />
             {scanningInbox ? "Scanning…" : "Scan Inbox for Receipts"}
@@ -375,6 +434,49 @@ const Financials = () => {
             <div className="flex justify-end gap-3 pt-2">
               <Button variant="outline" onClick={() => setEditorOpen(false)}>Cancel</Button>
               <Button onClick={handleSave}>{editing ? "Update" : "Create"}</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Receipt-capture vendor watch list */}
+      <Dialog open={vendorsOpen} onOpenChange={setVendorsOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Receipt capture vendors</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 text-sm">
+            <p className="text-muted-foreground">
+              Emails from these senders are scanned for receipts and posted as expenses.
+              Pausing a vendor stops new captures without deleting anything already recorded.
+            </p>
+            {vendorsLoading ? (
+              <div className="flex justify-center py-6"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
+            ) : (
+              <div className="space-y-1 max-h-64 overflow-y-auto">
+                {vendors.map((v) => (
+                  <div key={v.id} className="flex items-center gap-3 rounded-md border border-border/30 px-3 py-2">
+                    <div className="flex-1 min-w-0">
+                      <p className={`font-medium truncate ${v.active ? "" : "text-muted-foreground line-through"}`}>{v.vendor_name}</p>
+                      <p className="text-xs text-muted-foreground truncate">{v.sender_domain}</p>
+                    </div>
+                    <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => toggleVendor(v)}>
+                      {v.active ? "Pause" : "Resume"}
+                    </Button>
+                    <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => removeVendor(v)}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+                {vendors.length === 0 && <p className="text-muted-foreground text-center py-4">No vendors yet.</p>}
+              </div>
+            )}
+            <div className="flex gap-2 pt-1">
+              <Input value={newVendorName} onChange={(e) => setNewVendorName(e.target.value)} placeholder="Vendor name (e.g. Adobe)" />
+              <Input value={newVendorDomain} onChange={(e) => setNewVendorDomain(e.target.value)} placeholder="Sender domain (adobe.com)" onKeyDown={(e) => { if (e.key === "Enter") addVendor(); }} />
+              <Button onClick={addVendor} disabled={savingVendor}>
+                {savingVendor ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+              </Button>
             </div>
           </div>
         </DialogContent>
