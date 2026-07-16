@@ -159,7 +159,12 @@ Deno.serve(async (req: Request) => {
       .from("expense_email_senders").select("vendor_name, sender_domain").eq("active", true);
     if (!senders?.length) return json({ ok: true, scanned: 0, captured: 0, note: "No active vendors configured" }, 200, cors);
 
-    const q = `from:(${senders.map((s) => s.sender_domain).join(" OR ")}) newer_than:${SEARCH_WINDOW}`;
+    // Two ways in: sent directly by a watched vendor, or manually forwarded by
+    // Kristin (a forward's From is the forwarder, not the vendor — match those by
+    // "Fwd:" + billing words in the subject and let Gemini identify the vendor).
+    // newer_than applies to arrival in this inbox, so forwarding an old receipt
+    // today still gets it captured.
+    const q = `newer_than:${SEARCH_WINDOW} {from:(${senders.map((s) => s.sender_domain).join(" OR ")}) (subject:fwd subject:{receipt invoice payment bill charged})}`;
     const listRes = await fetch(
       `https://gmail.googleapis.com/gmail/v1/users/me/messages?q=${encodeURIComponent(q)}&maxResults=100`,
       { headers: { Authorization: `Bearer ${accessToken}` } },
