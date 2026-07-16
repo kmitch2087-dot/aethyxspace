@@ -34,15 +34,20 @@ Protected by `<ClientRoute>` — any authenticated Supabase user (non-admin) lan
 ## Supabase
 
 - Client: `src/integrations/supabase/client.ts` — import as `import { supabase } from "@/integrations/supabase/client"`
-- Full typed schema: `src/integrations/supabase/types.ts` (auto-generated — do not edit)
-- Migrations: `supabase/migrations/` (UUID-named files)
-- Edge functions: `supabase/functions/` — one directory per function (Deno, deployed to Supabase)
+- Full typed schema: `src/integrations/supabase/types.ts` (auto-generated — do not edit). Tables missing from generated types are accessed via `(supabase as any).from("table")`.
+- Migrations: `supabase/migrations/` — **naming rule**: after calling `apply_migration`, check `list_migrations` for the version Supabase actually assigned and name the local file exactly `<version>_<name>.sql` in the same turn. Do not approximate timestamps.
+- Edge functions: `supabase/functions/` — one directory per function (Deno). Deploy via `supabase functions deploy <name> --project-ref jsdjcizqwwmtuhfnkvqq` (CLI is authenticated; `--no-verify-jwt` only for functions doing their own auth: `stripe-webhook`, `capture-expense-emails`). Shared CORS helper: `_shared/admin-cors.ts`.
 
-Key tables: `user_roles`, `client_profiles`, `client_invoices`, `client_agreements`, `client_documents`, `client_intakes`, `client_projects`, `blog_posts`, `admin_documents`, `admin_media`, `contact_submissions`, `reviews`, `email_queue`.
+Key tables: `user_roles`, `client_profiles`, `client_invoices`, `client_agreement_records` (in-app signing; `document_path` renders an uploaded PDF as the agreement body, `down_payment_invoice_id` links the auto-created invoice-on-sign; `client_agreements` is a separate legacy system), `client_documents` (`shared_with_client` gates client visibility — admin uploads from ClientDetail default to hidden), `client_document_slots`, `client_intakes`, `client_project_plans`/`_phases`/`_updates`/`_tasks`, `client_assets`, `client_messages`, `client_portal_seen_at`, `blog_posts`, `admin_documents`, `admin_media`, `contact_submissions`, `reviews`, `email_queue`/`email_send_log`, `financial_records` (income + expenses), `expense_email_senders`/`expense_email_seen` (Gmail receipt capture), `referrals`/`referral_links`, `bounty_applicants`, `app_private_config` (service-role-only key/value; holds the Gmail-scoped Google refresh token).
 
-## Planned work (`.lovable/plan.md`)
+## Scheduled jobs (pg_cron)
 
-An admin v2 plan is in progress that adds: project/task management (`project_tasks`, `project_updates` tables), Claude integration via a `claude-project-api` edge function and MCP server (`claude-mcp`), edge function dashboard widgets, and new routes `/admin/projects`, `/portal/projects`, `/portal/tasks`. A `CLAUDE_API_TOKEN` secret is needed for the edge functions.
+- `stripe-sync-worker` — every minute, drives the managed Stripe integration.
+- `capture-expense-emails-daily` — 11:15 UTC daily, scans Gmail for subscription receipts → `financial_records` expenses. Bearer secret lives in Vault (`expense_capture_secret`) mirrored as edge secret `EXPENSE_CAPTURE_SECRET`.
+
+## Remaining planned work (`.lovable/plan.md`)
+
+Most of the admin v2 plan has shipped (projects/tasks/portal routes/messaging/financials). Still open from it: Claude integration via a `claude-project-api` edge function and MCP server (`claude-mcp`, needs a `CLAUDE_API_TOKEN` secret), and edge-function dashboard widgets.
 
 ## Path alias
 
