@@ -16,6 +16,7 @@
 # Legacy URLs from the pre-Aethyx design system (pages removed from the bundle).
 # 301 to the closest live equivalent instead of 404ing any residual link equity.
 /start-here /intake 301
+/medspa /industries/medspa 301
 /membership /services 301
 /testimonials /portfolio 301
 /seo /services 301

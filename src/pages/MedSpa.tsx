@@ -163,16 +163,17 @@ const MedSpa = () => {
       <Seo
         title="Med Spa Web Design — Premium Websites for Aesthetic Clinics | Aethyx"
         description="Luxury website design for med spas, aesthetic clinics, and wellness brands. Custom booking integrations, brand-aligned visuals, and SEO built for the aesthetics industry."
-        path="/medspa"
+        path="/industries/medspa"
+        noindex
         jsonLd={[
           breadcrumb([
             { name: "Home", path: "/" },
-            { name: "Med Spa Web Design", path: "/medspa" },
+            { name: "Med Spa Web Design", path: "/industries/medspa" },
           ]),
           serviceSchema(
             "Med Spa & Aesthetic Clinic Web Design",
             "Premium website design and brand visuals for med spas and aesthetic clinics. Includes booking integration (Mindbody, Boulevard, Zenoti), SEO, and SEO-safe migration.",
-            "/medspa"
+            "/industries/medspa"
           ),
         ]}
       />

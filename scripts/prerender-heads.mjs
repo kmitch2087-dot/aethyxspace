@@ -90,12 +90,22 @@ const ROUTES = [
     description:
       "Start your project with a short form. Aethyx personally reviews every submission and follows up to discuss next steps — backed by real research.",
   },
+  // Industry ad-landing pages: real prerendered heads (nice link previews when
+  // shared with prospects) but noindex + excluded from the sitemap — reached
+  // via ads and direct shares only, deliberately not public-facing.
   {
-    path: "/medspa",
+    path: "/industries",
+    title: "Industries — Aethyx Web Design",
+    description: "Industry-specific web design from Aethyx.",
+    noindex: true,
+  },
+  {
+    path: "/industries/medspa",
     og: "medspa",
     title: "Med Spa Web Design — Premium Websites for Aesthetic Clinics | Aethyx",
     description:
       "Luxury website design for med spas, aesthetic clinics, and wellness brands. Custom booking integrations, brand-aligned visuals, and SEO built for the aesthetics industry.",
+    noindex: true,
   },
   {
     path: "/blog",

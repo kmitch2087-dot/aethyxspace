@@ -33,6 +33,7 @@ const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService"));
 const MedSpa = lazy(() => import("./pages/MedSpa"));
+const Industries = lazy(() => import("./pages/Industries"));
 const Intake = lazy(() => import("./pages/Intake"));
 const IntakeSuccess = lazy(() => import("./pages/IntakeSuccess"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
@@ -106,7 +107,8 @@ const App = () => (
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<TermsOfService />} />
-            <Route path="/medspa" element={<MedSpa />} />
+            <Route path="/industries" element={<Industries />} />
+            <Route path="/industries/medspa" element={<MedSpa />} />
             <Route path="/unsubscribe" element={<Unsubscribe />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/admin/login" element={<AdminLogin />} />
