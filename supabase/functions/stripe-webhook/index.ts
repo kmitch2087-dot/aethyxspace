@@ -7,7 +7,13 @@ Deno.serve(async (req) => {
   try {
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
-    if (!stripeKey || !webhookSecret) return new Response("Stripe secrets not configured", { status: 500 });
+    if (!stripeKey || !webhookSecret) {
+      // Say which name is missing (never values) — a combined message made a 4-day
+      // outage undiagnosable from Stripe's side.
+      const missing = [!stripeKey && "STRIPE_SECRET_KEY", !webhookSecret && "STRIPE_WEBHOOK_SECRET"].filter(Boolean).join(", ");
+      console.error(`[stripe-webhook] missing secrets: ${missing}`);
+      return new Response(`Stripe secrets not configured: ${missing}`, { status: 500 });
+    }
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     const sig = req.headers.get("stripe-signature");
