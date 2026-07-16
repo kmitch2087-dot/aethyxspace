@@ -76,7 +76,7 @@ interface Invoice {
   review_reason: string | null;
 }
 
-interface DocRow { id: string; title: string; file_url: string | null; created_at: string; parent_admin_doc_id: string | null; linked_invoice_id: string | null; }
+interface DocRow { id: string; title: string; file_url: string | null; created_at: string; parent_admin_doc_id: string | null; linked_invoice_id: string | null; shared_with_client: boolean; }
 interface AgreementRow { id: string; service_name: string | null; status: string; amount: number | null; agreement_url: string | null; created_at: string; }
 interface IntakeRow {
   id: string;
@@ -692,12 +692,15 @@ const ClientDetail = () => {
     const filePath = `${profile.id}/${Date.now()}_${docFile.name}`;
     const { error: upErr } = await supabase.storage.from("client-documents").upload(filePath, docFile);
     if (upErr) { setUploading(false); toast({ title: "Upload failed", description: upErr.message, variant: "destructive" }); return; }
-    const { error: insErr } = await supabase.from("client_documents").insert({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: insErr } = await (supabase as any).from("client_documents").insert({
       client_profile_id: profile.id,
       user_id: profile.user_id,
       title: docTitle.trim(),
       file_url: filePath,
       uploaded_by: "admin",
+      // Admin uploads start hidden — share explicitly via the eye toggle when ready.
+      shared_with_client: false,
     });
     setUploading(false);
     if (insErr) toast({ title: "Save failed", description: insErr.message, variant: "destructive" });
@@ -710,6 +713,19 @@ const ClientDetail = () => {
     if (!trimmed || trimmed === doc.title) return;
     await supabase.from("client_documents").update({ title: trimmed }).eq("id", doc.id);
     setDocs((s) => s.map((d) => d.id === doc.id ? { ...d, title: trimmed } : d));
+  };
+
+  const toggleDocShared = async (doc: DocRow) => {
+    const next = !doc.shared_with_client;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any)
+      .from("client_documents").update({ shared_with_client: next }).eq("id", doc.id);
+    if (error) {
+      toast({ title: "Could not update visibility", description: error.message, variant: "destructive" });
+      return;
+    }
+    setDocs((s) => s.map((d) => d.id === doc.id ? { ...d, shared_with_client: next } : d));
+    toast({ title: next ? "Shared with client" : "Hidden from client" });
   };
 
   const handleDeleteDoc = async (doc: DocRow) => {
@@ -2072,8 +2088,23 @@ const ClientDetail = () => {
                           <p className="font-medium text-sm text-black truncate">{d.title}</p>
                         )}
                         <p className="text-xs text-black/50 mt-0.5">{format(new Date(d.created_at), "MMM d, yyyy")}</p>
-                        {d.linked_invoice_id && <Badge variant="outline" className="text-xs mt-1">Invoice</Badge>}
+                        <div className="flex gap-1 mt-1 flex-wrap">
+                          {d.linked_invoice_id && <Badge variant="outline" className="text-xs">Invoice</Badge>}
+                          {d.shared_with_client ? (
+                            <Badge className="text-xs bg-green-100 text-green-700 border border-green-200 hover:bg-green-100">Visible to client</Badge>
+                          ) : (
+                            <Badge className="text-xs bg-gray-100 text-gray-500 border border-gray-200 hover:bg-gray-100">Hidden from client</Badge>
+                          )}
+                        </div>
                       </div>
+                    </button>
+                    {/* Share toggle stays visible (not hover-only) so visibility state is obvious */}
+                    <button
+                      className={`absolute top-2 left-2 p-1.5 rounded-full shadow-sm ${d.shared_with_client ? "bg-green-50 text-green-600 hover:bg-green-100" : "bg-white/90 text-black/40 hover:bg-gray-100"}`}
+                      onClick={(e) => { e.stopPropagation(); toggleDocShared(d); }}
+                      title={d.shared_with_client ? "Visible to client — click to hide" : "Hidden from client — click to share"}
+                    >
+                      {d.shared_with_client ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                     </button>
                     <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       {fileExt(d.file_url) === "pdf" && (
