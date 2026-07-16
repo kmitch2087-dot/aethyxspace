@@ -70,6 +70,12 @@ const Financials = () => {
         setGmailDialogOpen(true);
         return;
       }
+      if (data?.apiDisabled) {
+        // Not an auth problem — the Gmail API is off in Google Cloud. Re-consenting
+        // can't fix it, so don't reopen the connect dialog.
+        toast({ title: "One more step: enable the Gmail API", description: data.error, duration: 15000 });
+        return;
+      }
       if (!data?.ok) throw new Error(data?.error || "Scan failed");
       toast({
         title: "Inbox scan complete",

@@ -166,12 +166,24 @@ Deno.serve(async (req: Request) => {
     );
     if (listRes.status === 403) {
       const detail = await listRes.text().catch(() => "");
-      console.warn("[capture-expense-emails] Gmail scope insufficient:", detail.slice(0, 300));
+      console.warn("[capture-expense-emails] Gmail 403:", detail.slice(0, 500));
+      // Only a scope problem is fixable by re-consenting. "accessNotConfigured"
+      // means the Gmail API itself is disabled on the Google Cloud project —
+      // re-asking for a code loops forever, so say what actually needs doing.
+      if (detail.includes("accessNotConfigured") || detail.includes("has not been used in project")) {
+        return json({
+          ok: false,
+          apiDisabled: true,
+          error: "The Gmail API is not enabled on the Google Cloud project. Enable it at https://console.cloud.google.com/apis/library/gmail.googleapis.com then scan again — no new code needed.",
+          detail: detail.slice(0, 400),
+        }, 200, cors);
+      }
       return json({
         ok: false,
         needsAuth: true,
         error: "The Google connection doesn't have Gmail read permission yet.",
         consentUrl: buildConsentUrl(),
+        detail: detail.slice(0, 400),
       }, 200, cors);
     }
     if (!listRes.ok) {
