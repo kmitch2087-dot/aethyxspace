@@ -5,11 +5,54 @@
 //
 // Titles/descriptions mirror each page's <Seo> props — keep them in sync when
 // a page's Seo changes.
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 
 const SITE = "https://aethyx.space";
 const DIST = "dist";
+
+// Supabase creds for fetching published blog posts at build time. Available as
+// env vars on Cloudflare Pages builds; locally fall back to parsing .env.
+function supabaseCreds() {
+  let url = process.env.VITE_SUPABASE_URL;
+  let key = process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+  if ((!url || !key) && existsSync(".env")) {
+    const env = readFileSync(".env", "utf8");
+    const get = (name) => env.match(new RegExp(`^${name}="?([^"\\n]+)"?`, "m"))?.[1];
+    url = url || get("VITE_SUPABASE_URL");
+    key = key || get("VITE_SUPABASE_PUBLISHABLE_KEY");
+  }
+  return url && key ? { url, key } : null;
+}
+
+// Published posts get real prerendered heads + sitemap entries. Best-effort:
+// a fetch failure must never fail the build — posts published after the last
+// build are still served via the /blog/* SPA fallback, just without a unique
+// prerendered head until the next build.
+async function fetchPublishedPosts() {
+  const creds = supabaseCreds();
+  if (!creds) {
+    console.warn("prerender-heads: no Supabase creds — skipping blog post prerender");
+    return [];
+  }
+  try {
+    const res = await fetch(
+      `${creds.url}/rest/v1/blog_posts?select=slug,title,excerpt,content,published_at,updated_at,cover_image_url&published=eq.true&order=published_at.desc`,
+      { headers: { apikey: creds.key, Authorization: `Bearer ${creds.key}` } },
+    );
+    if (!res.ok) throw new Error(`blog_posts fetch ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn("prerender-heads: blog post fetch failed —", err.message);
+    return [];
+  }
+}
+
+// Mirrors BlogPost.tsx's derived description: excerpt, else stripped content.
+function postDescription(post) {
+  const raw = post.excerpt || (post.content || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  return raw.slice(0, 155);
+}
 
 const ROUTES = [
   {
@@ -107,7 +150,7 @@ const esc = (s) => s.replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceA
 const shell = readFileSync(join(DIST, "index.html"), "utf8");
 
 let written = 0;
-for (const r of ROUTES) {
+function writeRoute(r) {
   const url = SITE + (r.path === "/" ? "/" : r.path);
   let html = shell
     .replace(/<title>[^<]*<\/title>/, `<title>${esc(r.title)}</title>`)
@@ -135,11 +178,11 @@ for (const r of ROUTES) {
         `<meta name="twitter:description" content="${esc(r.description)}">`,
       );
   }
-  if (r.og) {
-    const img = `${SITE}/og/${r.og}.png`;
+  const img = r.ogImage || (r.og ? `${SITE}/og/${r.og}.png` : null);
+  if (img) {
     html = html
-      .replace(/<meta property="og:image" content="[^"]*"\s*\/?>/, `<meta property="og:image" content="${img}">`)
-      .replace(/<meta name="twitter:image" content="[^"]*"\s*\/?>/, `<meta name="twitter:image" content="${img}" />`);
+      .replace(/<meta property="og:image" content="[^"]*"\s*\/?>/, `<meta property="og:image" content="${esc(img)}">`)
+      .replace(/<meta name="twitter:image" content="[^"]*"\s*\/?>/, `<meta name="twitter:image" content="${esc(img)}" />`);
   }
   const extra = [`<link rel="canonical" href="${url}" />`];
   if (r.noindex) extra.push(`<meta name="robots" content="noindex, nofollow" />`);
@@ -154,6 +197,40 @@ for (const r of ROUTES) {
   written++;
 }
 
+for (const r of ROUTES) writeRoute(r);
+
+// Published blog posts: real prerendered heads (unique title/description/
+// canonical/og), fixing the "generic shell head on every post" gap. Posts
+// published after this build fall back to the SPA shell until the next build.
+const posts = await fetchPublishedPosts();
+for (const p of posts) {
+  writeRoute({
+    path: `/blog/${p.slug}`,
+    title: `${p.title} | Aethyx Blog`,
+    description: postDescription(p),
+    ogImage: p.cover_image_url || `${SITE}/og/blog.png`,
+  });
+}
+
+// Build-time sitemap.xml: every indexable public route + every published post.
+// Replaces the old hand-maintained public/sitemap.xml (which had gone stale —
+// missing /bounty, /advertise, /intake, and all blog posts).
+const sitemapEntries = [
+  ...ROUTES.filter((r) => !r.noindex).map((r) => ({ loc: SITE + (r.path === "/" ? "/" : r.path) })),
+  ...posts.map((p) => ({
+    loc: `${SITE}/blog/${p.slug}`,
+    lastmod: (p.updated_at || p.published_at || "").slice(0, 10) || undefined,
+  })),
+];
+const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${sitemapEntries
+  .map((e) => `  <url>\n    <loc>${esc(e.loc)}</loc>${e.lastmod ? `\n    <lastmod>${e.lastmod}</lastmod>` : ""}\n  </url>`)
+  .join("\n")}
+</urlset>
+`;
+writeFileSync(join(DIST, "sitemap.xml"), sitemap);
+
 // Branded 404 (Cloudflare Pages serves this with a real 404 status for
 // unmatched paths once it exists, instead of the SPA 200-fallback).
 const notFound = shell
@@ -162,4 +239,4 @@ const notFound = shell
   .replace("</head>", `    <meta name="robots" content="noindex" />\n  </head>`);
 writeFileSync(join(DIST, "404.html"), notFound);
 
-console.log(`prerender-heads: wrote ${written} route heads + 404.html`);
+console.log(`prerender-heads: wrote ${written} route heads (${posts.length} blog posts) + sitemap.xml + 404.html`);

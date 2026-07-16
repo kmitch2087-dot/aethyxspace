@@ -8,6 +8,7 @@ import navLogo from "@/assets/aethyx-web-design-studio-logo.png";
 const links = [
   { to: "/", label: "Home" },
   { to: "/services", label: "Services" },
+  { to: "/medspa", label: "Med Spa" },
   { to: "/portfolio", label: "Portfolio" },
   { to: "/blog", label: "Blog" },
   { to: "/about", label: "About" },

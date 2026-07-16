@@ -41,12 +41,14 @@ const Footer = () => (
     <nav aria-label="Footer" className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-muted-foreground">
       <Link to="/" className="hover:text-primary transition-colors">Home</Link>
       <Link to="/services" className="hover:text-primary transition-colors">Services</Link>
+      <Link to="/medspa" className="hover:text-primary transition-colors">Med Spa</Link>
       <Link to="/portfolio" className="hover:text-primary transition-colors">Portfolio</Link>
       <Link to="/about" className="hover:text-primary transition-colors">About</Link>
       <Link to="/blog" className="hover:text-primary transition-colors">Blog</Link>
       <Link to="/contact" className="hover:text-primary transition-colors">Contact</Link>
       <Link to="/bounty" className="hover:text-primary transition-colors">Bounty Program</Link>
       <Link to="/advertise" className="hover:text-primary transition-colors">Advertise</Link>
+      <Link to="/intake" className="hover:text-primary transition-colors">Start a Project</Link>
     </nav>
 
     <div className="mt-6 text-center">

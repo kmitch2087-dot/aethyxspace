@@ -1,8 +1,22 @@
-# SPA fallbacks for dynamic route trees only. All static public routes are
-# prerendered to real files by scripts/prerender-heads.mjs; anything else
-# falls through to 404.html with a genuine 404 status.
+# SPA fallbacks for dynamic route trees only. All static public routes AND
+# published blog posts are prerendered to real files by
+# scripts/prerender-heads.mjs; anything else falls through to 404.html with a
+# genuine 404 status.
 # Note: the rewrite target must be `/` — `/index.html` is rejected by Pages'
 # infinite-loop detection and the whole rule gets ignored.
+# Note: there is deliberately NO `/blog/*` rule — _redirects rules take
+# precedence over static assets, so a splat here would shadow every
+# prerendered per-post file (and rewriting to `<slug>.html` 308s via Pages'
+# pretty-URL normalization). Consequence: a post published AFTER the last
+# build 404s until the next Pages build (any git push triggers one). Unknown
+# blog URLs correctly return 404.
 /admin/* / 200
 /portal/* / 200
-/blog/* / 200
+
+# Legacy URLs from the pre-Aethyx design system (pages removed from the bundle).
+# 301 to the closest live equivalent instead of 404ing any residual link equity.
+/start-here /intake 301
+/membership /services 301
+/testimonials /portfolio 301
+/seo /services 301
+/rebrand /portfolio 301
