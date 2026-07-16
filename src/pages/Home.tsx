@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { ArrowRight, Globe, Palette, Layers } from "lucide-react";
 
 import Navbar from "@/components/Navbar";
@@ -60,15 +60,16 @@ const trafficButtons = [
 ];
 
 const Home = () => {
-  const navigate = useNavigate();
   const [otherOpen, setOtherOpen] = useState(false);
+  const [sourceReported, setSourceReported] = useState(false);
 
   const handleTrafficClick = async (source: "tiktok" | "instagram" | "facebook" | "other", otherDetails?: string) => {
+    // Thank them in place — don't navigate away from the page they just landed on.
+    setSourceReported(true);
     await supabase.from("traffic_clicks").insert({
       source,
       other_details: otherDetails || null,
     } as any);
-    navigate("/contact");
   };
 
   return (
@@ -131,24 +132,37 @@ const Home = () => {
           </p>
 
           {/* Traffic source buttons */}
-          <p className="text-foreground/40 text-xs mt-10 tracking-[0.25em] uppercase">How did you find us?</p>
-          <div className="flex flex-wrap justify-center gap-3 mt-4">
-            {trafficButtons.map((btn) => (
-              <button
-                key={btn.source}
-                onClick={() => {
-                  if (btn.source === "other") {
-                    setOtherOpen(true);
-                  } else {
-                    handleTrafficClick(btn.source);
-                  }
-                }}
-                className="px-5 py-2 rounded-full border border-foreground/20 text-foreground/60 text-xs tracking-[0.25em] uppercase hover:border-primary/60 hover:text-primary transition-all"
-              >
-                {btn.label}
-              </button>
-            ))}
-          </div>
+          {sourceReported ? (
+            <div className="mt-10 max-w-md mx-auto rounded-2xl border border-primary/30 bg-primary/5 px-6 py-5">
+              <p className="text-primary font-display text-lg mb-2">Thank you 💛</p>
+              <p className="text-foreground/60 text-sm leading-relaxed">
+                As a one-woman studio, knowing how you found me is genuinely valuable — it's real
+                data that tells me where to show up more, so more people like you can find Aethyx.
+                Thanks for taking the two seconds.
+              </p>
+            </div>
+          ) : (
+            <>
+              <p className="text-foreground/40 text-xs mt-10 tracking-[0.25em] uppercase">How did you find us?</p>
+              <div className="flex flex-wrap justify-center gap-3 mt-4">
+                {trafficButtons.map((btn) => (
+                  <button
+                    key={btn.source}
+                    onClick={() => {
+                      if (btn.source === "other") {
+                        setOtherOpen(true);
+                      } else {
+                        handleTrafficClick(btn.source);
+                      }
+                    }}
+                    className="px-5 py-2 rounded-full border border-foreground/20 text-foreground/60 text-xs tracking-[0.25em] uppercase hover:border-primary/60 hover:text-primary transition-all"
+                  >
+                    {btn.label}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </section>
 

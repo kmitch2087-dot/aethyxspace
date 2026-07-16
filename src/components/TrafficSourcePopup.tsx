@@ -41,7 +41,7 @@ const TrafficSourcePopup = ({ open, onClose, onSubmit }: TrafficSourcePopupProps
           disabled={!details.trim()}
           className="w-full"
         >
-          Continue to Consultation
+          Submit
         </Button>
       </DialogContent>
     </Dialog>
