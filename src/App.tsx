@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,57 +13,69 @@ import ClientRoute from "@/components/ClientRoute";
 import CookieConsent from "@/components/CookieConsent";
 import PublicConcierge from "@/components/PublicConcierge";
 import Home from "./pages/Home";
-import Services from "./pages/Services";
-import Portfolio from "./pages/Portfolio";
-import About from "./pages/About";
-import Contact from "./pages/Contact";
-import Bounty from "./pages/Bounty";
-import Advertise from "./pages/Advertise";
-import Blog from "./pages/Blog";
-import BlogPost from "./pages/BlogPost";
-import PaymentSuccess from "./pages/PaymentSuccess";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import TermsOfService from "./pages/TermsOfService";
-import MedSpa from "./pages/MedSpa";
-import Intake from "./pages/Intake";
-import IntakeSuccess from "./pages/IntakeSuccess";
 import NotFound from "./pages/NotFound";
-import Unsubscribe from "./pages/Unsubscribe";
-import ResetPassword from "./pages/ResetPassword";
-import AdminLogin from "./pages/admin/AdminLogin";
-import AdminLayout from "./pages/admin/AdminLayout";
-import Dashboard from "./pages/admin/Dashboard";
-import BlogManager from "./pages/admin/BlogManager";
-import Inquiries from "./pages/admin/Inquiries";
-import Inbox from "./pages/admin/Inbox";
-import Reviews from "./pages/admin/Reviews";
-import Agreements from "./pages/admin/Agreements";
-import Financials from "./pages/admin/Financials";
-import Clients from "./pages/admin/Clients";
-import ClientDetail from "./pages/admin/ClientDetail";
-import Documents from "./pages/admin/Documents";
-import Media from "./pages/admin/Media";
-import Intakes from "./pages/admin/Intakes";
-import IntakeFormManager from "./pages/admin/IntakeForm";
-import Invoices from "./pages/admin/Invoices";
-import Projects from "./pages/admin/Projects";
-import ReferralProgram from "./pages/admin/ReferralProgram";
-import AddOns from "./pages/admin/AddOns";
-import PortalLayout from "./pages/portal/PortalLayout";
-import PortalReferrals from "./pages/portal/PortalReferrals";
-import PortalAddOns from "./pages/portal/PortalAddOns";
-import PortalOverview from "./pages/portal/PortalOverview";
-import PortalMessages from "./pages/portal/PortalMessages";
-import PortalDocuments from "./pages/portal/PortalDocuments";
-import PortalAgreements from "./pages/portal/PortalAgreements";
-import PortalPayments from "./pages/portal/PortalPayments";
-import PortalPay from "./pages/portal/PortalPay";
-import PortalIntake from "./pages/portal/PortalIntake";
-import PortalProjects from "./pages/portal/PortalProjects";
-import PortalAssets from "@/pages/portal/PortalAssets";
-import PortalTasks from "./pages/portal/PortalTasks";
+
+// Route-level code splitting: only Home (the LCP-critical landing page) and
+// NotFound ship in the entry bundle. Everything else — especially the admin
+// dashboard, client portal, and their Stripe/agreement machinery — loads on
+// navigation. Before this, every public visitor downloaded the whole app
+// (~480 KB gzip) plus Stripe.js just to render the homepage.
+const Services = lazy(() => import("./pages/Services"));
+const Portfolio = lazy(() => import("./pages/Portfolio"));
+const About = lazy(() => import("./pages/About"));
+const Contact = lazy(() => import("./pages/Contact"));
+const Bounty = lazy(() => import("./pages/Bounty"));
+const Advertise = lazy(() => import("./pages/Advertise"));
+const Blog = lazy(() => import("./pages/Blog"));
+const BlogPost = lazy(() => import("./pages/BlogPost"));
+const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const TermsOfService = lazy(() => import("./pages/TermsOfService"));
+const MedSpa = lazy(() => import("./pages/MedSpa"));
+const Intake = lazy(() => import("./pages/Intake"));
+const IntakeSuccess = lazy(() => import("./pages/IntakeSuccess"));
+const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const AdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
+const AdminLayout = lazy(() => import("./pages/admin/AdminLayout"));
+const Dashboard = lazy(() => import("./pages/admin/Dashboard"));
+const BlogManager = lazy(() => import("./pages/admin/BlogManager"));
+const Inquiries = lazy(() => import("./pages/admin/Inquiries"));
+const Inbox = lazy(() => import("./pages/admin/Inbox"));
+const Reviews = lazy(() => import("./pages/admin/Reviews"));
+const Agreements = lazy(() => import("./pages/admin/Agreements"));
+const Financials = lazy(() => import("./pages/admin/Financials"));
+const Clients = lazy(() => import("./pages/admin/Clients"));
+const ClientDetail = lazy(() => import("./pages/admin/ClientDetail"));
+const Documents = lazy(() => import("./pages/admin/Documents"));
+const Media = lazy(() => import("./pages/admin/Media"));
+const Intakes = lazy(() => import("./pages/admin/Intakes"));
+const IntakeFormManager = lazy(() => import("./pages/admin/IntakeForm"));
+const Invoices = lazy(() => import("./pages/admin/Invoices"));
+const Projects = lazy(() => import("./pages/admin/Projects"));
+const ReferralProgram = lazy(() => import("./pages/admin/ReferralProgram"));
+const AddOns = lazy(() => import("./pages/admin/AddOns"));
+const PortalLayout = lazy(() => import("./pages/portal/PortalLayout"));
+const PortalReferrals = lazy(() => import("./pages/portal/PortalReferrals"));
+const PortalAddOns = lazy(() => import("./pages/portal/PortalAddOns"));
+const PortalOverview = lazy(() => import("./pages/portal/PortalOverview"));
+const PortalMessages = lazy(() => import("./pages/portal/PortalMessages"));
+const PortalDocuments = lazy(() => import("./pages/portal/PortalDocuments"));
+const PortalAgreements = lazy(() => import("./pages/portal/PortalAgreements"));
+const PortalPayments = lazy(() => import("./pages/portal/PortalPayments"));
+const PortalPay = lazy(() => import("./pages/portal/PortalPay"));
+const PortalIntake = lazy(() => import("./pages/portal/PortalIntake"));
+const PortalProjects = lazy(() => import("./pages/portal/PortalProjects"));
+const PortalAssets = lazy(() => import("@/pages/portal/PortalAssets"));
+const PortalTasks = lazy(() => import("./pages/portal/PortalTasks"));
 
 const queryClient = new QueryClient();
+
+const RouteFallback = () => (
+  <div className="min-h-screen flex items-center justify-center">
+    <div className="h-8 w-8 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
+  </div>
+);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -75,6 +88,7 @@ const App = () => (
           <PageViewTracker />
           <GlobalBackground />
           <div className="relative z-10">
+          <Suspense fallback={<RouteFallback />}>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/services" element={<Services />} />
@@ -143,6 +157,7 @@ const App = () => (
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </Suspense>
           </div>
           <PublicConcierge />
           <CookieConsent />
