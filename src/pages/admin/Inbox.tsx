@@ -9,7 +9,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Send, Loader2, Inbox as InboxIcon, ChevronDown, ChevronUp } from "lucide-react";
+import { Send, Loader2, Inbox as InboxIcon, ChevronDown, ChevronUp, Sparkles } from "lucide-react";
+import { ToastAction } from "@/components/ui/toast";
 import { format } from "date-fns";
 
 interface ThreadClient {
@@ -180,6 +181,36 @@ const Inbox = () => {
   const [composeSubject, setComposeSubject] = useState("");
   const [composeMessage, setComposeMessage] = useState("");
   const [composeSending, setComposeSending] = useState(false);
+
+  // AI polish for the compose draft — replaces the draft with a brand-voice
+  // rewrite; the toast's Undo restores the original.
+  const [polishing, setPolishing] = useState(false);
+  const handlePolish = async () => {
+    if (!composeMessage.trim()) return;
+    setPolishing(true);
+    const prevSubject = composeSubject;
+    const prevMessage = composeMessage;
+    const { data, error } = await supabase.functions.invoke("polish-email", {
+      body: { subject: composeSubject, message: composeMessage },
+    });
+    setPolishing(false);
+    if (error || !data?.ok) {
+      toast({ title: "Polish failed", description: data?.error || error?.message, variant: "destructive" });
+      return;
+    }
+    setComposeSubject(data.subject);
+    setComposeMessage(data.message);
+    toast({
+      title: "Draft polished ✨",
+      description: "Review it before sending.",
+      action: (
+        <ToastAction altText="Undo" onClick={() => { setComposeSubject(prevSubject); setComposeMessage(prevMessage); }}>
+          Undo
+        </ToastAction>
+      ),
+    });
+  };
+
 
   const openCompose = async () => {
     setComposeOpen(true);
@@ -470,7 +501,19 @@ const Inbox = () => {
               <Input value={composeSubject} onChange={(e) => setComposeSubject(e.target.value)} />
             </div>
             <div>
-              <Label>Message</Label>
+              <div className="flex items-center justify-between">
+                <Label>Message</Label>
+                <button
+                  type="button"
+                  onClick={handlePolish}
+                  disabled={polishing || !composeMessage.trim()}
+                  title="Polish with AI"
+                  className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary/80 disabled:opacity-40 transition-colors"
+                >
+                  {polishing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+                  Polish with AI
+                </button>
+              </div>
               <Textarea rows={6} value={composeMessage} onChange={(e) => setComposeMessage(e.target.value)} />
             </div>
             <Button

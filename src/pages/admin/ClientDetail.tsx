@@ -662,6 +662,35 @@ const ClientDetail = () => {
   const [composeOpen, setComposeOpen] = useState(false);
   const [composeSubject, setComposeSubject] = useState("");
   const [composeMessage, setComposeMessage] = useState("");
+  const [polishingCompose, setPolishingCompose] = useState(false);
+
+  // AI polish for the compose draft — replaces it with a brand-voice rewrite;
+  // the toast's Undo restores the original.
+  const handlePolishCompose = async () => {
+    if (!composeMessage.trim()) return;
+    setPolishingCompose(true);
+    const prevSubject = composeSubject;
+    const prevMessage = composeMessage;
+    const { data, error } = await supabase.functions.invoke("polish-email", {
+      body: { subject: composeSubject, message: composeMessage, recipientName: profile?.first_name || "" },
+    });
+    setPolishingCompose(false);
+    if (error || !data?.ok) {
+      toast({ title: "Polish failed", description: data?.error || error?.message, variant: "destructive" });
+      return;
+    }
+    setComposeSubject(data.subject);
+    setComposeMessage(data.message);
+    toast({
+      title: "Draft polished ✨",
+      description: "Review it before sending.",
+      action: (
+        <ToastAction altText="Undo" onClick={() => { setComposeSubject(prevSubject); setComposeMessage(prevMessage); }}>
+          Undo
+        </ToastAction>
+      ),
+    });
+  };
   const [composeSending, setComposeSending] = useState(false);
 
   const sendComposeEmail = async () => {
@@ -4011,7 +4040,19 @@ const ClientDetail = () => {
               <Input value={composeSubject} onChange={(e) => setComposeSubject(e.target.value)} />
             </div>
             <div>
-              <Label>Message</Label>
+              <div className="flex items-center justify-between">
+                <Label>Message</Label>
+                <button
+                  type="button"
+                  onClick={handlePolishCompose}
+                  disabled={polishingCompose || !composeMessage.trim()}
+                  title="Polish with AI"
+                  className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary/80 disabled:opacity-40 transition-colors"
+                >
+                  {polishingCompose ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+                  Polish with AI
+                </button>
+              </div>
               <Textarea rows={6} value={composeMessage} onChange={(e) => setComposeMessage(e.target.value)} />
             </div>
             <Button
