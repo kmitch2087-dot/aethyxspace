@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { Plus, Pencil, Trash2, RefreshCw } from "lucide-react";
+import { Plus, Pencil, Trash2, RefreshCw, Mail, ExternalLink } from "lucide-react";
 
 interface FinancialRecord {
   id: string;
@@ -51,6 +51,59 @@ const Financials = () => {
   const [openInvoicesTotal, setOpenInvoicesTotal] = useState(0);
   const [openInvoicesCount, setOpenInvoicesCount] = useState(0);
   const [entryTypeFilter, setEntryTypeFilter] = useState<"all" | "income" | "expense">("all");
+
+  const [scanningInbox, setScanningInbox] = useState(false);
+  const [gmailDialogOpen, setGmailDialogOpen] = useState(false);
+  const [consentUrl, setConsentUrl] = useState<string | null>(null);
+  const [authCode, setAuthCode] = useState("");
+  const [connectingGmail, setConnectingGmail] = useState(false);
+
+  // Scan Gmail for subscription receipts (Claude, Canva, ChatGPT, …) and post
+  // them as expenses. First run walks through a one-time Google consent.
+  const handleScanInbox = async () => {
+    setScanningInbox(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("capture-expense-emails", { body: {} });
+      if (error) throw error;
+      if (data?.needsAuth) {
+        setConsentUrl(data.consentUrl || null);
+        setGmailDialogOpen(true);
+        return;
+      }
+      if (!data?.ok) throw new Error(data?.error || "Scan failed");
+      toast({
+        title: "Inbox scan complete",
+        description: data.captured
+          ? `Captured ${data.captured} expense(s) totaling $${Number(data.totalAmount).toFixed(2)} (${data.scanned} new emails examined).`
+          : `No new receipts found (${data.scanned} new emails examined, ${data.alreadyProcessed} already processed).`,
+      });
+      fetchRecords();
+    } catch (e) {
+      toast({ title: "Inbox scan failed", description: e instanceof Error ? e.message : "Unknown error", variant: "destructive" });
+    } finally {
+      setScanningInbox(false);
+    }
+  };
+
+  const handleConnectGmail = async () => {
+    if (!authCode.trim()) return;
+    setConnectingGmail(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("capture-expense-emails", {
+        body: { authCode: authCode.trim() },
+      });
+      if (error) throw error;
+      if (!data?.ok) throw new Error(data?.error || "Connection failed");
+      setGmailDialogOpen(false);
+      setAuthCode("");
+      toast({ title: "Gmail connected", description: "Scanning your inbox for receipts now…" });
+      handleScanInbox();
+    } catch (e) {
+      toast({ title: "Gmail connection failed", description: e instanceof Error ? e.message : "Unknown error", variant: "destructive" });
+    } finally {
+      setConnectingGmail(false);
+    }
+  };
 
   const handleStripeSync = async () => {
     setSyncing(true);
@@ -168,6 +221,10 @@ const Financials = () => {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-display tracking-wider">Financials</h1>
         <div className="flex items-center gap-2">
+          <Button onClick={handleScanInbox} size="sm" variant="outline" disabled={scanningInbox}>
+            <Mail className={`h-4 w-4 mr-1 ${scanningInbox ? "animate-pulse" : ""}`} />
+            {scanningInbox ? "Scanning…" : "Scan Inbox for Receipts"}
+          </Button>
           <Button onClick={handleStripeSync} size="sm" variant="outline" disabled={syncing}>
             <RefreshCw className={`h-4 w-4 mr-1 ${syncing ? "animate-spin" : ""}`} />
             {syncing ? "Syncing…" : "Sync from Stripe"}
@@ -312,6 +369,46 @@ const Financials = () => {
             <div className="flex justify-end gap-3 pt-2">
               <Button variant="outline" onClick={() => setEditorOpen(false)}>Cancel</Button>
               <Button onClick={handleSave}>{editing ? "Update" : "Create"}</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* One-time Gmail consent for receipt capture */}
+      <Dialog open={gmailDialogOpen} onOpenChange={setGmailDialogOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Connect Gmail for receipt capture</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 text-sm">
+            <p className="text-muted-foreground">
+              One-time setup: give the app read-only access to your Gmail so it can find
+              subscription receipts (Claude, Canva, ChatGPT, Proton, Linktree…).
+            </p>
+            <ol className="list-decimal pl-5 space-y-2 text-muted-foreground">
+              <li>
+                {consentUrl ? (
+                  <a href={consentUrl} target="_blank" rel="noopener noreferrer" className="text-primary underline inline-flex items-center gap-1">
+                    Open Google consent <ExternalLink className="h-3 w-3" />
+                  </a>
+                ) : (
+                  "Open the Google consent link"
+                )}{" "}
+                and approve with your kmitch2087 account.
+              </li>
+              <li>You'll land on Google's OAuth Playground — copy the <strong>authorization code</strong> shown there (or the <code>code=</code> value from the address bar).</li>
+              <li>Paste it below.</li>
+            </ol>
+            <Input
+              value={authCode}
+              onChange={(e) => setAuthCode(e.target.value)}
+              placeholder="Paste authorization code (starts with 4/…)"
+            />
+            <div className="flex justify-end gap-3">
+              <Button variant="outline" onClick={() => setGmailDialogOpen(false)}>Cancel</Button>
+              <Button onClick={handleConnectGmail} disabled={!authCode.trim() || connectingGmail}>
+                {connectingGmail ? "Connecting…" : "Connect & Scan"}
+              </Button>
             </div>
           </div>
         </DialogContent>
