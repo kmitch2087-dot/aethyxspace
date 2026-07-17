@@ -15,7 +15,7 @@ const ReferralSignedEmail = ({
   referrerFirstName = 'there',
   referredName = 'your referral',
   firstRewardAmount = '100.00',
-  completionBonusAmount = '150.00',
+  completionBonusAmount = '100.00',
 }: ReferralSignedProps) => (
   <Html lang="en" dir="ltr">
     <Head />
@@ -25,8 +25,7 @@ const ReferralSignedEmail = ({
         <Img src="https://aethyx.space/aethyx-logo.png" width="120" alt="Aethyx" style={logo} />
         <Heading style={h1}>Great news, {referrerFirstName}!</Heading>
         <Text style={text}>
-          {referredName} just signed on with Aethyx — and that means your ${firstRewardAmount} signing reward is on its way. You'll earn another $100 when their project launches, and after 3 signed referrals you're upgraded to 10% commission on every sale.
-          You'll also earn an additional ${completionBonusAmount} once their project goes live.
+          {referredName} just signed on with Aethyx — and that means your ${firstRewardAmount} signing reward is on its way. You'll earn another ${completionBonusAmount} when their project launches, and after 3 signed referrals you're upgraded to 10% commission on every sale.
         </Text>
 
         <Section style={rewardBox}>
@@ -57,7 +56,7 @@ export const template = {
     referrerFirstName: 'Alex',
     referredName: 'Jordan Lee',
     firstRewardAmount: '100.00',
-    completionBonusAmount: '150.00',
+    completionBonusAmount: '100.00',
   },
 } satisfies TemplateEntry
 
