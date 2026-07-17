@@ -78,7 +78,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     // 1. Set up listener FIRST (captures events during getSession)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, newSession) => {
+      (event, newSession) => {
+        // Recovery links can land on any page (historically the homepage, when
+        // the redirect allow-list rejected /reset-password) — the SDK still
+        // consumes the token and signs the user in silently. Route them to the
+        // set-password screen so the flow always completes visibly.
+        if (event === "PASSWORD_RECOVERY" && window.location.pathname !== "/reset-password") {
+          window.location.assign("/reset-password");
+          return;
+        }
         // Don't block the callback — process async
         processSession(newSession);
       }
