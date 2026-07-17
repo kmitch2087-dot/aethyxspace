@@ -8,26 +8,44 @@ interface PortalInviteProps {
   firstName?: string
   actionLink?: string
   portalUrl?: string
+  /** Optional custom paragraphs replacing the default intro copy (e.g. a
+   * personal note on a manual resend). Newlines split into paragraphs. */
+  intro?: string
 }
 
-const PortalInviteEmail = ({ firstName, actionLink, portalUrl }: PortalInviteProps) => (
+const PortalInviteEmail = ({ firstName, actionLink, portalUrl, intro }: PortalInviteProps) => (
   <Html lang="en" dir="ltr">
     <Head />
     <Preview>Your Aethyx client portal is ready</Preview>
     <Body style={main}>
       <Container style={container}>
         <Img src="https://aethyx.space/aethyx-logo.png" width="120" alt="Aethyx" style={logo} />
+        <Section style={expiryNote}>
+          <Text style={expiryText}>
+            ⏳ <strong>Heads-up:</strong> for security, this sign-in link expires 24 hours after
+            it's sent. If it's expired when you click it, the page will let you send yourself a
+            fresh one in two taps.
+          </Text>
+        </Section>
         <Heading style={h1}>
           {firstName ? `Welcome, ${firstName}.` : 'Welcome.'}
         </Heading>
-        <Text style={text}>
-          Your private Aethyx client portal has been created. From here you'll be able to
-          view invoices, documents, agreements, and stay in sync with your project as we
-          build it together.
-        </Text>
-        <Text style={text}>
-          To get in, set your password using the secure link below.
-        </Text>
+        {intro ? (
+          intro.split(/\n\n+/).map((p, i) => (
+            <Text key={i} style={text}>{p}</Text>
+          ))
+        ) : (
+          <>
+            <Text style={text}>
+              Your private Aethyx client portal has been created. From here you'll be able to
+              view invoices, documents, agreements, and stay in sync with your project as we
+              build it together.
+            </Text>
+            <Text style={text}>
+              To get in, set your password using the secure link below.
+            </Text>
+          </>
+        )}
         <Section style={btnWrap}>
           <Button href={actionLink} style={btn}>Set your password</Button>
         </Section>
@@ -53,6 +71,8 @@ export const template = {
   previewData: { firstName: 'Adam', actionLink: 'https://aethyx.space/portal', portalUrl: 'https://aethyx.space/portal' },
 } satisfies TemplateEntry
 
+const expiryNote = { backgroundColor: '#fffbeb', border: '1px solid #f5d47a', borderRadius: '8px', padding: '10px 16px', margin: '0 0 24px' }
+const expiryText = { fontSize: '13px', color: '#7a5c00', lineHeight: '1.6', margin: 0 }
 const main = { backgroundColor: '#ffffff', fontFamily: 'Inter, Arial, sans-serif' }
 const container = { padding: '40px 32px', maxWidth: '560px' }
 const logo = { marginBottom: '20px' }
