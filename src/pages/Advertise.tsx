@@ -244,79 +244,87 @@ const Advertise = () => {
           </p>
 
           {stats ? (
-            <>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-                {statTiles.map((tile) => (
-                  <div
-                    key={tile.label}
-                    className="rounded-2xl border border-border/40 bg-card/40 backdrop-blur-sm p-8 text-center hover:border-primary/50 transition-all"
-                  >
-                    <p className="font-display font-black text-4xl md:text-5xl text-primary mb-3">
-                      <CountUp value={tile.value} />
-                    </p>
-                    <p className="text-muted-foreground text-xs tracking-[0.2em] uppercase">{tile.label}</p>
+            <div className="grid lg:grid-cols-2 gap-6 items-start">
+              {/* MEASURED — automatic first-party tracking */}
+              <div className="rounded-2xl border border-primary/30 bg-card/40 backdrop-blur-sm p-8">
+                <div className="flex items-center gap-2 mb-2">
+                  <BarChart3 className="h-4 w-4 text-primary" />
+                  <span className="text-primary text-[10px] tracking-[0.35em] uppercase font-semibold">Measured · Real Numbers</span>
+                </div>
+                <p className="text-muted-foreground text-xs mb-8">
+                  Counted automatically by this site for every visit — nobody has to do anything.
+                </p>
+                <div className="grid grid-cols-2 gap-4 mb-8">
+                  {statTiles.map((tile) => (
+                    <div
+                      key={tile.label}
+                      className="rounded-xl border border-border/40 bg-card/40 p-5 text-center hover:border-primary/50 transition-all"
+                    >
+                      <p className="font-display font-black text-3xl md:text-4xl text-primary mb-2">
+                        <CountUp value={tile.value} />
+                      </p>
+                      <p className="text-muted-foreground text-[10px] tracking-[0.2em] uppercase">{tile.label}</p>
+                    </div>
+                  ))}
+                </div>
+                <h3 className="font-display text-lg mb-4">Most-visited pages · 30 days</h3>
+                {stats.top_pages.length ? (
+                  <div className="space-y-4">
+                    {stats.top_pages.map((p) => (
+                      <div key={p.path}>
+                        <div className="flex justify-between text-sm mb-1.5">
+                          <span className="text-foreground/80 truncate mr-4">{p.path === "/" ? "Home" : p.path}</span>
+                          <span className="text-muted-foreground shrink-0">{p.views.toLocaleString()}</span>
+                        </div>
+                        <div className="h-1.5 rounded-full bg-muted/40 overflow-hidden">
+                          <div
+                            className="h-full rounded-full bg-primary/70 transition-all duration-700"
+                            style={{ width: `${(p.views / maxPageViews) * 100}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                ) : (
+                  <p className="text-muted-foreground text-sm">Collecting data — check back soon.</p>
+                )}
               </div>
 
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="rounded-2xl border border-border/40 bg-card/40 backdrop-blur-sm p-8">
-                  <div className="flex items-center gap-2 mb-6">
-                    <BarChart3 className="h-4 w-4 text-primary" />
-                    <h3 className="font-display text-xl">Most-visited pages · 30 days</h3>
-                  </div>
-                  {stats.top_pages.length ? (
-                    <div className="space-y-4">
-                      {stats.top_pages.map((p) => (
-                        <div key={p.path}>
-                          <div className="flex justify-between text-sm mb-1.5">
-                            <span className="text-foreground/80 truncate mr-4">{p.path === "/" ? "Home" : p.path}</span>
-                            <span className="text-muted-foreground shrink-0">{p.views.toLocaleString()}</span>
-                          </div>
-                          <div className="h-1.5 rounded-full bg-muted/40 overflow-hidden">
-                            <div
-                              className="h-full rounded-full bg-primary/70 transition-all duration-700"
-                              style={{ width: `${(p.views / maxPageViews) * 100}%` }}
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-muted-foreground text-sm">Collecting data — check back soon.</p>
-                  )}
+              {/* SELF-REPORTED — visitors tell us their social source */}
+              <div className="rounded-2xl border border-sky-400/30 bg-sky-500/[0.04] backdrop-blur-sm p-8">
+                <div className="flex items-center gap-2 mb-2">
+                  <Users className="h-4 w-4 text-sky-300" />
+                  <span className="text-sky-300 text-[10px] tracking-[0.35em] uppercase font-semibold">Self-Reported · Social Sources</span>
                 </div>
-
-                <div className="rounded-2xl border border-border/40 bg-card/40 backdrop-blur-sm p-8">
-                  <div className="flex items-center gap-2 mb-6">
-                    <Users className="h-4 w-4 text-primary" />
-                    <h3 className="font-display text-xl">Where visitors come from · 30 days</h3>
-                  </div>
-                  {stats.sources.length ? (
-                    <div className="space-y-4">
-                      {stats.sources.map((s) => (
-                        <div key={s.source}>
-                          <div className="flex justify-between text-sm mb-1.5">
-                            <span className="text-foreground/80 capitalize">{s.source}</span>
-                            <span className="text-muted-foreground">{s.clicks.toLocaleString()}</span>
-                          </div>
-                          <div className="h-1.5 rounded-full bg-muted/40 overflow-hidden">
-                            <div
-                              className="h-full rounded-full bg-primary/70 transition-all duration-700"
-                              style={{ width: `${(s.clicks / maxSourceClicks) * 100}%` }}
-                            />
-                          </div>
+                <p className="text-muted-foreground text-xs mb-8">
+                  Visitors on the homepage voluntarily tap which social platform brought them here.
+                  Honest answers, but only from people who bother — so treat these as a floor, not a total.
+                </p>
+                <h3 className="font-display text-lg mb-4">Where visitors say they came from · 30 days</h3>
+                {stats.sources.length ? (
+                  <div className="space-y-4">
+                    {stats.sources.map((s) => (
+                      <div key={s.source}>
+                        <div className="flex justify-between text-sm mb-1.5">
+                          <span className="text-foreground/80 capitalize">{s.source}</span>
+                          <span className="text-muted-foreground">{s.clicks.toLocaleString()}</span>
                         </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-muted-foreground text-sm">
-                      Self-reported by visitors on the homepage — collecting data now.
-                    </p>
-                  )}
-                </div>
+                        <div className="h-1.5 rounded-full bg-muted/40 overflow-hidden">
+                          <div
+                            className="h-full rounded-full bg-sky-400/70 transition-all duration-700"
+                            style={{ width: `${(s.clicks / maxSourceClicks) * 100}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground text-sm">
+                    Self-reported by visitors on the homepage — collecting data now.
+                  </p>
+                )}
               </div>
-            </>
+            </div>
           ) : (
             <div className="flex justify-center py-16">
               <Loader2 className="h-6 w-6 animate-spin text-primary" />
