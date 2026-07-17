@@ -112,7 +112,7 @@ const PortalReferrals = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const firstRewardAmount = settings?.first_reward_amount ?? 200;
+  const firstRewardAmount = settings?.first_reward_amount ?? 100;
   const completionBonusAmount = settings?.completion_bonus_amount ?? 150;
   const tierThreshold = settings?.tier_threshold ?? 3;
   const commissionRate = settings?.commission_rate ?? 0.1;

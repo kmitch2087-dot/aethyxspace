@@ -14,7 +14,7 @@ interface ReferralPayoutProps {
 
 const ReferralPayoutEmail = ({
   firstName = 'there',
-  amount = '200.00',
+  amount = '100.00',
   payoutMethod = 'PayPal',
   referredName = 'your referral',
   isCredit = false,
@@ -74,12 +74,12 @@ const ReferralPayoutEmail = ({
 export const template = {
   component: ReferralPayoutEmail,
   subject: (data: Record<string, any>) =>
-    `Your referral payout of $${data.amount ?? '200.00'} has been sent — Aethyx`,
+    `Your referral payout of $${data.amount ?? '100.00'} has been sent — Aethyx`,
   senderType: 'personal',
   displayName: 'Referral payout',
   previewData: {
     firstName: 'Alex',
-    amount: '200.00',
+    amount: '100.00',
     payoutMethod: 'PayPal',
     referredName: 'Jordan Lee',
     isCredit: false,

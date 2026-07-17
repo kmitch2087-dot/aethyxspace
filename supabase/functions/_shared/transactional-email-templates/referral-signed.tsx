@@ -14,7 +14,7 @@ interface ReferralSignedProps {
 const ReferralSignedEmail = ({
   referrerFirstName = 'there',
   referredName = 'your referral',
-  firstRewardAmount = '200.00',
+  firstRewardAmount = '100.00',
   completionBonusAmount = '150.00',
 }: ReferralSignedProps) => (
   <Html lang="en" dir="ltr">
@@ -25,7 +25,7 @@ const ReferralSignedEmail = ({
         <Img src="https://aethyx.space/aethyx-logo.png" width="120" alt="Aethyx" style={logo} />
         <Heading style={h1}>Great news, {referrerFirstName}!</Heading>
         <Text style={text}>
-          {referredName} just signed on with Aethyx — and that means your ${firstRewardAmount} reward is on its way.
+          {referredName} just signed on with Aethyx — and that means your ${firstRewardAmount} signing reward is on its way. You'll earn another $100 when their project launches, and after 3 signed referrals you're upgraded to 10% commission on every sale.
           You'll also earn an additional ${completionBonusAmount} once their project goes live.
         </Text>
 
@@ -50,13 +50,13 @@ const ReferralSignedEmail = ({
 export const template = {
   component: ReferralSignedEmail,
   subject: (data: Record<string, any>) =>
-    `Your referral signed — $${data.firstRewardAmount ?? '200.00'} is on its way!`,
+    `Your referral signed — $${data.firstRewardAmount ?? '100.00'} is on its way!`,
   senderType: 'personal',
   displayName: 'Referral signed',
   previewData: {
     referrerFirstName: 'Alex',
     referredName: 'Jordan Lee',
-    firstRewardAmount: '200.00',
+    firstRewardAmount: '100.00',
     completionBonusAmount: '150.00',
   },
 } satisfies TemplateEntry
