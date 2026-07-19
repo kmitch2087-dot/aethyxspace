@@ -131,6 +131,13 @@ const Home = () => {
             Woman Owned • RI-based • Serving The Entire USA
           </p>
 
+          <p className="text-foreground/50 text-sm mt-6">
+            Need it fast and fixed-price?{" "}
+            <Link to="/launch" className="text-primary underline hover:text-primary/80">
+              Launch-ready sites from $749 — live in 7 days →
+            </Link>
+          </p>
+
           {/* Traffic source buttons */}
           {sourceReported ? (
             <div className="mt-10 max-w-md mx-auto rounded-2xl border border-primary/30 bg-primary/5 px-6 py-5">

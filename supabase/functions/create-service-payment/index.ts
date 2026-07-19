@@ -3,8 +3,8 @@ import Stripe from "https://esm.sh/stripe@18.5.0";
 
 // Allowed origins for CORS
 const allowedOrigins = [
-  "https://vibeshiftstudio.lovable.app",
-  "https://id-preview--9d25c426-f64e-4f23-85cf-2cebfabb0756.lovable.app",
+  "https://aethyx.space",
+  "https://www.aethyx.space",
   "http://localhost:8080",
   "http://localhost:5173",
 ];
@@ -60,6 +60,11 @@ const VALID_PRICE_IDS = [
   "price_1SwpdzCEyzqaryb8fBB1OGte", // PWA - Standalone $900
   // Subscriptions
   "price_1SwQQECEyzqaryb8F6NdVpEd", // Site Maintenance - $100/mo
+  // /launch offer packages (2026-07-18)
+  "price_1Tui8RCEyzqaryb8UeFDNbLX", // Launch-Ready Site — 50% Deposit $374.50
+  "price_1Tui8SCEyzqaryb8UCrbrMUZ", // Get Found Locally - $199
+  "price_1Tui8SCEyzqaryb8uuXmTBZm", // Care Plan - $99/mo (subscription)
+  "price_1Tui8SCEyzqaryb8REiA9V9l", // Live Checkout Test - $1 (verification)
 ];
 
 serve(async (req) => {
@@ -79,7 +84,9 @@ serve(async (req) => {
   }
 
   try {
-    const { email, name, priceId, serviceName, isSubscription } = await req.json();
+    const { email, name, priceId, serviceName, isSubscription, cancelPath } = await req.json();
+    // Only same-origin absolute paths may override the cancel destination.
+    const safeCancelPath = typeof cancelPath === "string" && /^\/[a-z0-9\-\/]*$/i.test(cancelPath) ? cancelPath : "/services";
 
     // Input validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -134,7 +141,7 @@ serve(async (req) => {
       ],
       mode: isSubscription ? "subscription" : "payment",
       success_url: `${req.headers.get("origin")}/payment-success`,
-      cancel_url: `${req.headers.get("origin")}/services`,
+      cancel_url: `${req.headers.get("origin")}${safeCancelPath}`,
       metadata: {
         type: "service",
         serviceName: sanitizedServiceName,

@@ -128,6 +128,13 @@ const ROUTES = [
       "Put your brand in front of founders and business owners. Live, transparent first-party traffic stats and premium ad placements on aethyx.space.",
   },
   {
+    path: "/launch",
+    og: "services",
+    title: "Launch-Ready Websites — Live in 7 Days, Fixed Price | Aethyx",
+    description:
+      "A custom website live in 7 days — fixed price, fixed timeline, no agency runaround. Launch-ready sites from $749, local SEO setup, and monthly care plans.",
+  },
+  {
     path: "/barter",
     og: "advertise",
     title: "Barter for Ad Space — Trade With Aethyx",

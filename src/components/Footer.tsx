@@ -41,6 +41,7 @@ const Footer = () => (
     <nav aria-label="Footer" className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-muted-foreground">
       <Link to="/" className="hover:text-primary transition-colors">Home</Link>
       <Link to="/services" className="hover:text-primary transition-colors">Services</Link>
+      <Link to="/launch" className="hover:text-primary transition-colors">Launch in 7 Days</Link>
       <Link to="/portfolio" className="hover:text-primary transition-colors">Portfolio</Link>
       <Link to="/about" className="hover:text-primary transition-colors">About</Link>
       <Link to="/blog" className="hover:text-primary transition-colors">Blog</Link>
