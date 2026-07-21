@@ -31,6 +31,7 @@ import { template as bountyApproved } from './bounty-approved.tsx'
 import { template as adminCompose } from './admin-compose.tsx'
 import { template as consultationScheduled } from './consultation-scheduled.tsx'
 import { template as offerLeadNotification } from './offer-lead-notification.tsx'
+import { template as agreementDirect } from './agreement-direct.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'inquiry-notification': inquiryNotification,
@@ -53,4 +54,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'admin-compose': adminCompose,
   'consultation-scheduled': consultationScheduled,
   'offer-lead-notification': offerLeadNotification,
+  'agreement-direct': agreementDirect,
 }

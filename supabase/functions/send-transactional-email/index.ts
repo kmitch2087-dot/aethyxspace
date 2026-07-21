@@ -28,12 +28,14 @@ Deno.serve(async (req) => {
   let recipientEmail: string
   let templateData: Record<string, any> = {}
   let metadata: Record<string, any> | null = null
+  let storageAttachments: Array<{ bucket: string; path: string; filename?: string }> = []
   try {
     const body = await req.json()
     templateName = body.templateName || body.template_name
     recipientEmail = body.recipientEmail || body.recipient_email
     if (body.templateData && typeof body.templateData === 'object') templateData = body.templateData
     if (body.metadata && typeof body.metadata === 'object') metadata = body.metadata
+    if (Array.isArray(body.storageAttachments)) storageAttachments = body.storageAttachments
   } catch {
     return new Response(JSON.stringify({ error: 'Invalid JSON' }), {
       status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -91,13 +93,36 @@ Deno.serve(async (req) => {
   const text = await renderAsync(React.createElement(template.component, templateData), { plainText: true })
   const subject = typeof template.subject === 'function' ? template.subject(templateData) : template.subject
 
+  // Pull optional attachments out of Supabase Storage and base64 them for Resend.
+  const attachments: Array<{ filename: string; content: string }> = []
+  for (const att of storageAttachments) {
+    if (!att?.bucket || !att?.path) continue
+    const { data: file, error: dlError } = await supabase.storage.from(att.bucket).download(att.path)
+    if (dlError || !file) {
+      return new Response(JSON.stringify({ error: `Attachment download failed: ${att.bucket}/${att.path}`, detail: dlError?.message }), {
+        status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+    const bytes = new Uint8Array(await file.arrayBuffer())
+    let binary = ''
+    const chunk = 0x8000
+    for (let i = 0; i < bytes.length; i += chunk) {
+      binary += String.fromCharCode(...bytes.subarray(i, i + chunk))
+    }
+    attachments.push({ filename: att.filename || att.path.split('/').pop() || 'attachment', content: btoa(binary) })
+  }
+
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${resendApiKey}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ from: template.senderType === 'brand' ? FROM_BRAND : FROM_PERSONAL, to: [to], subject, html, text }),
+    body: JSON.stringify({
+      from: template.senderType === 'brand' ? FROM_BRAND : FROM_PERSONAL,
+      to: [to], subject, html, text,
+      ...(attachments.length > 0 ? { attachments } : {}),
+    }),
   })
 
   const resBody = await res.json()
