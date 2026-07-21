@@ -24,8 +24,6 @@ interface AgreementDirectProps {
   terms?: string[]
   /** Why the ID upload step is back (shown under step 2). */
   idResetNote?: string
-  /** Example booking apps for the client's industry. */
-  bookingApps?: string
 }
 
 const AgreementDirectEmail = ({
@@ -46,7 +44,6 @@ const AgreementDirectEmail = ({
   timelineText,
   terms = [],
   idResetNote,
-  bookingApps = 'Booksy, Squire, The Cut, or something else',
 }: AgreementDirectProps) => (
   <Html lang="en" dir="ltr">
     <Head />
@@ -181,11 +178,16 @@ const AgreementDirectEmail = ({
         </Section>
 
         <Section style={step}>
-          <Text style={stepTitle}>✓&nbsp;&nbsp;Your booking platform — tell me what you use</Text>
+          <Text style={stepTitle}>✓&nbsp;&nbsp;Booksy — add me as a staff member</Text>
           <Text style={stepText}>
-            {bookingApps} — just <strong>reply to this email with the name of the app</strong> your
-            clients book through. I'll send you the two clicks needed to add me, so we can track
-            which ads actually turn into appointments.
+            Log in at <Link href="https://booksy.com/biz" style={link}>booksy.com/biz</Link> (or open
+            the Booksy Biz app) → <strong>Staff members</strong> → <strong>Add staff member</strong> →
+            enter <strong>{accessEmail}</strong>. That lets me see which ads actually turn into
+            booked appointments.
+          </Text>
+          <Text style={hint}>
+            Use anything else alongside Booksy — an Instagram booking link, Square, a website form?
+            Just reply and tell me what, and I'll handle the rest.
           </Text>
         </Section>
 
