@@ -138,8 +138,17 @@ const AgreementDirectEmail = ({
         <Text style={small}>
           You can knock these out any time — before or right after signing. Each one takes about
           two minutes, and I've listed exactly where to click.
-          {accessEmail && <> Grant everything to <strong>{accessEmail}</strong>.</>}
         </Text>
+        {accessEmail && (
+          <Section style={accessBox}>
+            <Text style={accessBoxLabel}>Add me with this exact email, everywhere below:</Text>
+            <Text style={accessBoxEmail}>{accessEmail}</Text>
+            <Text style={accessBoxNote}>
+              (That's my Google account for managing your ads — different from the address this
+              email came from, so double-check you're typing this one.)
+            </Text>
+          </Section>
+        )}
 
         <Section style={step}>
           <Text style={stepTitle}>✓&nbsp;&nbsp;Google Ads account — add me as admin</Text>
@@ -265,6 +274,10 @@ const termText = { fontSize: '13px', color: '#6b6c78', lineHeight: '1.6', margin
 const invoiceCard = { border: '1px solid #dcdde3', borderRadius: '10px', padding: '22px 24px', margin: '0 0 10px', textAlign: 'center' as const }
 const amountText = { fontSize: '30px', fontWeight: 600, color: '#0a0a14', margin: '0 0 4px' }
 const invMeta = { fontSize: '13px', color: '#8a8b96', margin: 0 }
+const accessBox = { backgroundColor: '#f0fdfb', border: '2px solid #00E6D8', borderRadius: '10px', padding: '14px 18px', margin: '0 0 18px', textAlign: 'center' as const }
+const accessBoxLabel = { fontSize: '12px', fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '0.06em', color: '#0d7d74', margin: '0 0 4px' }
+const accessBoxEmail = { fontSize: '19px', fontWeight: 700, color: '#0a0a14', margin: '0 0 6px', fontFamily: 'Menlo, Consolas, monospace' }
+const accessBoxNote = { fontSize: '12px', color: '#6b6c78', lineHeight: '1.5', margin: 0 }
 const helpNote = { backgroundColor: '#fffbeb', border: '1px solid #f5d47a', borderRadius: '8px', padding: '10px 16px', margin: '8px 0 24px' }
 const helpText = { fontSize: '13px', color: '#7a5c00', lineHeight: '1.6', margin: 0 }
 const signature = { margin: '18px 0 0' }
